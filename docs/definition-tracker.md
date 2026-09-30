@@ -23,8 +23,8 @@ adversarial quedó cerrada para la definición: `REV-2026-105` y `110` `accepted
 Decidido el 2026-09-30: el piloto es un IDP con Backstage (catálogo + TechDocs,
 repositorio nuevo) y el flujo de construcción por feature con ocho skills
 ([workflow-construccion.md](workflow-construccion.md), v4, diseñado en pareja con
-Astra en cuatro rondas). Siguientes pasos de S12: acordar los experimentos y
-métricas del v0 (propuesta E1-E5); redactar las ocho skills en `skills/`;
+Astra en cuatro rondas). Experimentos y métricas del v0 (E1-E5)
+aceptados el 2026-09-30. Siguientes pasos de S12: redactar las ocho skills en `skills/`;
 ordenar backlog y roadmap (incluidas las tres tareas de migración del bootstrap:
 ledger, aprobación `local`, Beads); y decidir explícitamente si se autoriza la
 construcción. La construcción continúa sin autorización hasta el cierre de S12.
