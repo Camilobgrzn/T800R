@@ -1,0 +1,197 @@
+# Anotación de revisión
+
+- ID de anotación: `REV-2026-077`
+- Unidad y ubicación: `ADR-004` — [«Por qué la decisión (qué dice la industria)»](../adr/ADR-004-contrato-portable-de-handoffs.md#por-qué-la-decisión-qué-dice-la-industria)
+  (l. 52-59), [«Alternativas evaluadas»](../adr/ADR-004-contrato-portable-de-handoffs.md#alternativas-evaluadas)
+  (l. 37-42) y [«Por qué descartamos las otras»](../adr/ADR-004-contrato-portable-de-handoffs.md#por-qué-descartamos-las-otras)
+  (l. 46-47), frente a las URL de «Referencias» (l. 131-133, bloque `B040`) y a
+  [S05](../definition/session-05-handoffs.md) (sin fuentes externas). Bloque `B038`.
+- Revisión examinada: estado de los archivos al 2026-09-25 (repositorio sin
+  commits; ADR-004 fechado 2026-09-16). Citas distintivas: «Las prácticas
+  revisadas de OpenAI y Anthropic para harnesses de agentes enfatizan progreso
+  persistente, estado verificable, contexto explícito y recuperación entre
+  ventanas de ejecución» (l. 54-56); «Esas prácticas no definen `handoff/v1`»
+  (l. 56); «los contratos del proveedor no constituyen una fuente durable ni
+  portable» (l. 46-47).
+- Tipo: `incompleto`
+- Gravedad: `media`
+- Estado: `deferred`
+- Confianza: `alta` sobre lo que dicen las fuentes leídas; `media` sobre el
+  impacto (no se comprobó qué proveedores de T800R hablan A2A ni se leyó S08)
+- Impacto: la justificación externa de la decisión de crear un contrato propio
+  en lugar de adoptar o mapear un protocolo interoperable existente, y el
+  trabajo de portabilidad de adapters (S08/ADR-007). No cambia ningún acuerdo
+  por sí misma.
+
+## Clasificación de evidencia
+
+- Clase: `hallazgo fundamentado`.
+- Fuente primaria (fichas; consulta 2026-09-25):
+  1. Anthropic, «Effective harnesses for long-running agents», publicado el
+     2025-11-26, <https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents>.
+     Extractos: «The key insight here was finding a way for agents to quickly
+     understand the state of work when starting with a fresh context window,
+     which is accomplished with the claude-progress.txt file alongside the git
+     history»; «Only mark features as 'passing' after careful testing»; «We
+     refer to these as separate agents in this context only because they have
+     different initial user prompts. The system prompt, set of tools, and overall
+     agent harness was otherwise identical»; «it's still unclear whether a single,
+     general-purpose coding agent performs best across contexts, or if better
+     performance can be achieved through a multi-agent architecture». Paráfrasis
+     fiel del resultado de la lectura: no trata contratos de handoff tipados,
+     aceptación, ownership ni idempotencia entre agentes. Fuerza `alta`;
+     **confirma** «progreso persistente», «estado verificable» y «recuperación
+     entre ventanas» para un mismo harness.
+  2. Anthropic, «Effective context engineering for AI agents», publicado el
+     2025-09-29, <https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents>.
+     Extractos: «agents built with the 'just in time' approach maintain
+     lightweight identifiers (file paths, stored queries, web links, etc.)»;
+     «Structured note-taking, or agentic memory, is a technique where the agent
+     regularly writes notes persisted to memory outside of the context window»;
+     sobre subagentes: «returns only a condensed, distilled summary of its work
+     (often 1,000-2,000 tokens)». Paráfrasis fiel: no trata aceptación frente a
+     entrega, ownership ni contrato tipado de transferencia. Fuerza `alta`;
+     **confirma** «contexto explícito» y respalda referenciar en vez de copiar
+     (ADR l. 26-27).
+  3. OpenAI, «Harness engineering», <https://openai.com/index/harness-engineering/>:
+     **no consultada** (HTTP 403 en `B011`/`B017`; indicación de no insistir).
+     `B011` confirmó con fuerza `media` otras prácticas (AGENTS.md como índice,
+     linters, «doc-gardening»), no la recuperación entre ventanas.
+  4. OpenAI Agents SDK (Python), «Handoffs»,
+     <https://openai.github.io/openai-agents-python/handoffs/>, sin versión ni
+     fecha visibles. Extractos: «Handoffs allow an agent to delegate tasks to
+     another agent»; por defecto el receptor «takes over the conversation, and
+     gets to see the entire previous conversation history»; `input_filter`
+     permite modificar ese historial. Fuerza `alta`; pertinencia: es la
+     primitiva de OpenAI llamada «handoff» y corresponde a la alternativa 1 del
+     ADR (l. 39). El ADR no la cita.
+  5. A2A Protocol, «Specification», <https://a2a-protocol.org/latest/specification/>,
+     «Latest Released Version `1.0.0`». Extractos: §1 objetivo de comunicación
+     «between independent, potentially opaque AI agent systems»; §4.1.3
+     `TaskState`: `SUBMITTED`, `WORKING`, `INPUT_REQUIRED`, `AUTH_REQUIRED`,
+     `COMPLETED`, `FAILED`, `CANCELED`, `REJECTED` (terminales: completed,
+     failed, canceled, rejected); §4.1.1 id de tarea «generated by the server»;
+     §3.4.1 `contextId` agrupa tareas y mensajes relacionados; §3.3.1 «Agents
+     may utilize the messageId to detect duplicate messages». Y «Life of a
+     Task», <https://a2a-protocol.org/latest/topics/life-of-a-task/>: «Once a
+     task reaches a terminal state (completed, canceled, rejected, or failed), it
+     cannot restart»; el refinamiento crea otra tarea con el mismo `contextId` y
+     `referenceTaskIds`. Fuerza `alta`.
+  6. Versiones de A2A: <https://github.com/a2aproject/A2A/releases>: «1.0.0
+     (2026-03-12)»; v0.3.0 (2025-07-30). Fuerza `alta`; pertinencia: el
+     estándar existía en versión 1.0 seis meses antes de la fecha del ADR.
+     Localizado mediante búsqueda web (gobernanza de la Linux Foundation según
+     resultados secundarios, no comprobada en fuente primaria).
+- Sección o localizador: interno, ADR-004 l. 8, 22-27, 37-42, 46-50, 54-59;
+  S05 l. 7-10 (objetivo) y l. 44-56 (alternativas y filas `rejected`); externo,
+  ver fichas.
+- Fecha de consulta/publicación: consulta 2026-09-25; publicaciones en cada
+  ficha.
+- Hecho observado:
+  1. **Las paráfrasis sobre Anthropic son fieles, pero describen la
+     continuidad de un mismo harness entre ventanas de contexto.** Las fichas 1
+     y 2 confirman progreso persistente, estado verificable, contexto explícito
+     y recuperación. La ficha 1 aclara que sus «agentes» comparten harness y
+     difieren sólo en el prompt inicial, y deja abierta la conveniencia del
+     multiagente. El problema que el ADR declara (l. 8, 22) es transferir
+     trabajo entre actores, sesiones y proveedores distintos sin confundir
+     entrega con aceptación; ninguna de las dos fuentes lo trata. El propio ADR
+     lo reconoce en parte (l. 56, «no definen `handoff/v1`»), pero la sección no
+     cita nada que respalde el núcleo: contrato común frente a contratos por
+     intención, aceptación distinta de entrega, idempotencia o transferencia de
+     ownership. Es el patrón de `REV-2026-068` (base que respalda prácticas
+     periféricas).
+  2. **La sección no considera los artefactos del sector que tratan
+     específicamente la transferencia entre agentes.** La primitiva «handoff»
+     de OpenAI (ficha 4) cede la conversación con todo su historial por
+     defecto: es una práctica real de la alternativa 1 (l. 39), que el ADR
+     descarta sin nombrarla. A2A (fichas 5-6) es un protocolo abierto para
+     interoperar agentes de distintos sistemas, publicado en 1.0.0 el
+     2026-03-12, con lifecycle de tareas, estados terminales que no se
+     reinician, seguimiento mediante una tarea nueva que referencia la anterior
+     y deduplicación por `messageId`: la misma familia de reglas que S05 l. 60,
+     77-78 y ADR l. 9 adoptan como propias. «A2A» no aparece en `docs/` ni en
+     `ideas/` (búsqueda).
+  3. **La tabla de alternativas no incluye «adoptar o mapear un protocolo
+     interoperable existente».** Las cuatro filas (l. 39-42) son coordinación
+     conversacional o del proveedor, sólo ownership, contratos por intención y
+     el contrato común. l. 46-47 descarta «los contratos del proveedor» por no
+     ser durables ni portables, lo que no alcanza a un estándar abierto y
+     multiproveedor. S05 tampoco lo evalúa (l. 44-48, 55-56).
+  4. **«Prácticas revisadas» no tiene registro de revisión.** S05 no cita
+     fuentes ni enlaza investigación, y no existe investigación sobre handoffs
+     en `docs/` (`B019`); ADR-004 es el único lugar con base externa. Ya
+     cubierto en lo esencial por `REV-2026-005`; aquí sólo se enlaza.
+- Inferencia (si aplica): la justificación externa respalda prácticas de
+  continuidad que cualquier diseño con artefactos persistentes cumpliría, y
+  omite los dos referentes del sector más próximos a la decisión: uno que
+  ilustra la alternativa descartada y otro que es un estándar portable con
+  semántica solapada. Sin evaluarlos, el ADR no muestra por qué un contrato
+  propio es preferible a mapearse a A2A o a declararlo como destino de
+  traducción de adapters.
+
+## Observación y propuesta
+
+- Observación: la decisión de un contrato propio puede ser correcta: A2A no
+  modela ownership único, operación atómica con el tracker, `expired` ni
+  `superseded`, y genera el id de tarea en el servidor, no en el emisor. Pero
+  esa comparación no consta, y «qué dice la industria» se apoya en fuentes que
+  no tratan la transferencia entre actores.
+- Propuesta concreta: que la persona decida (a) si ADR-004 debe añadir una
+  alternativa «adoptar o mapear un protocolo interoperable existente (A2A)» con
+  resultado y justificación y, en su caso, una fila `rejected` o `deferred` en
+  S05; (b) si «Por qué la decisión» debe acotarse a lo que confirman las
+  fuentes (continuidad del mismo harness y referencias ligeras) y nombrar la
+  primitiva de OpenAI como ejemplo de la alternativa 1; y (c) si la relación
+  entre `handoff/v1` y A2A (mapa de estados, identidad, deduplicación) es
+  pregunta de S08/ADR-007 o de S12. No editar ADR-004 ni S05 sin esa decisión.
+- Contraargumento o coste/riesgo: A2A está pensado para agentes remotos y
+  opacos sobre HTTP, mientras T800R coordina agentes de codificación en un
+  repositorio con tracker; no se comprobó que Codex, Claude Code u OpenCode lo
+  expongan; l. 58-59 ya dice que T800R no adopta automáticamente formatos
+  externos; y un ADR no está obligado a revisar todos los estándares. El coste
+  de corregirlo es una fila y unas frases; el de no hacerlo es descubrir el
+  solapamiento durante la construcción de adapters.
+
+## Análisis adicional
+
+- Evidencia interna: ADR-004 l. 8, 22-27, 37-50, 54-59; S05 l. 7-10, 44-56;
+  `B019` (sin fuentes ni investigación sobre handoffs); búsqueda de
+  «A2A|Agent2Agent|agent-to-agent|Agents SDK» en el repositorio (sólo
+  `ideas/MULTI_AGENT_HARNESS_ARCHITECTURE.md` l. 385, «Protocolo estructurado
+  agent-to-agent», propio, y `research-orchestrator-responsibilities.md` l. 31,
+  70, sobre el Agents SDK para orquestación, no para contrato).
+- Contraevidencia y límites: las fichas 1, 2, 4 y 5 se leyeron con una
+  herramienta que resume; se conservan las citas literales devueltas y se marcan
+  las paráfrasis. No se leyó «Harness engineering» (OpenAI). No se leyó S08 ni
+  ADR-007, que podrían tratar protocolos de interoperabilidad con otro nombre
+  (la búsqueda de «A2A» no lo encontró). La fecha 1.0.0 procede de la página de
+  versiones del repositorio; versiones previas (v0.2-0.3, 2025) también
+  anteceden al ADR. No se afirma que T800R deba adoptar A2A.
+- Pregunta para resolver: ¿debe ADR-004 registrar como alternativa evaluada un
+  protocolo interoperable existente como A2A 1.0 —y con qué resultado—, y debe
+  «Por qué la decisión» limitarse a lo que sus fuentes confirman?
+
+## Resolución humana
+
+- Decisión y justificación: `deferred`. Cerrada en bloque el 2026-09-30 por la decisión «Perfil MVP mínimo» de S12: el área afectada pasa al backlog de arquitectura objetivo ([backlog-ideas.md](../backlog-ideas.md)) y la anotación se retomará cuando el uso del MVP muestre el problema o el área salga del backlog. La evidencia y la propuesta se conservan sin cambios.
+- Responsable y fecha: la persona (Camilo Barreto), 2026-09-30.
+- Enlace al cambio canónico o ADR: [S12 «Decisiones»](../definition/session-12-validation-convergence.md#decisiones), fila «Perfil MVP mínimo»; [backlog-ideas.md](../backlog-ideas.md).
+- Enlaces relacionados: [B038](blocks/B038.md), [B019](blocks/B019.md),
+  [B011](blocks/B011.md),
+  [`REV-2026-005`](2026-09-21-REV-2026-005-revision-transversal-sin-rastro-s05-s07.md),
+  [`REV-2026-068`](2026-09-25-REV-2026-068-base-de-adr-002-respalda-practicas-perifericas-omite-la-investigacion-de-fuentes-y-su-limite-sin-jerarquia-universal.md),
+  [`REV-2026-072`](2026-09-25-REV-2026-072-contexto-de-adr-003-atribuye-a-microsoft-una-advertencia-sobre-coste-multiagente-que-la-investigacion-y-la-fuente-citada-no-contienen.md),
+  [`REV-2026-067`](2026-09-25-REV-2026-067-alternativas-de-adr-002-sin-estado-sin-fila-en-s03-y-disjuntas-de-las-opciones-descartadas-en-las-justificaciones-de-s03.md),
+  cruces `CT03` y `CT07`.
+
+## Preguntas pendientes
+
+Ver el checkpoint [B038](blocks/B038.md).
+
+## Cobertura y límites
+
+Ver el checkpoint [B038](blocks/B038.md). Fuentes externas efectivamente
+consultadas: las dos páginas de Anthropic, la página «Handoffs» del Agents SDK
+de OpenAI (Python), la especificación de A2A, «Life of a Task» y la página de
+versiones de `a2aproject/A2A`.
