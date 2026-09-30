@@ -51,9 +51,10 @@ desechable, entorno) y qué decisión desbloquea. La rama se descarta.
    entorno; «no ejecutado: motivo» para lo que no pudiste probar.
 4. **Responde** la pregunta en una o dos frases, con el grado de confianza y
    los límites (qué no se probó). Si la respuesta es «depende», di de qué.
-5. **Descarta** la rama (`git branch -D spike/<id>` tras anotar su último SHA en
-   el archivo; el SHA permite recuperarla del reflog un tiempo si hiciera falta,
-   pero no es una entrega).
+5. **Descarta** la rama tras anotar su último SHA en el archivo: si usaste
+   worktree, primero `git worktree remove <ruta>`; después `git branch -D
+   spike/<id>`. El SHA permite recuperarla del reflog un tiempo si hiciera
+   falta, pero no es una entrega.
 6. **Entrega**: ruta de `spikes/<id>.md`, respuesta, decisión que desbloquea y
    a qué skill vuelve el flujo (`/feature-spec`, `/feature-plan` o la sesión de
    definición).

@@ -11,9 +11,15 @@ incoherente con `evidence/`, la elegibilidad no puede determinarse y se rechaza.
 
 Formato: `<fecha ISO> | <tarea> | <actor_id> | <proveedor/sesión> | <rol> | <evento> | <nota>`
 
-Roles: worker, owner, verifier, orchestrator.
-Eventos: assigned, transferred, started, delivered, verdict, handoff_accepted,
-handoff_rejected, invalidated.
+Roles: worker, owner, verifier, integrador, orchestrator.
+Eventos:
+- assigned, transferred, started, delivered (worker/owner)
+- verdict, ineligible (verifier; `ineligible` lo registra el orchestrator cuando
+  un candidato a verifier no pudo verificar, sin que se escriba veredicto)
+- handoff_emitted, handoff_accepted, handoff_rejected
+- invalidated (tras una replanificación: la evidencia previa de la tarea deja de
+  valer)
+- integrated (cierre de la feature tras el merge)
 
 <!-- sin eventos -->
 ```

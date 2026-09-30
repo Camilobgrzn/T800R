@@ -1,8 +1,9 @@
 # Plantilla de `features/<id>/evidence/<task>.md`
 
 Append-only. Lo escribe **sólo el worker de la tarea**. Una entrada por ronda;
-nunca se edita una entrada anterior. El orchestrator puede añadir al final una
-línea `INVALIDADA: <motivo>` tras una replanificación; nada más.
+nunca se edita una entrada anterior. Nadie más escribe aquí: una invalidación
+tras replanificar se registra como evento `invalidated` en `participations.md`
+(orchestrator), no en este archivo.
 
 ```markdown
 # Evidencia: <id> / T<n>

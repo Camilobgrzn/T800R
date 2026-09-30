@@ -173,7 +173,9 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
   - **laguna de intención** → tarea `blocked` (`intent gap`), consulta a la
     persona; el intento se guarda como parche;
   - **defecto de spec** → vuelve a `/feature-spec`; el planner identifica las
-    tareas afectadas, **invalida su evidencia** y las independientes continúan;
+    tareas afectadas, el orchestrator registra `invalidated` en
+    `participations.md` para cada una (eso **invalida su evidencia** sin que
+    nadie edite `evidence/`) y las independientes continúan;
   - **corrección local** → se hace y se anota;
   - **hallazgo ajeno** → `findings.md`, sin tocar archivos fuera del alcance.
 - Límite de **tres rondas** por tarea (build+verify); al agotarlas, cambiar

@@ -29,39 +29,51 @@ verifier o integrador).
 
 ## Precondiciones mecánicas
 
-1. Rama de la tarea activa (`feat/<id>/T<n>` o `feat/<id>/integrate`).
+1. Rama activa: `feat/<id>/T<n>` (worker) o `feat/<id>/integrate`
+   (integrador). Un verifier que cierra a medias no hace handoff de la rama:
+   deja su `.verdict.md` sin veredicto final y usa esta skill sólo para el
+   `handoff.md`, sin commit `wip:` de trabajo ajeno.
 2. Tras el commit `wip:`, `git status --porcelain` vacío.
-3. `tasks.md` y `participations.md` legibles; la tarea tiene owner en
-   `tasks.md` y ese owner es tu `actor_id` (si no, no es tu handoff).
-4. `evidence/<task>.md` tiene al menos la entrada de la ronda en curso.
+3. `tasks.md` y `participations.md` legibles. Si eres worker, la tarea tiene tu
+   `actor_id` como owner en `tasks.md` (si no, no es tu handoff). Verifier e
+   integrador no necesitan ser owner.
+4. Si eres worker, `evidence/<task>.md` tiene al menos la entrada de la ronda en
+   curso.
 
 ## Procedimiento
 
-1. **Commit de cierre.** `git add -A` limitado a los archivos permitidos de la
-   tarea más `features/<id>/`; `git commit -m "wip: T<n> <estado en cinco
-   palabras>"`. Si hay archivos fuera de los permitidos modificados, no los
-   incluyas: anótalos en «Pendiente» como hallazgo y déjalos fuera del commit
-   sólo si son tuyos por error; si son de otra tarea, es una escritura indebida
-   y debe constar.
-2. **Toma los SHA.** `git rev-parse HEAD` (último commit), SHA base de la rama
-   (del brief), `git hash-object features/<id>/tasks.md` y `git hash-object
-   features/<id>/participations.md`.
-3. **Escribe `handoff.md`** con la plantilla. En «Validación», cada comando
-   declarado con resultado o «no ejecutada: motivo»; nunca «pendiente» a secas.
-   En «Pendiente», la **próxima acción concreta** (un verbo y un objeto), no una
-   lista de deseos. En «Contexto», sólo decisiones tomadas durante la sesión
-   que no estén ya en spec, plan o evidencia, con su fuente.
-4. **Añade la entrada a la evidencia**: una línea en `evidence/<task>.md`
-   («handoff emitido, sha …») y commit.
-5. **Pide al orchestrator** la línea `handoff_emitted` (o `transferred` si hay
-   receptor designado) en `participations.md`. Tú no la escribes.
-6. **Retorno breve**: ruta del handoff, SHA, próxima acción, y si el receptor
-   debe ser un `actor_id` concreto (p. ej. para verificar, uno distinto del
-   worker).
+1. **Commit del trabajo.** `git add -- <archivos permitidos de la tarea>
+   features/<id>/` (nunca `-A`); `git commit -m "wip: T<n> <estado en cinco
+   palabras>"`. Si hay archivos modificados fuera de los permitidos: si son
+   tuyos por error, restáuralos con `git checkout -- <ruta>` y repórtalo en
+   «Pendiente»; si no sabes de dónde vienen, **no los toques, no emitas handoff
+   y escala** (árbol sucio de origen desconocido = posible escritura indebida).
+2. **Toma los SHA del trabajo.** `git rev-parse HEAD` es el **SHA del trabajo**
+   (`<sha-trabajo>`); además el SHA base de la rama (del brief),
+   `git hash-object features/<id>/tasks.md` y `… participations.md`.
+3. **Escribe `handoff.md`** con la plantilla citando `<sha-trabajo>`. En
+   «Validación», cada comando declarado con resultado o «no ejecutada: motivo»;
+   nunca «pendiente» a secas. En «Pendiente», la **próxima acción concreta**
+   (un verbo y un objeto), no una lista de deseos. En «Contexto», sólo
+   decisiones tomadas durante la sesión que no estén ya en spec, plan o
+   evidencia, con su fuente.
+4. **Si eres worker**, añade una línea a `evidence/<task>.md` («handoff
+   emitido sobre <sha-trabajo>»). Verifier e integrador no escriben ahí.
+5. **Commit del handoff**, separado del trabajo: `git add --
+   features/<id>/handoff.md features/<id>/evidence/<task>.md` y `git commit -m
+   "handoff: T<n>"`. Ese commit sólo toca esos archivos; el receptor comprobará
+   que `HEAD^` == `<sha-trabajo>` y que `HEAD` no toca nada más.
+6. **Pide al orchestrator** la línea `handoff_emitted` en `participations.md`.
+   Tú no la escribes. La transferencia de owner (`transferred`) **no** se
+   registra ahora: sólo después de que el receptor acepte.
+7. **Retorno breve**: ruta del handoff, `<sha-trabajo>`, próxima acción, y si
+   el receptor debe ser un `actor_id` concreto (p. ej. para verificar, uno
+   distinto del worker).
 
 ## Comprobación antes de cerrar
 
-- [ ] Árbol limpio tras el commit `wip:`.
+- [ ] Árbol limpio; dos commits: `wip:` (trabajo) y `handoff:` (sólo handoff y
+      evidencia).
 - [ ] `handoff.md` con los cuatro bloques y todos los SHA.
 - [ ] Ningún artefacto duplicado; todo enlazado.
 - [ ] Próxima acción concreta y una sola.
@@ -73,7 +85,7 @@ verifier o integrador).
 | --- | --- |
 | Activación | «Cierro por hoy» con T2 a medias → commit `wip:` y `handoff.md` |
 | No activación | «Cierro» con T2 ya entregada y sin cambios → responde que no hay nada que entregar |
-| Restricción | Árbol con cambios en archivos fuera de los permitidos → los excluye y los reporta; sin commit → no escribe handoff |
+| Restricción | Árbol con cambios de origen desconocido fuera de los permitidos → no emite handoff y escala; sin commit `wip:` → no escribe handoff |
 | Comparación | Misma situación: mismo contenido esencial, sin copiar spec ni plan |
 
 ## Referencias

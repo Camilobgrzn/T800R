@@ -39,9 +39,10 @@ coherencia → readiness**; nunca readiness primero.
    coincide con ese digest. Si no coincide, detente: la spec cambió después de
    aprobarse.
 2. **Sin `build` vigente para este plan**, o se está **replanificando por
-   defecto de spec** (hay un hallazgo `defecto de spec` en `evidence/` o
-   `findings.md`). En cualquier otro caso, un `plan.md` con `build … authorized`
-   es inmutable: detente y dilo.
+   defecto de spec** (hay un hallazgo `defecto de spec` en un
+   `evidence/<task>.md` o en un `.verdict.md`; `findings.md` no cuenta, es para
+   hallazgos ajenos). En cualquier otro caso, un `plan.md` con `build …
+   authorized` es inmutable: detente y dilo.
 3. Para un `acotado`: no existe `spec.md`; la descripción cabe en la sección
    «Spec del acotado» del plan.
 4. Si existe `policy.yaml`, lee `protected_paths` para el riesgo por tarea.
@@ -102,8 +103,9 @@ Comprobaciones mecánicas obligatorias (marca cada una en el plan):
 - [ ] Ningún par de tareas paralelas comparte archivos.
 - [ ] Ningún comando de validación toca `protected_paths` sin que la tarea sea
       `high`.
-- [ ] Las tareas `high` tienen anotado que exigen aprobación `local` y verifier
-      con `actor_id` distinto.
+- [ ] Las tareas `high` tienen anotado que exigen aprobación `local` antes del
+      efecto. (El verifier con `actor_id` distinto es universal, no sólo para
+      `high`.)
 
 Un actor distinto del planner revisa el readiness **sólo** si el riesgo o la
 incertidumbre lo justifican; no es un gate rutinario.
@@ -112,10 +114,11 @@ incertidumbre lo justifican; no es un gate rutinario.
 
 - **Primera ejecución**: crea `tasks.md` (todas en `pending`, `owner` vacío) y
   `participations.md` (cabecera y sin eventos).
-- **Replanificación por defecto de spec**: no toques `participations.md`. En
-  `plan.md` añade la sección «Replanificación» con: qué cambió en la spec, qué
-  tareas quedan **afectadas** (su evidencia se marca inválida en la propia
-  entrada de `evidence/<task>.md` por el orchestrator, no por ti), qué tareas
+- **Replanificación por defecto de spec**: no toques `participations.md` ni
+  `evidence/`. En `plan.md` añade la sección «Replanificación» con: qué cambió
+  en la spec, qué tareas quedan **afectadas** (tú las identificas; el
+  orchestrator registra el evento `invalidated` de cada una en
+  `participations.md`, que es lo que invalida su evidencia), qué tareas
   **independientes** continúan sin interrupción y qué tareas nuevas aparecen.
   Conserva los `id` existentes; los nuevos siguen la numeración. Pide al
   orchestrator que añada las tareas nuevas a `tasks.md` en `pending`. Esto
@@ -124,8 +127,8 @@ incertidumbre lo justifican; no es un gate rutinario.
 
 ### Paso 5. Digest y entrega
 
-`git hash-object features/<id>/plan.md` sobre el archivo guardado; anótalo en la
-cabecera. Entrega a la persona: ruta, digest del plan, digest de la spec,
+`git hash-object features/<id>/plan.md` sobre el archivo guardado; **no lo
+escribas dentro del archivo** (cambiaría el hash). Entrega a la persona: ruta, digest del plan, digest de la spec,
 readiness con sus `CONCERNS` si los hay, número de tareas y cuáles pueden ir en
 paralelo, tareas `high`, y la línea exacta para `control:approvals/<id>.md`.
 Recuerda: desde que se registre esa línea, `plan.md` es inmutable; el progreso
@@ -138,7 +141,7 @@ vive en `tasks.md`.
 - [ ] Readiness con resultado y evidencia; `CONCERNS` numerados.
 - [ ] Sin código ni soluciones en el plan.
 - [ ] `tasks.md` y `participations.md` creados sólo si no existían.
-- [ ] Digest calculado sobre el archivo final.
+- [ ] Digest calculado sobre el archivo final y no escrito dentro de él.
 
 ## Evals (checklist manual, README §6)
 

@@ -30,7 +30,8 @@ y una propuesta de tamaño del cambio (`spike`, `acotado`, `feature`). Nada más
 Compruébalas antes de escribir; si alguna falla, detente y dilo.
 
 1. `id` propuesto único: `features/<id>/` no existe, o existe y contiene un
-   `spec.md` con defecto reportado en `evidence/` o `findings.md`.
+   `spec.md` con **defecto de spec** reportado en `evidence/<task>.md` o en un
+   `.verdict.md` (`findings.md` es sólo para hallazgos ajenos).
 2. Si `features/<id>/spec.md` ya tiene una línea `spec <digest> approved` en
    `control:approvals/<id>.md` (`git show control:approvals/<id>.md`), advierte
    que cambiarla exige nueva aprobación y, si además hay `build … authorized`,
@@ -62,10 +63,11 @@ Compruébalas antes de escribir; si alguna falla, detente y dilo.
    arquitectónico; `acotado` si no hay comportamiento nuevo (entonces esta skill
    sobra: dilo y propón ir a `/feature-plan`); `spike` si una incertidumbre
    impide decidir (propón `/spike` con la pregunta concreta).
-6. **Calcula el digest** y déjalo en la cabecera: `git hash-object
-   features/<id>/spec.md` sobre el archivo guardado. Es el valor que la persona
-   citará en `control:approvals/<id>.md`. Si después cambias una letra, el digest
-   cambia y la aprobación deja de aplicar: recalcúlalo y avísalo.
+6. **Calcula el digest** con `git hash-object features/<id>/spec.md` sobre el
+   archivo guardado y **no lo escribas dentro del archivo** (cambiaría el hash).
+   Es el valor que la persona citará en `control:approvals/<id>.md`. Si después
+   cambias una letra, el digest cambia y la aprobación deja de aplicar:
+   recalcúlalo y avísalo.
 7. **Entrega.** Responde a la persona con: ruta del archivo, digest, tamaño
    propuesto, riesgo, lista de preguntas abiertas (si hay, el gate 1 no procede)
    y la línea exacta que debe registrar si aprueba:
@@ -84,7 +86,7 @@ Compruébalas antes de escribir; si alguna falla, detente y dilo.
 - [ ] No hay decisión inventada: todo lo tomado tiene fuente (persona o canon).
 - [ ] Riesgo declarado con su motivo.
 - [ ] No-alcance escrito.
-- [ ] Digest calculado sobre el archivo final.
+- [ ] Digest calculado sobre el archivo final y no escrito dentro de él.
 - [ ] No se escribió en ningún otro archivo.
 
 ## Evals (checklist manual, README §6)

@@ -16,7 +16,8 @@ Lo escribe **sólo el verifier**. Una entrada por ronda, append-only.
 - participations.md leído completo ✔
 - Mi actor_id no figura como worker/owner de T<n> ✔
 - Línea `delivered` del worker <actor_id> presente y coherente con la evidencia ✔
-(Si algo falla: veredicto `ineligible`, motivo, y fin.)
+(Si algo falla, este archivo no se escribe: el verifier se detiene y reporta al
+orchestrator, que registra `ineligible` en participations.md.)
 
 ### Protected paths
 - Diff toca protected_paths: no | sí (<archivos>) → revisados antes de ejecutar: justificado / injustificado
@@ -39,13 +40,13 @@ Lo escribe **sólo el verifier**. Una entrada por ronda, append-only.
 - No bloqueante: <lista> | ninguno
 
 ### Veredicto
-**pass | concerns | fail | ineligible**
+**pass | concerns | fail**
 
 - Si concerns: <observaciones no bloqueantes; sin incumplimiento ni riesgo pendiente; los acepta la persona en el gate 3>
 - Si fail: clase = <defecto de implementación | criterio no cubierto | archivo fuera de alcance | validación en rojo | protected_path injustificado | defecto de spec | laguna de intención>; qué información nueva necesita la siguiente ronda.
 
 ### Solicitud de aprobación `high` (sólo si la tarea es high)
 - Efecto: <qué efecto protegido>
-- Digest de la solicitud: <hash de «<id>/T<n> <sha> <efecto>»>
+- Digest de la solicitud: `printf '%s' '<id>/T<n> <sha> <efecto>' | git hash-object --stdin` → <valor>
 - Línea para control:approvals/<id>.md: `high <digest> approved`
 ```

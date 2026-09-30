@@ -32,18 +32,21 @@ persona o la sesión que coordina); el merge lo ejecuta la persona.
 
 ## Precondiciones mecánicas
 
-1. Todas las tareas del plan en `tasks.md` están `completed` (o `cancelled` con
-   cambio de alcance aceptado por la persona).
+1. Todas las tareas del plan en `tasks.md` están `completed` (o `cancelled`
+   con una línea `scope <digest-plan> cancelled T<n> accepted` de la persona en
+   `control:approvals/<id>.md`).
 2. Cada `evidence/<task>.verdict.md` termina en `pass` o en `concerns`; los
    `concerns` figuran en la lista que la persona aceptará en el gate 3.
 3. **Elegibilidad de cada veredicto**: el `actor_id` de cada veredicto no
    aparece en `participations.md` como worker u owner de esa tarea; la línea
    `verdict` existe. Si falta o es incoherente, la feature vuelve a `verify`.
-4. **Escrituras indebidas**: `git log control -- approvals/<id>.md` sólo tiene
-   commits de la persona; `participations.md` y los `.verdict.md` no tienen
-   commits de un `actor_id` distinto del que corresponde (comprobación por
-   autoría Git, limitada; véase workflow §7). Si detectas una, registra el
-   incidente en `evidence/README.md` y devuelve la feature a `verify`.
+4. **Escrituras indebidas**: es una **revisión manual de la persona**, no una
+   comprobación automática. La autoría Git no distingue actores (los tres
+   proveedores cometen con el mismo `user.name`; workflow §7). La persona repasa
+   `git log -p control -- approvals/<id>.md`, `participations.md` y los
+   `.verdict.md` buscando líneas que no reconozca haber escrito o que no
+   correspondan al actor declarado. Si encuentra una, registra el incidente en
+   `evidence/README.md` y la feature vuelve a `verify`.
 5. Cada rama `feat/<id>/T<n>` está en el SHA de su última entrega verificada.
 6. Tareas `high`: existe `high <digest> approved` en `control` para cada una.
 
@@ -72,12 +75,13 @@ persona o la sesión que coordina); el merge lo ejecuta la persona.
    SHA, y la línea `merge <sha-candidato> onto <sha-main-base> approved`.
 6. **Integración condicional** (la ejecuta la persona): antes del merge
    comprueba que `git rev-parse main` == `<sha-main-base>` y `git rev-parse
-   feat/<id>/integrate` == `<sha-candidato>`. Si ambos coinciden, merge
-   (`git merge --no-ff feat/<id>/integrate`). Si `main` avanzó, vuelve al paso
-   1 con la nueva base; la aprobación anterior no aplica.
+   feat/<id>/integrate` == `<sha-candidato>`. Si ambos coinciden: `git checkout
+   main && git merge --no-ff feat/<id>/integrate`. Si `main` avanzó, vuelve al
+   paso 1 con la nueva base; la aprobación anterior no aplica.
 7. **Después del merge** (la persona): registra el SHA de integración en
-   `control:approvals/<id>.md` (`integrated <sha-merge>`); pide al orchestrator
-   la línea final en `participations.md`. Sólo entonces se proponen notas de
+   `control:approvals/<id>.md` (`integrated <sha-merge>`) y el evento
+   `integrated` en `participations.md` (en bootstrap integrador y orchestrator
+   suelen ser la misma sesión: entonces lo escribe ella). Sólo entonces se proponen notas de
    conocimiento (con fuente y verificación; la utilidad la deciden dos o más
    criterios) y una skill si una instrucción se repitió tres veces (cambio
    `high`).

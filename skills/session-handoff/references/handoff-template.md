@@ -8,9 +8,11 @@ al final.
 # Handoff: <id> / T<n>
 
 - Emitido: <YYYY-MM-DDTHH:MM> por <actor_id> (<proveedor>)
-- Rama: feat/<id>/T<n>
+- Rama: feat/<id>/T<n> | feat/<id>/integrate
 - SHA base: <sha-base>
-- SHA último commit: <sha-head> (incluye `wip:` si aplica)
+- SHA del trabajo: <sha-trabajo> (último commit de trabajo, `wip:` si aplica; el
+  commit `handoff:` que contiene este archivo va encima y sólo toca handoff.md y
+  evidence/T<n>.md)
 - tasks.md: <git hash-object>
 - participations.md: <git hash-object>
 - Receptor esperado: cualquiera | <actor_id> | «un actor_id distinto de <worker>» (para verificar)
@@ -39,6 +41,6 @@ Decisiones tomadas en esta sesión que no están en spec, plan ni evidencia:
 
 ---
 ## Aceptación (la escribe el receptor con /session-resume)
-- <fecha> | <actor_id receptor> | aceptado | árbol en <sha-head>, tasks/participations coinciden
+- <fecha> | <actor_id receptor> | aceptado | HEAD^ == <sha-trabajo>, commit handoff: sólo handoff/evidencia, tasks/participations coinciden
 - o: rechazado | motivo: <árbol distinto / owner distinto / historial incoherente>
 ```

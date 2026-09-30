@@ -11,7 +11,6 @@ size: feature | acotado | spike
 risk: routine | high
 risk_reason: <por qué; qué disparador de S09 o qué protected_path>
 status: draft            # metadato; la aprobación vive en control:approvals/<id>.md
-digest: <git hash-object de este archivo al entregar>
 created: <YYYY-MM-DD>
 ---
 
@@ -63,6 +62,9 @@ Sólo términos nuevos que introduce esta feature.
 Notas:
 
 - `status` cambia a `implemented` únicamente en la candidata que prepara
-  `/feature-integrate`; nunca a `approved`.
-- El `digest` se recalcula cada vez que el archivo cambia; la línea de
-  aprobación en `control` cita el digest del contenido que la persona leyó.
+  `/feature-integrate`. `approved` es tolerable como metadato, pero no
+  autoriza nada: la aprobación es la línea en `control`.
+- El digest **no se escribe dentro del archivo** (insertarlo cambiaría el
+  hash). Se calcula con `git hash-object features/<id>/spec.md` sobre el archivo
+  guardado y se entrega en el retorno; la línea de aprobación en `control` cita
+  ese valor. Cambiar una letra cambia el digest y la aprobación deja de aplicar.

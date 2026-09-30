@@ -4,7 +4,6 @@
 ---
 id: <id>
 spec_digest: <git hash-object de spec.md aprobado; «n/a» en un acotado>
-digest: <git hash-object de este archivo al entregar>
 size: feature | acotado
 readiness: PASS | CONCERNS | FAIL
 created: <YYYY-MM-DD>
@@ -84,6 +83,9 @@ Máximo dos workers. Pares admitidos: <T<a> ∥ T<b>> | ninguno.
 
 ## Línea para control:approvals/<id>.md
 
-`build <digest> on spec <spec_digest> authorized`
-(acotado: `build <digest> authorized`)
+`build <digest-plan> on spec <spec_digest> authorized`
+(acotado: `build <digest-plan> authorized`)
+
+`<digest-plan>` = `git hash-object features/<id>/plan.md` sobre el archivo
+guardado; no se escribe dentro del archivo. Se entrega en el retorno.
 ```

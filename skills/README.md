@@ -34,8 +34,9 @@ es una rama de Git sin historia común con `main` donde sólo la persona registr
 aprobaciones (`control:approvals/<feature-id>.md`); está separada de `main` y de
 la rama candidata para que registrar una aprobación no cambie el SHA de nada
 aprobado (workflow §2). Un **digest** es un hash del contenido de `spec.md` o
-`plan.md` que la aprobación cita para identificar exactamente qué se aprobó; el
-método de cálculo lo fijará la skill, el workflow no lo prescribe.
+`plan.md` que la aprobación cita para identificar exactamente qué se aprobó. Las
+skills lo fijan como `git hash-object <archivo>` sobre el archivo guardado; el
+digest nunca se escribe dentro del archivo (cambiaría el hash).
 
 ```
 idea / issue / problema en una frase
@@ -495,7 +496,7 @@ proyectarse a los proveedores.
 | worker | Actor que ejecuta una tarea dentro de su brief; escribe la rama y `evidence/<task>.md`; nunca veredictos ni aprobaciones. |
 | verifier | Actor con `actor_id` elegible que reejecuta las validaciones y escribe `evidence/<task>.verdict.md`. |
 | incremento | Unidad que recorre `plan → design → build → verify → deploy`; aquí, una `feature` o un `acotado`. `build` se autoriza por incremento, no por tarea (S04 l. 81, 275). |
-| digest | Hash del contenido de `spec.md` o `plan.md` en el momento de aprobar; las líneas de `control:approvals/<id>.md` lo citan para que la aprobación identifique exactamente lo aprobado. El método de cálculo no está fijado en el workflow; lo fijará la skill. |
+| digest | Hash del contenido de `spec.md` o `plan.md` en el momento de aprobar; las líneas de `control:approvals/<id>.md` lo citan para que la aprobación identifique exactamente lo aprobado. Método fijado por las skills: `git hash-object <archivo>`; el digest no se escribe dentro del archivo. |
 | candidata | Rama con todas las tareas verificadas y los cambios documentales del cierre, identificada por `<sha-candidato>`. |
 | base | SHA de `main` sobre el que se verificó la candidata (`<sha-main-base>`); se aprueba el par y se integra sólo si ambos siguen iguales. |
 | `high` | Nivel de riesgo que exige aprobación `local` de la persona en el punto del efecto (disparadores de S09 más `protected_paths`). |

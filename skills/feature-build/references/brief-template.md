@@ -36,7 +36,7 @@ una pantalla.
 - `<comando 2>`
 
 ## Riesgo
-- routine | high (<motivo>; si high: aprobación local antes del efecto y verifier distinto)
+- routine | high (<motivo>; si high: aprobación local antes del efecto). El verifier con actor_id distinto es obligatorio en todas las tareas.
 
 ## Tests primero
 - sí | no (<motivo>)

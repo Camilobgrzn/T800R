@@ -19,8 +19,8 @@ antes de verificar, nunca después del merge).
 | T2 | … | … | 2 | concerns | <resumen> | `high <digest> approved` |
 
 ## Elegibilidad y escrituras
-- Cada verifier ausente de participations.md como worker/owner de su tarea ✔
-- control:approvals/<id>.md sólo con commits de la persona ✔
+- Cada verifier ausente de participations.md como worker/owner de su tarea ✔ (comprobación mecánica)
+- Revisión manual de la persona de control:approvals/<id>.md, participations.md y .verdict.md: hecha el <fecha> | pendiente (la autoría Git no distingue actores; workflow §7)
 - Escrituras indebidas detectadas: ninguna | <incidente → feature devuelta a verify>
 
 ## Cierre documental incluido en la candidata

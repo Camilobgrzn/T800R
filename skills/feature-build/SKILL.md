@@ -79,9 +79,18 @@ Compruébalas y anótalas en la primera entrada de evidencia.
 7. **Rutas protegidas**: si la tarea es `high` porque toca `protected_paths`
    (`package.json` scripts, hooks, CI, lockfiles, `policy.yaml`, `skills/`,
    configuración de agentes), **no ejecutes ningún comando** sobre esos archivos
-   modificados hasta que el verifier los revise; anótalo como «no ejecutado:
-   pendiente de revisión de protected_paths».
-8. **Entrega**: último commit, entrada final en la evidencia con el SHA
+   modificados hasta que un veredicto haya revisado **esa versión** de los
+   archivos (mismo `git hash-object` de cada uno); anótalo como «no ejecutado:
+   pendiente de revisión de protected_paths». El verifier los revisa y, si son
+   justificados, ejecuta él las validaciones en su veredicto. En una ronda
+   posterior puedes ejecutarlas tú sólo si no volviste a cambiar esos archivos.
+8. **Efectos `high`**: el efecto protegido (p. ej. una migración destructiva
+   o un push fuera del repositorio) lo ejecutas tú, y sólo después de comprobar
+   que existe `high <digest> approved` en `control:approvals/<id>.md` para el
+   digest que preparó el verifier (`<id>/T<n> <sha> <efecto>`), releyendo la
+   rama `control` justo antes de ejecutarlo. Si el efecto es integrar, lo hace la
+   persona con `/feature-integrate`.
+9. **Entrega**: último commit, entrada final en la evidencia con el SHA
    entregado y el resumen de criterios cubiertos; pide al orchestrator la línea
    `delivered`. Retorno breve a quien coordina (≈300 palabras orientativas):
    SHA, qué se validó, qué no y por qué, hallazgos clasificados.

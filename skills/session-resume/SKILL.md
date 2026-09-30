@@ -39,20 +39,28 @@ es una: **no escribas nada hasta validar**.
 1. **Checkout y limpieza.** `git checkout <rama>`; `git status --porcelain`
    debe estar vacío. Si hay cambios sin commit que no son tuyos, **no los
    toques**: rechazo por «árbol sucio».
-2. **Comprueba el árbol.** `git rev-parse HEAD` == SHA último commit del
-   handoff. Si `HEAD` avanzó: rechazo por «árbol distinto» (alguien trabajó
-   después del handoff); reconciliar antes de continuar.
+2. **Comprueba el árbol.** `git log -1 --format=%s` empieza por `handoff:`;
+   `git rev-parse HEAD^` == `<sha-trabajo>` del handoff; y `git diff --name-only
+   HEAD^ HEAD` sólo lista `features/<id>/handoff.md` y, si aplica,
+   `features/<id>/evidence/<task>.md`. Si `HEAD` avanzó más o el commit de
+   handoff toca otra cosa: rechazo por «árbol distinto» (alguien trabajó después
+   del handoff); reconciliar antes de continuar.
 3. **Comprueba los registros.** `git hash-object features/<id>/tasks.md` y
    `… participations.md` == los del handoff. El owner de la tarea en `tasks.md`
    es el emisor del handoff, y el último evento de la tarea en
-   `participations.md` es `handoff_emitted` o `transferred` hacia ti. Si no:
-   rechazo por «owner distinto» o «historial incoherente».
+   `participations.md` es `handoff_emitted`. Si no: rechazo por «owner
+   distinto» o «historial incoherente». (`transferred` nunca precede a la
+   aceptación: se registra después, paso 6.)
 4. **Comprueba la coherencia** entre `handoff.md` y la última entrada de
    `evidence/<task>.md` (mismo SHA, misma ronda). Si no: rechazo por
    «evidencia distinta».
 5. **Acepta o rechaza.** Escribe la línea en la sección «Aceptación» de
-   `handoff.md` y haz commit de ese único cambio. Si rechazas, detente ahí y
-   reporta: el rechazo no es un fallo, es el mecanismo funcionando.
+   `handoff.md` y haz commit de ese único cambio (`git commit -m "handoff:
+   T<n> aceptado|rechazado"`). Si rechazas, detente ahí y reporta: el rechazo
+   no es un fallo, es el mecanismo funcionando. **Quien reconcilia** tras un
+   rechazo es el orchestrator: decide si el trabajo posterior al handoff se
+   conserva (nuevo handoff desde el estado real) o se descarta, registra la
+   decisión en `participations.md` y se vuelve a ejecutar `/session-resume`.
 6. **Ownership.** Si el receptor eres tú y el owner era otro, pide al
    orchestrator la línea `transferred` en `participations.md` y el cambio de
    owner en `tasks.md`; **no escribas en la rama hasta que exista esa línea**.
@@ -75,7 +83,7 @@ es una: **no escribas nada hasta validar**.
 | --- | --- |
 | Activación | Abrir sesión sobre una feature con `handoff.md` válido → aceptación escrita y próxima acción anunciada |
 | No activación | Feature sin `handoff.md` → indica empezar por la skill de la etapa, sin escribir |
-| Restricción | `HEAD` distinto del declarado, o `participations.md` con otro hash → rechazo anotado, sin tocar la rama |
+| Restricción | `HEAD^` distinto del `<sha-trabajo>` declarado, commit `handoff:` que toca otros archivos, o `participations.md` con otro hash → rechazo anotado, sin tocar la rama |
 | Comparación | Mismo handoff: misma decisión de aceptar/rechazar y mismo motivo |
 
 ## Referencias

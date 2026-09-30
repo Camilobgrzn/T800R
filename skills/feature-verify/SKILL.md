@@ -35,9 +35,12 @@ calidad técnica y veredicto. Para `high`, además la solicitud de aprobación
    `transferred`, `started`, `delivered`). Comprueba también que la línea
    `delivered` del worker existe y que su `actor_id` coincide con la cabecera de
    `evidence/<task>.md`. **Historial incompleto o incoherente → no elegible**:
-   escribe un veredicto `ineligible` con el motivo y detente. Reanudar, cambiar
-   de proceso o de modelo no devuelve independencia: la comparación es por
-   `actor_id`.
+   **no escribas `.verdict.md`** (sería una escritura indebida); detente y
+   reporta al orchestrator el motivo, que registrará `ineligible` en
+   `participations.md`; no consume ronda. Reanudar, cambiar de proceso o de
+   modelo no devuelve independencia: la comparación es por `actor_id`. Tu
+   `actor_id` es el que la persona te asignó al abrir esta sesión
+   (`<proveedor>:<máquina o usuario>`); si no lo tienes, pídelo antes de seguir.
 2. **Base.** `git rev-parse HEAD` en la rama `feat/<id>/<task>` es el SHA
    entregado de la última entrada de `evidence/<task>.md`; árbol limpio.
 3. **Plan vigente.** `git hash-object features/<id>/plan.md` coincide con el
@@ -82,11 +85,12 @@ calidad técnica y veredicto. Para `high`, además la solicitud de aprobación
      injustificado, defecto de spec, laguna de intención). Devuelve la tarea a
      `build` y consume una ronda; si es defecto de spec o laguna de intención,
      dilo para que vaya a `/feature-spec` o a `blocked`.
-   - `ineligible`: no pudiste verificar por elegibilidad; no consume ronda.
 8. **`high`.** Si la tarea es `high`, añade la solicitud de aprobación con
-   digest (`tarea + SHA + efecto`) para que la persona registre `high <digest>
-   approved` en `control:approvals/<id>.md`. El efecto no se ejecuta ni se
-   integra sin esa línea, revalidada justo antes del efecto.
+   digest: `printf '%s' '<id>/T<n> <sha> <efecto>' | git hash-object --stdin`,
+   para que la persona registre `high <digest> approved` en
+   `control:approvals/<id>.md`. El efecto lo ejecuta el worker en la ronda
+   siguiente (o la persona, si el efecto es integrar) sólo tras releer esa línea
+   en `control`; nunca tú.
 9. **Entrega**: veredicto guardado; retorno breve al orchestrator con el
    resultado y, si `fail`, qué información nueva necesita la siguiente ronda.
 
@@ -104,7 +108,7 @@ calidad técnica y veredicto. Para `high`, además la solicitud de aprobación
 | --- | --- |
 | Activación | «Verifica T2» desde una sesión distinta del worker → `evidence/T2.verdict.md` con A, B y veredicto |
 | No activación | «¿Pasó T2?» → lee el veredicto existente, no verifica de nuevo |
-| Restricción | Mismo `actor_id` que el worker, o `participations.md` sin `delivered` → `ineligible`; SHA distinto del entregado → se detiene |
+| Restricción | Mismo `actor_id` que el worker, o `participations.md` sin `delivered` → se detiene sin escribir veredicto y reporta; SHA distinto del entregado → se detiene |
 | Comparación | Misma tarea y SHA: mismos criterios evaluados, sin reutilizar evidencia fuera de vigencia |
 
 ## Referencias

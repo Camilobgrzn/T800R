@@ -6,7 +6,7 @@ Estado operativo mutable. Lo inicializa `/feature-plan` una sola vez; después
 ```markdown
 # Tareas: <id>
 
-plan_digest_autorizado: <se rellena al registrarse build … authorized>
+plan_digest_autorizado: <lo rellena el orchestrator al registrarse build … authorized>
 
 | Tarea | Estado | Owner (actor_id) | Depende de | Ronda | Última actualización | Nota |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -20,7 +20,10 @@ Estados (S04): `pending`, `ready`, `in_progress`, `waiting`, `blocked`,
 Reglas del orchestrator:
 - `pending → ready` cuando las dependencias están `completed` y `build` está
   autorizado para el digest vigente.
-- `ready → in_progress` al asignar; el evento va también a `participations.md`.
+- Al asignar: la tarea sigue `ready`, se rellena `Owner` y se registra
+  `assigned` en `participations.md`.
+- `ready → in_progress` cuando el worker empieza (`started` en
+  `participations.md`).
 - `in_progress → blocked` por `intent gap` (nota: la pregunta a la persona).
 - `in_progress → completed` sólo con veredicto `pass` (o `concerns` aceptados)
   del verifier; el orchestrator registra el veredicto en `participations.md` y
