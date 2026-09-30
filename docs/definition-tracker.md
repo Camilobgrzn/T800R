@@ -20,10 +20,14 @@ repositorios propios. Lo aceptado en S09-S11 que excede ese perfil está en
 adversarial quedó cerrada para la definición: `REV-2026-105` y `110` `accepted`
 (registradas en S12), las 109 restantes `deferred` al backlog.
 
-Siguientes pasos de S12: seleccionar el repositorio piloto; definir corpus,
-métricas, umbrales y experimentos sólo para el perfil v0; ordenar backlog y
-roadmap; y decidir explícitamente si se autoriza la construcción. La construcción
-continúa sin autorización hasta el cierre de S12.
+Decidido el 2026-09-30: el piloto es un IDP con Backstage (catálogo + TechDocs,
+repositorio nuevo) y el flujo de construcción por feature con ocho skills
+([workflow-construccion.md](workflow-construccion.md), v4, diseñado en pareja con
+Astra en cuatro rondas). Siguientes pasos de S12: acordar los experimentos y
+métricas del v0 (propuesta E1-E5); redactar las ocho skills en `skills/`;
+ordenar backlog y roadmap (incluidas las tres tareas de migración del bootstrap:
+ledger, aprobación `local`, Beads); y decidir explícitamente si se autoriza la
+construcción. La construcción continúa sin autorización hasta el cierre de S12.
 
 Historial: el 2026-09-29 se resolvió `REV-2026-110` (perfil de aprobación `local`;
 SSHSIG/FIDO pasa a perfil `signed`; enmiendas en S11 l. 133-137 y ADR-010 punto
