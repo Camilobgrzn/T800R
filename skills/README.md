@@ -101,6 +101,103 @@ en el gate 3 para los de los veredictos (workflow §4.2 y §4.5).
 corresponde invalida la feature; el integrador registra el incidente y la
 feature vuelve a `verify` (workflow §2).
 
+### Diagrama de flujo
+
+```mermaid
+flowchart TD
+    idea([Idea / issue / problema]) --> spec
+
+    subgraph plan["plan"]
+        spec["/feature-spec<br/>→ spec.md"]
+        spike["/spike<br/>→ spikes/&lt;id&gt;.md<br/>(sólo si una incertidumbre impide decidir)"]
+    end
+    spec -. duda bloqueante .-> spike
+    spike -. respuesta .-> spec
+
+    spec --> g1{{"GATE 1 · persona<br/>control:approvals/&lt;id&gt;.md<br/>spec &lt;digest-spec&gt; approved"}}
+
+    subgraph design["design"]
+        planS["/feature-plan<br/>→ plan.md (tareas, coherencia, readiness)<br/>inicializa tasks.md y participations.md"]
+    end
+    g1 --> planS
+    planS -- "readiness FAIL" --> spec
+    planS --> g2{{"GATE 2 · persona<br/>build &lt;digest-plan&gt; on spec &lt;digest-spec&gt; authorized<br/>(acepta CONCERNS) · plan.md queda inmutable"}}
+
+    subgraph build["build"]
+        orch["orchestrator<br/>tasks.md: ready → owner<br/>participations.md: assigned"]
+        buildS["/feature-build &lt;task&gt;<br/>rama feat/&lt;id&gt;/&lt;task&gt;<br/>→ evidence/&lt;task&gt;.md (append-only)"]
+    end
+    g2 --> orch --> buildS
+
+    subgraph verify["verify"]
+        verifyS["/feature-verify &lt;task&gt;<br/>actor_id ∉ workers/owners<br/>→ evidence/&lt;task&gt;.verdict.md"]
+    end
+    buildS -- "delivered" --> verifyS
+    verifyS -- "fail (hasta 3 rondas)" --> buildS
+    verifyS -- "intent gap / defecto de spec" --> stop[/"blocked → persona<br/>o vuelta a /feature-spec"/]
+    verifyS -- "high" --> gh{{"aprobación local<br/>high &lt;digest&gt; approved"}}
+    gh --> verifyS
+
+    verifyS -- "pass / concerns" --> allDone{¿todas las tareas pass?}
+    allDone -- no --> orch
+
+    subgraph deploy["deploy (integrar)"]
+        integ["/feature-integrate<br/>rama feat/&lt;id&gt;/integrate<br/>cierre documental + validaciones globales<br/>sobre (sha-candidato, sha-main-base)"]
+    end
+    allDone -- sí --> integ
+    integ --> g3{{"GATE 3 · persona<br/>merge &lt;sha-candidato&gt; onto &lt;sha-main-base&gt; approved<br/>merge sólo si ambos SHA siguen iguales"}}
+    g3 --> main[("main")]
+    main --> post["persona: integrated &lt;sha-merge&gt; en control<br/>+ evento integrated en participations.md"]
+
+    subgraph transversal["transversal"]
+        ho["/session-handoff<br/>commit wip: + commit handoff:<br/>→ handoff.md"]
+        re["/session-resume<br/>aceptación condicional<br/>(HEAD^ == sha-trabajo, tasks/participations iguales)"]
+    end
+    ho --> re
+    re -- "rechazo" --> ho
+
+    classDef gate fill:#fff3cd,stroke:#b8860b,color:#000
+    classDef human fill:#e8f4ff,stroke:#1f5fa8,color:#000
+    class g1,g2,g3,gh gate
+    class post human
+```
+
+Leyenda: los rombos amarillos son los gates que sólo la persona abre escribiendo
+en la rama `control`; las flechas discontinuas son opcionales; «transversal»
+puede ocurrir en cualquier etapa.
+
+### Quién escribe qué (secuencia típica de una tarea)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor P as Persona
+    participant O as Orchestrator
+    participant W as Worker (actor_id A)
+    participant V as Verifier (actor_id B ≠ A)
+    participant C as rama control
+    participant F as features/<id>/
+
+    P->>C: spec <digest-spec> approved
+    O->>F: plan.md (planner) · tasks.md · participations.md (init)
+    P->>C: build <digest-plan> on spec <digest-spec> authorized
+    O->>F: tasks.md: T1 ready, owner A · participations: assigned
+    W->>F: participations: started (vía O) · evidence/T1.md ronda 1
+    W->>W: commits en feat/<id>/T1 · sólo archivos permitidos · sólo comandos declarados
+    W->>F: evidence/T1.md: entrega (sha) · participations: delivered (vía O)
+    P->>V: abre sesión distinta de la del worker
+    V->>F: lee participations.md completo → B ∉ {workers, owners de T1}
+    V->>V: reejecuta validaciones sobre el sha entregado
+    V->>F: evidence/T1.verdict.md: pass | concerns | fail
+    O->>F: participations: verdict · tasks.md: T1 completed (si pass)
+    Note over W,V: fail → nueva ronda (máx. 3) · intent gap → blocked → Persona
+    O->>F: evidence/README.md · rama feat/<id>/integrate · validaciones globales
+    P->>C: merge <sha-candidato> onto <sha-main-base> approved
+    P->>P: git checkout main && git merge --no-ff (si ambos SHA siguen iguales)
+    P->>C: integrated <sha-merge>
+    P->>F: participations: integrated
+```
+
 ### Tres tamaños de cambio (workflow §3)
 
 | Tamaño | Cuándo | Skills que usa | Artefactos |
