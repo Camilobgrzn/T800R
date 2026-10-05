@@ -19,23 +19,22 @@ v4), experimentos E1-E5 y las ocho skills redactadas en
 [skills/](../skills/README.md) (verificadas por Fable; la pasada de Codex quedó
 pendiente por cuota). La persona aceptó las skills el 2026-10-05 para continuar.
 
-**Siguiente sesión, en orden:**
+**Avance 2026-10-05.** Roadmap v0 en borrador v2.1
+([roadmap-v0.md](roadmap-v0.md)), verificado en pareja (Fable «SÍ con
+cambios»; Astra dos rondas, bloqueantes resueltos en v2.1); umbral de la
+métrica global fijado en 75 % de tareas del IDP bajo el orchestrator; se
+mantienen los tres gates de v4. La revisión Codex (`gpt-6-astra`) de `skills/`
+dio 18 hallazgos (8 altos); la persona decidió corregirlos **antes** de
+autorizar.
 
-1. **Roadmap del v0** (paso 5 de S12): ordenar por dependencia y riesgo qué se
-   construye de T800R v0 y del IDP, incluidas las tres tareas de migración del
-   bootstrap (ledger/`actor_id`, aprobación `local`, Beads) y las tres mejoras
-   que Astra dejó para después del piloto (workflow §11). Registrar en S12.
-2. **Decisión explícita de autorizar la construcción** (paso 6): comprobar el
-   criterio de salida de S12, registrar el cierre y actualizar `AGENTS.md`, que
-   hoy prohíbe código de producto.
-3. **Arranque de la construcción**, sólo tras el paso 2: crear la rama huérfana
-   `control`; crear el repo del IDP con `@backstage/create-app` en versión
-   fijada y anotar la línea base; proyectar las skills a `.claude/skills/`,
-   `.opencode/` y Codex comprobando que cada proveedor las ejecuta (E4); primera
-   feature de T800R con `/feature-spec`, que es además la primera eval real de
-   las skills.
-4. Opcional: relanzar la verificación de Codex (`gpt-6-astra`, `medium`; si
-   falta cuota, `gpt-5.6-sol`, `xhigh`) sobre `skills/` y aplicar hallazgos.
+**Siguiente, en orden:**
+
+1. **Corrección de skills y flujo v4** con los hallazgos de la revisión Codex;
+   verificación en pareja Fable + Astra hasta veredicto SÍ.
+2. **Aprobación del roadmap v0** por la persona y registro en S12 (paso 5).
+3. **Decisión explícita de autorizar la construcción** (paso 6): comprobar el
+   criterio de salida de S12, registrar el cierre y actualizar `AGENTS.md`.
+4. **Arranque** según F0 del roadmap.
 
 La construcción continúa sin autorización hasta el cierre de S12.
 
