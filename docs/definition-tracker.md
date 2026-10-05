@@ -5,34 +5,46 @@
 - Fase: definición; construcción aún no autorizada.
 - Avance: 11 de 12 sesiones completadas.
 - Sesión actual: 12 — validación y convergencia (`in_progress`).
-- Última actualización: 2026-09-30.
+- Última actualización: 2026-10-05.
 - Coordinador declarado: `openai/gpt-5.6-sol`.
 - Documento rector: [product-definition.md](product-definition.md); unidades
   canónicas por sesión: [definition/README.md](definition/README.md).
 
 ## Próxima acción
 
-Continuar S12 sobre el **perfil MVP mínimo** decidido el 2026-09-30
-([S12 «Decisiones»](definition/session-12-validation-convergence.md#decisiones)):
-un harness del loop de desarrollo con memoria y orquestación de agentes para
-repositorios propios. Lo aceptado en S09-S11 que excede ese perfil está en
-[backlog-ideas.md](backlog-ideas.md) como arquitectura objetivo. La revisión
-adversarial quedó cerrada para la definición: `REV-2026-105` y `110` `accepted`
-(registradas en S12), las 109 restantes `deferred` al backlog.
+**Estado al 2026-10-05.** S12 tiene resueltos cuatro de sus seis pasos: piloto
+(IDP con Backstage, catálogo + TechDocs, repositorio nuevo), flujo de
+construcción por feature ([workflow-construccion.md](workflow-construccion.md),
+v4), experimentos E1-E5 y las ocho skills redactadas en
+[skills/](../skills/README.md) (verificadas por Fable; la pasada de Codex quedó
+pendiente por cuota). La persona aceptó las skills el 2026-10-05 para continuar.
 
-Decidido el 2026-09-30: el piloto es un IDP con Backstage (catálogo + TechDocs,
-repositorio nuevo) y el flujo de construcción por feature con ocho skills
-([workflow-construccion.md](workflow-construccion.md), v4, diseñado en pareja con
-Astra en cuatro rondas). Experimentos y métricas del v0 (E1-E5)
-aceptados el 2026-09-30. Siguientes pasos de S12: redactar las ocho skills en `skills/`;
-ordenar backlog y roadmap (incluidas las tres tareas de migración del bootstrap:
-ledger, aprobación `local`, Beads); y decidir explícitamente si se autoriza la
-construcción. La construcción continúa sin autorización hasta el cierre de S12.
+**Siguiente sesión, en orden:**
+
+1. **Roadmap del v0** (paso 5 de S12): ordenar por dependencia y riesgo qué se
+   construye de T800R v0 y del IDP, incluidas las tres tareas de migración del
+   bootstrap (ledger/`actor_id`, aprobación `local`, Beads) y las tres mejoras
+   que Astra dejó para después del piloto (workflow §11). Registrar en S12.
+2. **Decisión explícita de autorizar la construcción** (paso 6): comprobar el
+   criterio de salida de S12, registrar el cierre y actualizar `AGENTS.md`, que
+   hoy prohíbe código de producto.
+3. **Arranque de la construcción**, sólo tras el paso 2: crear la rama huérfana
+   `control`; crear el repo del IDP con `@backstage/create-app` en versión
+   fijada y anotar la línea base; proyectar las skills a `.claude/skills/`,
+   `.opencode/` y Codex comprobando que cada proveedor las ejecuta (E4); primera
+   feature de T800R con `/feature-spec`, que es además la primera eval real de
+   las skills.
+4. Opcional: relanzar la verificación de Codex (`gpt-6-astra`, `medium`; si
+   falta cuota, `gpt-5.6-sol`, `xhigh`) sobre `skills/` y aplicar hallazgos.
+
+La construcción continúa sin autorización hasta el cierre de S12.
 
 Historial: el 2026-09-29 se resolvió `REV-2026-110` (perfil de aprobación `local`;
 SSHSIG/FIDO pasa a perfil `signed`; enmiendas en S11 l. 133-137 y ADR-010 punto
 14). El 2026-09-30 se resolvió `REV-2026-105` (predicado de elegibilidad del
-verifier; precisiones en S04 l. 107 y ADR-003 punto 9).
+verifier), se decidió el perfil MVP mínimo (109 REV `deferred` a
+[backlog-ideas.md](backlog-ideas.md)), el piloto, el flujo v4 y E1-E5. El
+2026-10-05 se aceptaron las ocho skills.
 
 ## Registro de cierre de la sesión 11
 

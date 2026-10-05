@@ -22,6 +22,12 @@ Lee en este orden:
 `docs/definition/` es la fuente canónica de los acuerdos de su sesión. Los
 documentos de `ideas/` son insumos y no representan decisiones aceptadas.
 
+Para la construcción (aún no autorizada) ya están definidos el flujo por feature
+en `docs/workflow-construccion.md` (v4, aceptado en S12) y las ocho skills en
+`skills/` (catálogo en `skills/README.md`). Léelos antes de proponer cómo
+trabajar; no los proyectes a `.claude/` ni `.opencode/` hasta que S12 autorice
+construir. Lo diferido del MVP está en `docs/backlog-ideas.md`.
+
 ## Forma de trabajo
 
 1. Trabaja únicamente en la sesión marcada como `ready`, `in_progress` o
