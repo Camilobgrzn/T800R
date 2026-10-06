@@ -1,6 +1,6 @@
 ---
 name: feature-build
-description: Ejecuta una tarea autorizada del plan dentro de su brief, en su propia rama task/<id>/<task>, tocando sólo los archivos permitidos y corriendo sólo los comandos de validación declarados; deja evidencia append-only en evidence/<task>.md (commit `evidence:` encima del SHA del trabajo) y clasifica cualquier hallazgo. Úsala con una tarea `ready` de un incremento con build autorizado, al volver de un fail mientras queden rondas, o para la fase de efecto de un high ya aprobado. No la uses sin autorización en control, con dependencias pendientes, agotadas las tres rondas ni en main.
+description: Ejecuta una tarea autorizada del plan dentro de su brief, en su propia rama task/<id>/<task>, tocando sólo los archivos permitidos y corriendo sólo los comandos de validación declarados; deja evidencia append-only en evidence/<task>.md (commit `evidence:` encima del SHA del trabajo) y clasifica cualquier hallazgo. Úsala con una tarea asignada a tu actor_id (`in_progress` en tasks.md; `ready` es sólo la elegibilidad previa) de un incremento con build autorizado, al volver de un fail mientras queden rondas, o para la fase de efecto de un high ya aprobado. No la uses sin autorización en control, con dependencias pendientes, agotadas las tres rondas ni en main.
 ---
 
 # /feature-build <task>
@@ -154,8 +154,10 @@ Compruébalas y anótalas en la primera entrada de evidencia. Lee `control` y
   esta vez; la rama continúa desde tu `<sha-entrega>` anterior. **Nunca repitas
   lo mismo**: si no hay información nueva, dilo y pide cambio de contexto,
   tamaño de tarea o modelo.
-- Esperar una aprobación `high`, la fase de efecto y su comprobación posterior
-  no consumen ronda.
+- Esperar una aprobación `high`, la fase de efecto y una comprobación posterior
+  satisfactoria no consumen ronda; un `fail` posterior sí suma una ronda y deja
+  la tarea `blocked` hasta que la persona resuelva la recuperación (misma regla
+  en `tasks.md` y workflow §4.3).
 - Al agotar la tercera ronda sin `pass`, la tarea queda `blocked`; no abras una
   cuarta.
 - Para en cuanto se cumpla una condición de parada del brief (presupuesto,

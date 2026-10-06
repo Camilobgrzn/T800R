@@ -42,11 +42,12 @@ Reglas del orchestrator:
   estado, integra la rama de la tarea en `feat/<id>` (`git merge --no-ff
   <sha-entrega>`) y registra `merged`. Sólo entonces las dependientes pasan a
   `ready`.
-- `Ronda` cuenta rondas de corrección: se incrementa al registrar un `fail`.
-  Esperar una aprobación `high`, ejecutar el efecto aprobado y su comprobación
-  posterior **no** incrementan `Ronda`. Al registrar el tercer `fail`, la tarea
-  pasa a `blocked` con nota «rondas agotadas: cambiar contexto, tamaño
-  (replanificar) o modelo».
+- `Ronda` cuenta rondas de corrección: se incrementa al registrar un `fail`,
+  también un `fail` de comprobación posterior. Esperar una aprobación `high`,
+  ejecutar el efecto aprobado y una comprobación posterior satisfactoria
+  (`pass`/`concerns`) **no** incrementan `Ronda`. Al registrar el tercer
+  `fail`, la tarea pasa a `blocked` con nota «rondas agotadas: cambiar
+  contexto, tamaño (replanificar) o modelo».
 - Efecto `high` en ejecución: con veredicto previo `ready_for_effect` (no es
   `pass`: no declara cumplimiento) la tarea pasa a `waiting` (nota: `high
   <digest> pendiente`); cuando la persona registra `high <digest> approved` en
@@ -59,8 +60,11 @@ Reglas del orchestrator:
 - `invalidated` (replanificación): según la disposición del plan, la tarea
   vuelve a `pending` con `Ronda` 0 y nota «rehacer: <motivo>», o pasa a
   `cancelled` con nota «superseded by T<m>»; su evidencia y veredictos
-  anteriores no cuentan para integrar. Las conservadas reciben `ratified` y
-  no cambian de estado.
+  anteriores no cuentan para integrar. Las conservadas completadas reciben
+  `ratified` y no cambian de estado; las conservadas no terminales mantienen
+  estado, owner y `Ronda`, y el orchestrator actualiza `Depende de` y la nota
+  con la referencia al plan nuevo (evento `reconciled`); las canceladas
+  previas no cambian.
 - `cancelled` (cualquier estado no terminal, S04): nota con razón e impacto;
   exige cambio de alcance aceptado (`scope … cancelled T<n> accepted` en
   `control`, o sustitución aceptada en el gate 2 renovado), dependientes

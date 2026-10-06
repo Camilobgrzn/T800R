@@ -84,8 +84,8 @@ idea / issue / problema en una frase
                │ desde aquí plan.md es inmutable; el progreso vive en tasks.md
                ▼
 ┌─ build ────────────────────────────────────────────────────────────┐
-│ orchestrator: tarea `ready` en tasks.md + asignación en             │
-│   participations.md (ambos en feat/<id>)                            │
+│ orchestrator: tarea `ready` → asignada: owner, `in_progress`,       │
+│   assigned + started en participations.md (ambos en feat/<id>)      │
 │ /feature-build <task> ──► rama task/<id>/<task> desde feat/<id>;    │◄─┐
 │   trabajo hasta <sha-trabajo>; encima commit `evidence:` con        │  │ hasta
 │   evidence/<task>.md (append-only) y evidence/<task>.findings.md si hay hallazgo    │  │ 3 rondas
@@ -98,7 +98,7 @@ idea / issue / problema en una frase
 │   `high`: además aprobación `local` en control:approvals/<id>.md    │
 │ orchestrator: completed + merge de la rama en feat/<id> (`merged`)  │
 └──────────────┬─────────────────────────────────────────────────────┘
-               ▼ todas las tareas `completed` (pass o concerns) y `merged`
+               ▼ cada tarea `completed` (pass/concerns) y `merged`, o `cancelled` aceptada
 ┌─ deploy (integrar) ────────────────────────────────────────────────┐
 │ /feature-integrate ──► candidata = feat/<id> sobre main:            │
 │   cierre documental (specs/; spec.md y plan.md intactos) = sha-verif.│
@@ -174,7 +174,7 @@ flowchart TD
     gh -- "worker ejecuta el efecto;<br/>comprobación posterior" --> verifyS
 
     verifyS -- "pass / concerns" --> merged["orchestrator: completed<br/>+ merge de la rama en feat/&lt;id&gt; (merged)"]
-    merged --> allDone{¿todas las tareas completed y merged?}
+    merged --> allDone{¿cada tarea completed+merged<br/>o cancelled aceptada?}
     allDone -- no --> orch
 
     subgraph deploy["deploy (integrar)"]
@@ -253,8 +253,8 @@ reclasifica a `feature` y vuelve a `plan`.
 | --- | --- | --- | --- | --- | --- |
 | `/feature-spec` | `plan` | planner + persona | Idea, issue o problema en una frase; borrador; `acotado` reclasificado; defecto de spec | `features/<id>/spec.md` en `feat/<id>` | Prepara el gate 1 (aprobar spec); se detiene ante un efecto `prohibited` |
 | `/feature-plan` | `design` | planner | `spec.md` aprobada (o descripción del `acotado`); replanificación por defecto de spec, reclasificación, cambio de alcance o rondas agotadas | `plan.md` en `feat/<id>`; inicializa `tasks.md` y `participations.md` | Prepara el gate 2 (autorizar `build`, aceptando los `CONCERNS`); `FAIL` cierra y devuelve a `/feature-spec` |
-| `/feature-build <task>` | `build` | worker | Autorización de `build` vigente (digests de plan y spec), tarea `ready` con dependencias `merged`, brief | Rama `task/<id>/<task>` hasta `<sha-trabajo>`; encima commit `evidence:` con `evidence/<task>.md` y `evidence/<task>.findings.md` | Ninguno; se detiene por `intent gap`, defecto de spec, `high` sin aprobar, `prohibited` o ronda 3 |
-| `/feature-verify <task>` | `verify` | verifier | `<sha-trabajo>` y `<sha-entrega>` de `evidence/<task>.md` | `evidence/<task>.verdict.md` en `feat/<id>` (commit `verdict:`) | Cierra la tarea (`pass` o `concerns`) o la devuelve a `build` (`fail`); `high` exige aprobación `local` |
+| `/feature-build <task>` | `build` | worker | Autorización de `build` vigente (digests de plan y spec), tarea asignada (`in_progress` con el worker como owner; `ready` es la elegibilidad previa) con dependencias `merged`, brief | Rama `task/<id>/<task>` hasta `<sha-trabajo>`; encima commit `evidence:` con `evidence/<task>.md` y `evidence/<task>.findings.md` | Ninguno; se detiene por `intent gap`, defecto de spec, `high` sin aprobar, `prohibited` o ronda 3 |
+| `/feature-verify <task>` | `verify` | verifier | `<sha-trabajo>` de `evidence/<task>.md`; `<sha-entrega>` del evento `delivered`, contrastado con el HEAD de la rama | `evidence/<task>.verdict.md` en `feat/<id>` (commit `verdict:`) | Cierra la tarea (`pass` o `concerns`) o la devuelve a `build` (`fail`); `high` exige aprobación `local` |
 | `/feature-integrate` | `deploy` | integrador + persona | Cada tarea `completed` (con veredicto o ratificación vigente y `merged`) o `cancelled` (con alcance aceptado y dependencias reconciliadas) | Candidata `feat/<id>` (`specs/`, `evidence/README.md` en commit `evidence:`; nunca `spec.md` ni `plan.md`) | Prepara el gate 3 (aprobar merge); el merge lo ejecuta la persona; después sólo `integrated` en `control` |
 | `/session-handoff` | transversal | worker o integrador que cierra | Estado real de la rama entregada | `evidence/<task>.handoff.md` (tipo `work` o `integrate`), commits `wip:` y `handoff:` | Ninguno |
 | `/session-resume` | transversal | quien abre la sesión | `evidence/<task>.handoff.md`, rama entregada, coordinación actual en `feat/<id>` | Nada; acepta o rechaza vía eventos del orchestrator | Ninguno; puede rechazar el handoff |
@@ -276,7 +276,7 @@ pendiente; cuando la persona pide un **cambio de alcance, comportamiento o
 interfaz** sobre una spec aprobada que no era defectuosa (sección «Impacto del
 cambio»; renueva el gate 1 y después el gate 2). **Cuándo no.** Para un
 `acotado` (la spec cabe en `plan.md`), para un `spike`, o cuando ya existe spec
-aprobada sin defecto ni cambio pedido.
+aprobada sin defecto, sin decisión funcional pendiente ni cambio pedido.
 
 **Precondiciones mecánicas.** Una de las cinco entradas anteriores; si
 `spec.md` ya tiene digest aprobado en `control:approvals/<id>.md`, advierte que
@@ -333,10 +333,12 @@ el planner los escribe, después son del orchestrator. Todo se comete en
 `participations.md`, identifica las tareas afectadas (el orchestrator registra
 `invalidated`), y deja que las independientes continúen (workflow §4.2-4.3;
 conservación histórica de S04 l. 94-99). Dispone **cada** tarea existente:
-conservada (ratificación del verifier contra los digests nuevos, evento
-`ratified`), rehacer (mismo `id`, `pending`) o sustituida por otra
-(`cancelled superseded by T<m>`); ninguna obligatoria queda `pending` si su
-corrección va en otra. La skill
+conservada completada (ratificación del verifier contra los digests nuevos,
+evento `ratified`), conservada no terminal (mantiene estado, owner y trabajo;
+se reconcilian dependencias y plan, evento `reconciled`; se verifica al
+entregar), cancelada previa (se conserva), rehacer (mismo `id`, `pending`) o
+sustituida por otra (`cancelled superseded by T<m>`); ninguna obligatoria
+queda `pending` si su corrección va en otra. La skill
 comprueba lo mecánico del readiness (aceptación y archivos por tarea, IDs,
 comandos, criterios cubiertos, ningún efecto `prohibited`); el juicio sobre
 incógnitas lo prepara el planner.
@@ -390,7 +392,8 @@ y `evidence/<task>.findings.md`; hallazgos clasificados (laguna de intención �
 `intent gap` con el intento como parche; defecto de spec → `/feature-spec`;
 corrección local → se hace y se anota; hallazgo ajeno → `evidence/<task>.findings.md`). Un
 efecto `high` en ejecución se entrega sin ejecutar y se ejecuta en la fase de
-efecto, tras `pass` y aprobación `local`.
+efecto, tras el veredicto previo `ready_for_effect` y la aprobación `local`;
+el veredicto final llega con la comprobación posterior.
 
 **Qué no hace.** No escribe veredictos, aprobaciones ni `participations.md`. No
 ejecuta integración. No toca archivos fuera de los permitidos más sus rutas de
@@ -472,14 +475,15 @@ esa línea.
 base exacta de `main` y dejar listo el gate 3; el merge lo ejecuta la persona
 (workflow §4.5).
 
-**Cuándo invocarla.** Cuando todas las tareas están `completed` (`pass` o
-`concerns`) y `merged` en `feat/<id>`, y cada veredicto tiene `actor_id`
-elegible. **Cuándo no.** Con tareas `fail` o sin veredicto; con una rama de
-tarea movida tras su entrega; para desplegar a un entorno (fuera del v0; será
-`high`).
+**Cuándo invocarla.** Cuando cada tarea del plan está `completed` (veredicto
+`pass` o `concerns` vigente o ratificado, `actor_id` elegible, `merged` en
+`feat/<id>`) o `cancelled` (aceptación de alcance, dependencias reconciliadas
+y disposición del código). **Cuándo no.** Con tareas en otro estado o una
+`completed` sin veredicto vigente; con una rama de tarea movida tras su
+entrega; para desplegar a un entorno (fuera del v0; será `high`).
 
 **Precondiciones mecánicas.** Autorización de `build` vigente para los digests
-actuales; todas las tareas `completed` y `merged`; cada `.verdict.md` en `pass`
+actuales; cada tarea `completed` y `merged` o `cancelled` aceptada; cada `.verdict.md` en `pass`
 o `concerns`, posterior al último `invalidated` de su tarea; `actor_id` de cada
 veredicto ausente de `participations.md` como worker u owner de esa tarea;
 `high` aprobado donde se exige; revisión manual de escrituras indebidas por la
@@ -696,12 +700,12 @@ proyectarse a los proveedores.
 | verifier | Actor con `actor_id` elegible que reejecuta las validaciones y escribe `evidence/<task>.verdict.md`. |
 | incremento | Unidad que recorre `plan → design → build → verify → deploy`; aquí, una `feature` o un `acotado`. `build` se autoriza por incremento, no por tarea (S04 l. 81, 275). |
 | digest | Hash del contenido de `spec.md` o `plan.md` en el momento de aprobar; las líneas de `control:approvals/<id>.md` lo citan para que la aprobación identifique exactamente lo aprobado. Método fijado por las skills: `git hash-object <archivo>`; el digest no se escribe dentro del archivo. |
-| candidata | `feat/<id>` con todas las tareas `merged`, actualizada sobre `main` y con los cambios documentales del cierre (`<sha-verificado>`), más `evidence/README.md` encima: `<sha-candidato>`. |
+| candidata | `feat/<id>` con cada tarea `completed` ya `merged` (y las `cancelled` aceptadas), actualizada sobre `main` y con los cambios documentales del cierre (`<sha-verificado>`), más `evidence/README.md` encima: `<sha-candidato>`. |
 | base | SHA de `main` sobre el que se verificó la candidata (`<sha-main-base>`); se aprueba el par y se integra sólo si ambos siguen iguales. |
 | `high` | Nivel de riesgo que exige aprobación `local` de la persona en el punto del efecto (disparadores de S09 l. 83 más `protected_paths`). Dos formas: **fase de efecto** (veredicto previo `ready_for_effect` → `waiting` → aprobación → el worker ejecuta releyendo `control` → comprobación posterior con veredicto final; espera y comprobación `pass` no consumen ronda, un `fail` posterior sí y bloquea hasta decidir la recuperación) y **`protected_paths`** (la aprobación es precondición del gate 3). |
 | `prohibited` | Nivel de riesgo que nunca se ejecuta. Dos clases: las **prohibiciones del canon** (S12 l. 64: efectos irreversibles fuera del repositorio; E5) no se aflojan en el v0 aunque cambie `policy.yaml`; las **adicionales** que declare `policy.yaml` sólo las reconsidera un cambio de política (`high`, separado). Se evalúa antes que `high`; una aprobación `high` no habilita ninguna. |
 | `ready_for_effect` | Veredicto previo de una tarea `high` con fase de efecto: criterios independientes del efecto cumplidos, validaciones en verde, efecto y recuperación descritos; **no declara cumplimiento**; pasa la tarea a `waiting`. El veredicto final llega con la comprobación posterior. |
-| reconciliación | Tras un gate 2 renovado, disposición de cada tarea existente: conservada (ratificación del verifier, evento `ratified`), rehacer (`invalidated` → `pending`, mismo `id`) o sustituida (`invalidated` + `cancelled superseded by T<m>`). Ninguna tarea obligatoria queda `pending` si su corrección va en otra (workflow §4.2). |
+| reconciliación | Tras un gate 2 renovado, disposición de cada tarea existente: conservada completada (ratificación del verifier, evento `ratified`), conservada no terminal (mantiene estado, owner y trabajo; dependencias y referencia al plan nuevo actualizadas, evento `reconciled`; se verifica al entregar), cancelada previa (se conserva), rehacer (`invalidated` → `pending`, mismo `id`) o sustituida (`invalidated` + `cancelled superseded by T<m>`). Ninguna tarea obligatoria queda `pending` si su corrección va en otra (workflow §4.2). |
 | protocolo de commit | Para todo escritor del checkout de coordinación: índice y árbol limpios al empezar (cambios ajenos → detenerse y escalar), `git add` por lista explícita, `git diff --cached --name-only` igual a la lista antes de cometer, árbol limpio al terminar (workflow §2.1). |
 | readiness | Resultado `PASS` / `CONCERNS` / `FAIL` de «¿puede implementarse sin inventar decisiones no registradas?», con condiciones de S04 l. 83; lo prepara el planner, lo autoriza la persona. |
 | intent gap | Laguna de intención: dos lecturas de la spec producen resultados observables distintos y nada registrado permite elegir. La tarea queda `blocked`, el intento se guarda como parche y se consulta a la persona. |

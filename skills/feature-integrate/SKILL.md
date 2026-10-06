@@ -1,6 +1,6 @@
 ---
 name: feature-integrate
-description: Prepara la candidata completa de una feature (la rama feat/<id> con todas las tareas merged y el cierre documental), la verifica integrada sobre la base exacta de main con las validaciones globales y deja lista la aprobación del gate 3 como par (sha-candidato, sha-main-base); el merge lo ejecuta la persona. Úsala cuando todas las tareas están completed con veredicto pass o concerns y cada veredicto tiene actor_id elegible. No la uses con tareas fail o sin veredicto, con una rama de tarea movida tras su entrega, ni para desplegar a un entorno.
+description: Prepara la candidata completa de una feature (la rama feat/<id> con cada tarea completed verificada y merged, o cancelled con aceptación, dependencias reconciliadas y disposición del código, más el cierre documental), la verifica integrada sobre la base exacta de main con las validaciones globales y deja lista la aprobación del gate 3 como par (sha-candidato, sha-main-base); el merge lo ejecuta la persona. Úsala cuando cada tarea del plan está completed (veredicto pass o concerns vigente o ratificado, actor_id elegible, merged) o cancelled con esas condiciones. No la uses con tareas en otro estado, con una completed sin veredicto vigente, con una rama de tarea movida tras su entrega, ni para desplegar a un entorno.
 ---
 
 # /feature-integrate
@@ -53,8 +53,9 @@ se crea otra rama.
    `pass`/`concerns`; un `ready_for_effect` sin comprobación posterior no
    cierra), es **posterior al último `invalidated`** de su tarea y cita los
    digests vigentes **o** termina en una «Ratificación» que los cita (evento
-   `ratified`); los `concerns` figuran en la lista que la persona aceptará en
-   el gate 3.
+   `ratified`; una conservada no terminal que entregó después de la
+   replanificación ya cita los digests nuevos y no necesita ratificación); los
+   `concerns` figuran en la lista que la persona aceptará en el gate 3.
 3b. Para cada **`cancelled`** (S04 l. 102) no se exige entrega, veredicto ni
    merge; se exige: evento `cancelled` con razón e impacto; cambio de alcance
    aceptado (`scope <digest-plan> cancelled T<n> accepted` en
@@ -136,8 +137,10 @@ se crea otra rama.
 
 ## Comprobación antes de pedir el gate 3
 
-- [ ] Candidata `feat/<id>` contiene todas las tareas (`merged`) y el cierre
-      documental; actualizada sobre `<sha-main-base>`.
+- [ ] Cada tarea del plan está `completed` (verificada y `merged` en la
+      candidata `feat/<id>`) o `cancelled` (aceptación, dependencias
+      reconciliadas y disposición del código anotadas); cierre documental
+      incluido; candidata actualizada sobre `<sha-main-base>`.
 - [ ] Validaciones globales ejecutadas sobre `<sha-verificado>`; ausencias
       registradas con aceptación focalizada.
 - [ ] `evidence/README.md` en commit de registro; entre `<sha-verificado>` y
@@ -152,7 +155,7 @@ se crea otra rama.
 
 | Caso | Prueba |
 | --- | --- |
-| Activación | Feature con todas las tareas `completed` y `merged` → `feat/<id>` actualizada, cierre documental, validaciones y par de SHA |
+| Activación | Feature con cada tarea `completed` y `merged`, o `cancelled` aceptada → `feat/<id>` actualizada, cierre documental, validaciones y par de SHA |
 | No activación | «¿Cuánto falta para integrar?» → responde desde `tasks.md`, no toca la candidata |
 | Restricción | Una tarea `fail`, un veredicto con `actor_id` que fue worker, un veredicto anterior a un `invalidated` sin ratificación, o una `cancelled` sin cambio de alcance aceptado → se detiene; `main` avanzado tras la aprobación → no hace merge y pide nueva verificación; `tasks.md` staged ajeno en el checkout → no comete y escala |
 | Continuidad | Tarea `cancelled` con `scope … accepted` y dependientes recableadas → integra sin exigirle veredicto ni merge; tarea conservada con «Ratificación» contra los digests nuevos → aceptada |

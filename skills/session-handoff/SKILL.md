@@ -53,9 +53,13 @@ verificación a medias se descarta y se rehace con contexto nuevo (workflow
 
 ## Procedimiento
 
-1. **Inspecciona antes de tocar.** `git status --porcelain` y `git diff
-   --cached --name-only`. Cada ruta listada (modificada, nueva o ya staged)
-   debe estar en tu lista de archivos propios. Si hay una ruta ajena: si es
+1. **Inspecciona antes de tocar.** Esta skill es la **excepción declarada** al
+   paso (a) del protocolo de commit (workflow §2.1): empiezas con cambios
+   propios pendientes, porque guardarlos es su objeto; lo que no cambia es el
+   rechazo de lo ajeno, la lista explícita y la comprobación del staged.
+   `git status --porcelain` y `git diff --cached --name-only`. Cada ruta
+   listada (modificada, nueva o ya staged) debe estar en tu lista de archivos
+   propios. Si hay una ruta ajena: si es
    tuya por error, restáurala (`git restore --staged -- <ruta>` y `git
    checkout -- <ruta>`) y repórtalo en «Pendiente»; si no sabes de dónde
    viene, **no la toques, no emitas handoff y escala** (árbol o índice sucio de

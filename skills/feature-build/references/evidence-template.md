@@ -24,7 +24,7 @@ escribe aquí: una invalidación tras replanificar se registra como evento
 ### Precondiciones comprobadas
 - build autorizado: `build <digest-plan> on spec <digest-spec> …` en control:approvals/<id>.md ✔
 - plan.md y spec.md: digests actuales coinciden ✔
-- tasks.md (feat/<id>): T<n> ready/in_progress, owner <actor_id>; dependencias completed y merged ✔
+- tasks.md (feat/<id>): T<n> in_progress, owner <actor_id>; dependencias completed y merged ✔
 - participations.md (feat/<id>): assigned/transferred posterior a todo invalidated ✔
 - Rama task/<id>/T<n> desde <sha-base> en worktree propio ✔
 

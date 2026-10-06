@@ -20,8 +20,11 @@ Eventos:
   `started` se registran juntos al asignar; `delivered` cita `<sha-trabajo>` y
   `<sha-entrega>`, que es el HEAD de la rama de la tarea)
 - verdict (verifier; nota: `pass`, `concerns`, `fail <clase>`,
-  `ready_for_effect` o `posterior pass|fail`), ratified (verifier ratifica un
-  veredicto conservado contra los digests nuevos tras una replanificación),
+  `ready_for_effect` o `posterior pass|fail`), ratified (verifier ratifica el
+  veredicto de una tarea conservada **completada** contra los digests nuevos
+  tras una replanificación), reconciled (orchestrator: tarea conservada **no
+  terminal** con dependencias y referencia al plan nuevo actualizadas; mantiene
+  estado y owner),
   ineligible (lo registra el orchestrator cuando un candidato a verifier no
   pudo verificar, sin que se escriba veredicto)
 - merged (orchestrator: rama de la tarea integrada en feat/<id> tras pass o

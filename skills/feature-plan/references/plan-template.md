@@ -81,7 +81,9 @@ Máximo dos workers. Pares admitidos: <T<a> ∥ T<b>> | ninguno.
 - Disposición de cada tarea existente (todas):
   | Tarea | Disposición | Detalle |
   | --- | --- | --- |
-  | T1 | conservada | ratificar contra los digests nuevos |
+  | T1 | conservada completada | ratificar contra los digests nuevos (completed y merged) |
+  | T4 | conservada no terminal | mantiene estado y owner; dependencias/plan reconciliados en tasks.md; se verifica al entregar |
+  | T6 | cancelada previa | se conserva sin ratificación |
   | T2 | rehacer | invalidated → pending; rama recreada desde feat/<id> si estaba merged |
   | T3 | sustituida por T5 | invalidated + cancelled (superseded); T5 corrige/retira su código y hereda sus dependientes |
 - Tareas nuevas: T<n>, … (con lo que sustituyen, si aplica)

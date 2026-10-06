@@ -134,12 +134,16 @@ las skills lo aplican igual.
    limita lo que `git commit` incorpora si otro dejó algo staged. Por eso una
    operación a la vez (en bootstrap la persona abre una sola sesión sobre el
    checkout) y todo escritor, en cualquier rama, sigue el mismo protocolo:
-   (a) empieza con `git status --porcelain` vacío; si hay cambios o staged
-   ajenos, **no los toca, no comete y escala**; (b) escribe sólo sus archivos;
-   (c) `git add -- <lista explícita>`; (d) `git diff --cached --name-only` es
-   exactamente su lista, si no, `git reset -q` y detenerse; (e) commit;
-   (f) termina con árbol limpio. Las skills lo citan como «protocolo de
-   commit».
+   (a) **al adquirir el checkout compartido**, `git status --porcelain` vacío;
+   si hay cambios o staged ajenos, **no los toca, no comete y escala**;
+   (b) escribe sólo sus archivos; (c) `git add -- <lista explícita>`;
+   (d) `git diff --cached --name-only` es exactamente su lista, si no,
+   `git reset -q` y detenerse; (e) commit; (f) termina con árbol limpio.
+   **Excepción de `/session-handoff`**: parte, por definición, de cambios
+   propios pendientes (su commit `wip:` existe para guardarlos); sustituye
+   (a) por identificar cada cambio y staged contra su lista de rutas propias y
+   rechazar cualquier ruta ajena, y aplica (c)-(f) sin cambios. Las skills lo
+   citan como «protocolo de commit».
 8. **Rutas por rol y operación.** Una sola tabla, usada por quien produce y por
    quien comprueba (`git diff --name-only <desde>..<hasta>` ⊆ conjunto); no se
    exige un commit de trabajo artificial para pasar la comprobación.
@@ -276,11 +280,21 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
   una tarea (cambiar su tamaño). El planner clasifica **cada** tarea existente
   en la sección «Replanificación» y, tras la nueva línea `build … authorized`,
   el orchestrator ejecuta la **reconciliación** que la sección fija:
-  - **conservada** (no cambia): su veredicto cita digests antiguos, así que un
-    verifier elegible para ella la **ratifica** contra los digests nuevos con
-    una entrada «Ratificación» en su `.verdict.md` (commit `verdict:`) y el
-    orchestrator registra `ratified`; una sola sesión puede ratificar todas las
-    conservadas. Sigue `completed` y `merged`;
+  - **conservada completada** (no cambia y ya está `completed` y `merged`):
+    su veredicto cita digests antiguos, así que un verifier elegible para ella
+    la **ratifica** contra los digests nuevos con una entrada «Ratificación»
+    en su `.verdict.md` (commit `verdict:`) y el orchestrator registra
+    `ratified`; una sola sesión puede ratificar todas. Sigue `completed` y
+    `merged`;
+  - **conservada no terminal** (no cambia y está `pending`, `in_progress`,
+    `waiting` o `blocked`): mantiene estado, owner y trabajo válido (S04:
+    conservar lo independiente); el orchestrator reconcilia en `tasks.md` sus
+    dependencias y la referencia al plan nuevo (evento `reconciled`); no se
+    ratifica nada porque aún no hay veredicto: se verificará cuando entregue,
+    ya contra los digests nuevos;
+  - **cancelada antes de la replanificación**: se conserva tal cual, sin
+    ratificación; sólo se recablean sus dependientes si el plan nuevo lo
+    requiere;
   - **rehacer** (afectada, mismo `id`): `invalidated` → `pending` → nueva
     asignación, entrega y verificación; si ya estaba `merged`, el orchestrator
     recrea `task/<id>/T<n>` desde `feat/<id>` actual (que contiene el código
@@ -298,8 +312,10 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
 
 - Precondición mecánica: `control:approvals/<id>.md` contiene la autorización
   de `build` para los digests **actuales** de `plan.md` **y** `spec.md` (ambos
-  se recalculan); la tarea está `ready` en `tasks.md`; sus dependencias están
-  `completed` y ya integradas en `feat/<id>` (evento `merged`); el orchestrator
+  se recalculan); la tarea está `in_progress` en `tasks.md` con el worker como
+  owner (`ready` es la elegibilidad previa: al asignar, el orchestrator la pasa
+  a `in_progress`); sus dependencias están `completed` y ya integradas en
+  `feat/<id>` (evento `merged`); el orchestrator
   registró `assigned` y `started` juntos en `participations.md` al asignar (el
   worker no espera un relevo); si la tarea tiene un evento `invalidated`,
   existe una asignación posterior.
@@ -343,10 +359,12 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
   - **corrección local** → se hace y se anota;
   - **hallazgo ajeno** → `evidence/<task>.findings.md`, sin tocar archivos fuera del alcance.
 - Límite de **tres rondas** por tarea; una ronda es un par build → verify que
-  termina en `fail`. La espera de una aprobación `high`, la ejecución del efecto
-  aprobado y su comprobación posterior **no consumen ronda**. Al agotarlas,
-  cambiar contexto, tamaño de tarea (replanificar) o modelo, o escalar; nunca
-  repetir sin cambios.
+  termina en `fail`. Regla única de cómputo para `high` con fase de efecto: la
+  espera de la aprobación, la ejecución del efecto aprobado y una comprobación
+  posterior satisfactoria (`pass`/`concerns`) **no consumen ronda**; un `fail`
+  posterior **suma una ronda y bloquea** la tarea hasta resolver la
+  recuperación. Al agotarlas, cambiar contexto, tamaño de tarea (replanificar)
+  o modelo, o escalar; nunca repetir sin cambios.
 - Efectos `high` en ejecución (migración destructiva, push fuera del
   repositorio): el worker entrega **sin** ejecutarlos. El verifier emite una
   **revisión previa al efecto** con veredicto `ready_for_effect`: los criterios

@@ -131,9 +131,16 @@ incertidumbre lo justifican; no es un gate rutinario.
   `participations.md` ni `evidence/`. En `plan.md` añade la sección
   «Replanificación» con la entrada, qué cambió y la **disposición de cada
   tarea existente** (workflow §4.2), sin excepción:
-  - **conservada**: no cambia; tras el nuevo gate 2 un verifier elegible la
-    ratifica contra los digests nuevos (entrada «Ratificación» en su
-    `.verdict.md`; evento `ratified`). Sigue `completed` y `merged`;
+  - **conservada completada**: no cambia y ya está `completed` y `merged`;
+    tras el nuevo gate 2 un verifier elegible la ratifica contra los digests
+    nuevos (entrada «Ratificación» en su `.verdict.md`; evento `ratified`);
+  - **conservada no terminal**: no cambia y está `pending`, `in_progress`,
+    `waiting` o `blocked`; mantiene estado, owner y trabajo válido; el
+    orchestrator reconcilia sus dependencias y la referencia al plan nuevo en
+    `tasks.md` (evento `reconciled`); se verificará cuando entregue, contra
+    los digests nuevos; no la clasifiques como «rehacer»;
+  - **cancelada previa**: ya estaba `cancelled`; se conserva sin ratificación,
+    recableando dependientes sólo si el plan nuevo lo requiere;
   - **rehacer**: afectada y se corrige con el mismo `id`; el orchestrator
     registra `invalidated` (→ `pending`, `Ronda` 0) y, si estaba `merged`,
     recrea `task/<id>/T<n>` desde `feat/<id>` actual;

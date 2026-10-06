@@ -139,8 +139,10 @@ de la tarea (`git show <sha-entrega>:features/<id>/evidence/<task>.md`).
    parcial, no ejecutado) para que el orchestrator bloquee la tarea hasta que
    la persona decida la recuperación; si el efecto a reintentar cambia, su
    digest cambia y hace falta nueva aprobación.
-9. **Ratificación tras una replanificación.** Si el orchestrator te pide
-   ratificar una tarea «conservada» (workflow §4.2), comprueba tu elegibilidad
+9. **Ratificación tras una replanificación.** Sólo para tareas «conservadas
+   completadas» (workflow §4.2); una conservada no terminal no se ratifica: se
+   verificará al entregar, ya con los digests nuevos. Si el orchestrator te
+   pide ratificar una, comprueba tu elegibilidad
    para ella, que su `<sha-entrega>` sigue `merged` en `feat/<id>` y que la
    tarea no cambia en el plan nuevo; añade la entrada «Ratificación» con los
    digests vigentes a su `.verdict.md` (commit `verdict: T<n> ratificación`)

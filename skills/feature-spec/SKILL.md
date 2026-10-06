@@ -1,6 +1,6 @@
 ---
 name: feature-spec
-description: Convierte una idea, issue o problema en features/<id>/spec.md con criterios de aceptación verificables, decisiones tomadas y delegadas y riesgo declarado, listo para que la persona lo apruebe en el gate 1. Úsala al abrir una feature, al revisar un borrador, al reclasificar un acotado, cuando build/verify/readiness reportan un defecto o una decisión funcional pendiente, o cuando la persona pide un cambio de alcance, comportamiento o interfaz sobre una spec aprobada. No la uses para un acotado, un spike ni cuando ya existe spec aprobada sin defecto conocido.
+description: Convierte una idea, issue o problema en features/<id>/spec.md con criterios de aceptación verificables, decisiones tomadas y delegadas y riesgo declarado, listo para que la persona lo apruebe en el gate 1. Úsala al abrir una feature, al revisar un borrador, al reclasificar un acotado, cuando build/verify/readiness reportan un defecto o una decisión funcional pendiente, o cuando la persona pide un cambio de alcance, comportamiento o interfaz sobre una spec aprobada. No la uses para un acotado, un spike ni cuando ya existe spec aprobada sin defecto conocido, sin decisión funcional pendiente y sin cambio solicitado por la persona.
 ---
 
 # /feature-spec
