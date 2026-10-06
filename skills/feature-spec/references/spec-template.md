@@ -9,7 +9,8 @@ id: <id>
 title: <título corto>
 size: feature | acotado | spike
 risk: routine | high
-risk_reason: <por qué; qué disparador de S09 o qué protected_path>
+risk_reason: <por qué; qué disparador de S09 l. 83 o qué protected_path>
+prohibited_effects: none   # si hay alguno, el gate 1 no procede (ver sección)
 status: draft            # metadato; la aprobación vive en control:approvals/<id>.md
 created: <YYYY-MM-DD>
 ---
@@ -50,6 +51,12 @@ observable (p. ej. nombre de un módulo interno, librería auxiliar).
 | Interfaz | Cambio | Consumidores conocidos |
 | --- | --- | --- |
 
+## Efectos prohibidos
+
+«Ninguno», o la lista de criterios que exigen un efecto irreversible fuera del
+repositorio (S12 l. 64) o algo `prohibited` en `policy.yaml`. Si hay alguno, el
+gate 1 no procede: se reformula el criterio; ninguna aprobación lo habilita.
+
 ## Preguntas abiertas
 
 Incógnitas de comportamiento sin resolver. Si hay alguna, el gate 1 no procede.
@@ -61,10 +68,14 @@ Sólo términos nuevos que introduce esta feature.
 
 Notas:
 
-- `status` cambia a `implemented` únicamente en la candidata que prepara
-  `/feature-integrate`. `approved` es tolerable como metadato, pero no
-  autoriza nada: la aprobación es la línea en `control`.
+- `status` **no cambia después del gate 1**: editar el archivo cambiaría el
+  digest aprobado. Que la spec está aprobada lo dice `control`; que está
+  implementada lo dicen `specs/` y la línea `integrated <sha-merge>` en
+  `control`. Un `status: approved` escrito antes del gate 1 es tolerable como
+  metadato, pero no autoriza nada.
 - El digest **no se escribe dentro del archivo** (insertarlo cambiaría el
   hash). Se calcula con `git hash-object features/<id>/spec.md` sobre el archivo
   guardado y se entrega en el retorno; la línea de aprobación en `control` cita
   ese valor. Cambiar una letra cambia el digest y la aprobación deja de aplicar.
+- El archivo vive en la rama `feat/<id>` (workflow §2.1); se comete ahí
+  (`coord: spec <id>`) antes de calcular el digest.

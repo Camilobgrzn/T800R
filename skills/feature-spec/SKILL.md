@@ -5,9 +5,10 @@ description: Convierte una idea, issue o problema en features/<id>/spec.md con c
 
 # /feature-spec
 
-Etapa `plan` del flujo de construcción
-([workflow-construccion.md](../../docs/workflow-construccion.md) §4.1; catálogo en
-[README](../README.md) §4.1). La ejecuta el planner junto con la persona.
+Etapa `plan` del flujo de construcción (`docs/workflow-construccion.md` §4.1;
+catálogo en `skills/README.md` §4.1; rutas desde la raíz del repositorio). La
+ejecuta el planner junto con la persona, desde el checkout de coordinación en la
+rama `feat/<id>` (workflow §2.1).
 
 ## Qué produce
 
@@ -29,15 +30,25 @@ y una propuesta de tamaño del cambio (`spike`, `acotado`, `feature`). Nada más
 
 Compruébalas antes de escribir; si alguna falla, detente y dilo.
 
-1. `id` propuesto único: `features/<id>/` no existe, o existe y contiene un
-   `spec.md` con **defecto de spec** reportado en `evidence/<task>.md` o en un
-   `.verdict.md` (`findings.md` es sólo para hallazgos ajenos).
+1. Una de estas cuatro entradas, y dilo cuál:
+   - **feature nueva**: `features/<id>/` no existe (`id` único); crea la rama
+     `feat/<id>` desde `main` si no existe;
+   - **borrador**: existe `spec.md` con `status: draft` y sin línea `spec …
+     approved` en `control`; se revisa en el sitio;
+   - **reclasificación de un `acotado`**: existe `plan.md` y no `spec.md`; la
+     spec se escribe en el mismo directorio y la autorización de `build` del
+     acotado deja de aplicar (el orchestrator registra `invalidated` en sus
+     tareas; después replanifica `/feature-plan`);
+   - **defecto de spec** reportado en `evidence/<task>.md` o en un
+     `.verdict.md` (`evidence/<task>.findings.md` es sólo para hallazgos ajenos).
 2. Si `features/<id>/spec.md` ya tiene una línea `spec <digest> approved` en
    `control:approvals/<id>.md` (`git show control:approvals/<id>.md`), advierte
    que cambiarla exige nueva aprobación y, si además hay `build … authorized`,
    nueva autorización con replanificación (`/feature-plan`).
-3. Si existe `policy.yaml`, lee `protected_paths` para declarar el riesgo. Si no
-   existe, usa los disparadores de S09 (sección «Riesgo» de la plantilla).
+3. Si existe `policy.yaml`, lee `protected_paths` y los niveles declarados para
+   el riesgo. Si no existe, usa la lista de `protected_paths` del workflow §4.3
+   y los disparadores de aprobación previa de S09 l. 83, reproducidos en el
+   paso 4.
 
 ## Procedimiento
 
@@ -54,11 +65,20 @@ Compruébalas antes de escribir; si alguna falla, detente y dilo.
    canon fija, con la fuente. «Decisiones delegadas»: detalles técnicos que el
    worker puede resolver sin cambiar el comportamiento. Una incógnita de
    comportamiento no se delega: va a «Preguntas abiertas» y bloquea el gate 1.
-4. **Declara el riesgo.** `high` si algún criterio implica pérdida o
-   transformación irreversible de datos, credenciales o permisos, efectos
-   externos irreversibles, contratos compartidos, o toca `protected_paths`
-   (`package.json` scripts, hooks, CI, lockfiles, `policy.yaml`, `skills/`,
-   configuración de agentes). Si dudas, `high`; la persona puede rebajarlo.
+4. **Declara el riesgo, `prohibited` primero.** Si algún criterio exige un
+   **efecto irreversible fuera del repositorio** (S12 l. 64: borrar o
+   transformar datos externos, pagos, envíos, despliegue a producción, push
+   forzado fuera del repositorio) o algo que `policy.yaml` declare
+   `prohibited`, anótalo en «Efectos prohibidos» y **detente**: la spec no es
+   aprobable tal cual; propón reformular el criterio (efecto reversible, o paso
+   manual de la persona fuera de T800R). Una aprobación `high` nunca lo
+   convierte en ejecutable; sólo un cambio de `policy.yaml` (cambio `high`
+   separado) lo reclasifica. Después, `high` si algún criterio implica pérdida
+   o transformación irreversible de datos, credenciales o permisos, contratos
+   compartidos, o toca `protected_paths` (`package.json` scripts, hooks, CI,
+   lockfiles, `policy.yaml`, `skills/`, configuración de agentes, más los de
+   `policy.yaml`). Si dudas, `high`; la persona puede corregir una
+   clasificación `high` → `routine` con motivo, nunca una `prohibited`.
 5. **Propón el tamaño.** `feature` si hay comportamiento nuevo o cambio
    arquitectónico; `acotado` si no hay comportamiento nuevo (entonces esta skill
    sobra: dilo y propón ir a `/feature-plan`); `spike` si una incertidumbre
@@ -84,10 +104,11 @@ Compruébalas antes de escribir; si alguna falla, detente y dilo.
 
 - [ ] Cada criterio de aceptación tiene cómo verificarse.
 - [ ] No hay decisión inventada: todo lo tomado tiene fuente (persona o canon).
-- [ ] Riesgo declarado con su motivo.
+- [ ] Riesgo declarado con su motivo; «Efectos prohibidos: ninguno» o detenida.
 - [ ] No-alcance escrito.
 - [ ] Digest calculado sobre el archivo final y no escrito dentro de él.
-- [ ] No se escribió en ningún otro archivo.
+- [ ] No se escribió en ningún otro archivo; la spec está cometida en
+      `feat/<id>` (`coord: spec <id>`).
 
 ## Evals (checklist manual, README §6)
 
@@ -95,12 +116,12 @@ Compruébalas antes de escribir; si alguna falla, detente y dilo.
 | --- | --- |
 | Activación | «Quiero que el IDP registre los servicios de la organización en el catálogo» → produce `features/<id>/spec.md` y digest |
 | No activación | «Arregla el typo del README» → responde que es un `acotado` y remite a `/feature-plan` sin crear spec |
-| Restricción | Con `spec … approved` ya registrado, intentar reescribir → advierte que exige nueva aprobación |
+| Restricción | Con `spec … approved` ya registrado, intentar reescribir → advierte que exige nueva aprobación; un criterio que exige un efecto `prohibited` → se detiene sin proponer riesgo `high` |
 | Comparación | Misma idea, misma base: criterios equivalentes o mejores que la revisión anterior de la skill, sin preguntas redundantes |
 
 ## Referencias
 
-Prácticas y su origen en [README](../README.md) §4.1: entrevista y glosario
+Prácticas y su origen en `skills/README.md` §4.1: entrevista y glosario
 (Pocock), tamaños de cambio (Superpowers `brainstorming`), decisiones tomadas y
 delegadas (BMAD, S04 l. 83), `skip_specs` y deltas (OpenSpec), aprobación por
 digest (S12).

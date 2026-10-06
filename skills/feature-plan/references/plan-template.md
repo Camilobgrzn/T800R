@@ -28,7 +28,7 @@ spec.md».
 - Archivos permitidos: `ruta/…`, `glob/**`
 - Dependencias: ninguna | T<n>
 - Validación: `<comando 1>`; `<comando 2>`
-- Riesgo: routine | high (<motivo>)
+- Riesgo: routine | high (<motivo>; si high: fase de efecto | protected_paths)
 - Tests primero: sí | no (<motivo>)
 - Paralelizable con: ninguna | T<n> (archivos disjuntos, interfaces acordadas)
 
@@ -55,7 +55,8 @@ Comprobaciones mecánicas:
 - [ ] Cada CA está en la tabla de cobertura.
 - [ ] Ningún par de tareas paralelas comparte archivos.
 - [ ] Ningún comando de validación toca protected_paths sin tarea high.
-- [ ] Las tareas high anotan aprobación local y verifier distinto.
+- [ ] Las tareas high anotan aprobación local (fase de efecto | protected_paths) y verifier distinto.
+- [ ] Ninguna tarea exige un efecto prohibited.
 
 Resultado: PASS | CONCERNS | FAIL
 
@@ -72,10 +73,11 @@ Máximo dos workers. Pares admitidos: <T<a> ∥ T<b>> | ninguno.
 
 ## Replanificación
 
-(Sólo tras un defecto de spec; incrementa `replans`.)
+(Sólo al replanificar; incrementa `replans`.)
 
-- Fecha y hallazgo que la motiva: <enlace a evidence/<task>.md o findings.md>
-- Cambio en la spec: <nuevo spec_digest>
+- Entrada: defecto de spec | reclasificación de acotado | cambio de alcance (persona, <fecha>) | rondas agotadas en T<n>
+- Fecha y hallazgo que la motiva: <enlace a evidence/<task>.md, .verdict.md o nota de tasks.md>
+- Cambio en la spec: <nuevo spec_digest> | sin cambio
 - Tareas afectadas (evidencia a invalidar por el orchestrator): T<n>, …
 - Tareas independientes que continúan: T<n>, …
 - Tareas nuevas: T<n>, …

@@ -1,14 +1,15 @@
 ---
 name: feature-plan
-description: Descompone una spec aprobada (o un acotado) en tareas verticales con interfaces, archivos permitidos, comandos de validación y riesgo; comprueba la coherencia spec↔plan; emite el readiness PASS/CONCERNS/FAIL y deja listo el gate 2 (autorizar build). Inicializa tasks.md y participations.md sólo la primera vez. Úsala con spec aprobada, para un acotado directamente, o para replanificar tras un defecto de spec. No la uses para cambiar un plan con build autorizado salvo esa replanificación, que reabre el gate 2.
+description: Descompone una spec aprobada (o un acotado) en tareas verticales con interfaces, archivos permitidos, comandos de validación y riesgo; comprueba la coherencia spec↔plan; emite el readiness PASS/CONCERNS/FAIL y deja listo el gate 2 (autorizar build). Inicializa tasks.md y participations.md sólo la primera vez. Úsala con spec aprobada, para un acotado directamente, o para replanificar (defecto de spec, reclasificación de un acotado, cambio de alcance pedido por la persona, rondas agotadas). No la uses para cambiar un plan con build autorizado fuera de esas cuatro entradas, que reabren el gate 2.
 ---
 
 # /feature-plan
 
-Etapa `design` del flujo de construcción
-([workflow-construccion.md](../../docs/workflow-construccion.md) §4.2; catálogo en
-[README](../README.md) §4.2). La ejecuta el planner. Orden fijo: **tareas →
-coherencia → readiness**; nunca readiness primero.
+Etapa `design` del flujo de construcción (`docs/workflow-construccion.md` §4.2;
+catálogo en `skills/README.md` §4.2; rutas desde la raíz del repositorio). La
+ejecuta el planner desde el checkout de coordinación en la rama `feat/<id>`
+(workflow §2.1). Orden fijo: **tareas → coherencia → readiness**; nunca
+readiness primero.
 
 ## Qué produce
 
@@ -38,14 +39,20 @@ coherencia → readiness**; nunca readiness primero.
    contiene `spec <digest> approved` y `git hash-object features/<id>/spec.md`
    coincide con ese digest. Si no coincide, detente: la spec cambió después de
    aprobarse.
-2. **Sin `build` vigente para este plan**, o se está **replanificando por
-   defecto de spec** (hay un hallazgo `defecto de spec` en un
-   `evidence/<task>.md` o en un `.verdict.md`; `findings.md` no cuenta, es para
-   hallazgos ajenos). En cualquier otro caso, un `plan.md` con `build …
-   authorized` es inmutable: detente y dilo.
+2. **Sin `build` vigente para este plan**, o se está **replanificando** por una
+   de estas cuatro entradas, que anotas en «Replanificación»: **defecto de
+   spec** (hallazgo en un `evidence/<task>.md` o un `.verdict.md`;
+   `evidence/<task>.findings.md` no cuenta, es para hallazgos ajenos); **reclasificación** de
+   un `acotado` (ahora existe `spec.md` aprobada); **cambio de alcance** pedido
+   por la persona en esta sesión; **rondas agotadas** en una tarea (`blocked`
+   con nota «rondas agotadas» en `tasks.md`: se cambia su tamaño). En
+   cualquier otro caso, un `plan.md` con `build … authorized` es inmutable:
+   detente y dilo.
 3. Para un `acotado`: no existe `spec.md`; la descripción cabe en la sección
-   «Spec del acotado» del plan.
-4. Si existe `policy.yaml`, lee `protected_paths` para el riesgo por tarea.
+   «Spec del acotado» del plan. La rama `feat/<id>` se crea aquí desde `main`
+   si no existe.
+4. Si existe `policy.yaml`, lee `protected_paths` y los niveles declarados
+   para el riesgo por tarea.
 
 ## Procedimiento
 
@@ -63,7 +70,9 @@ extremo a extremo (no «modelo», «servicio», «UI» por capas). Cada tarea de
   sus interfaces ya están acordadas; máximo dos workers a la vez.
 - **Dependencias** (`depends_on`).
 - **Comandos de validación** deterministas que debe dejar en verde (tests,
-  tipos, lint, build, arranque). Sólo estos comandos podrá ejecutar el worker.
+  tipos, lint, build, arranque). Son los únicos comandos que **ejecutan código
+  del repositorio** que el worker podrá correr (workflow §2.1, clases de
+  comando); la inspección y la coordinación con Git no necesitan declararse.
 - **Riesgo**: `routine` o `high` (hereda el de la spec si toca su disparador o
   un `protected_path`).
 - **Tests primero**: `sí` cuando el criterio describe comportamiento observable y
@@ -104,8 +113,11 @@ Comprobaciones mecánicas obligatorias (marca cada una en el plan):
 - [ ] Ningún comando de validación toca `protected_paths` sin que la tarea sea
       `high`.
 - [ ] Las tareas `high` tienen anotado que exigen aprobación `local` antes del
-      efecto. (El verifier con `actor_id` distinto es universal, no sólo para
-      `high`.)
+      efecto, y si el `high` es un efecto en ejecución (fase de efecto,
+      workflow §4.3) o un cambio en `protected_paths`. (El verifier con
+      `actor_id` distinto es universal, no sólo para `high`.)
+- [ ] Ninguna tarea exige un efecto `prohibited` (S12 l. 64 o `policy.yaml`);
+      si la spec lo pide, `FAIL` y vuelve a `/feature-spec`.
 
 Un actor distinto del planner revisa el readiness **sólo** si el riesgo o la
 incertidumbre lo justifican; no es un gate rutinario.
@@ -114,21 +126,26 @@ incertidumbre lo justifican; no es un gate rutinario.
 
 - **Primera ejecución**: crea `tasks.md` (todas en `pending`, `owner` vacío) y
   `participations.md` (cabecera y sin eventos).
-- **Replanificación por defecto de spec**: no toques `participations.md` ni
-  `evidence/`. En `plan.md` añade la sección «Replanificación» con: qué cambió
-  en la spec, qué tareas quedan **afectadas** (tú las identificas; el
-  orchestrator registra el evento `invalidated` de cada una en
-  `participations.md`, que es lo que invalida su evidencia), qué tareas
+- **Replanificación** (cualquiera de las cuatro entradas): no toques
+  `participations.md` ni `evidence/`. En `plan.md` añade la sección
+  «Replanificación» con: la entrada y qué cambió, qué tareas quedan
+  **afectadas** (tú las identificas; el orchestrator registra el evento
+  `invalidated` de cada una en `participations.md`, que es lo que invalida su
+  evidencia y sus veredictos, y las devuelve a `pending`), qué tareas
   **independientes** continúan sin interrupción y qué tareas nuevas aparecen.
-  Conserva los `id` existentes; los nuevos siguen la numeración. Pide al
-  orchestrator que añada las tareas nuevas a `tasks.md` en `pending`. Esto
-  **reabre el gate 2**: la persona debe registrar una nueva línea `build …
-  authorized` con el nuevo digest.
+  Una tarea ya `merged` en `feat/<id>` que quede afectada se corrige con una
+  tarea nueva sobre esa base, no borrando historia. Conserva los `id`
+  existentes; los nuevos siguen la numeración. Pide al orchestrator que añada
+  las tareas nuevas a `tasks.md` en `pending`. Esto **reabre el gate 2**: la
+  persona debe registrar una nueva línea `build … authorized` con el nuevo
+  digest.
 
 ### Paso 5. Digest y entrega
 
-`git hash-object features/<id>/plan.md` sobre el archivo guardado; **no lo
-escribas dentro del archivo** (cambiaría el hash). Entrega a la persona: ruta, digest del plan, digest de la spec,
+Comete `plan.md` (y, la primera vez, `tasks.md` y `participations.md`) en
+`feat/<id>` (`coord: plan <id>`). `git hash-object features/<id>/plan.md` sobre
+el archivo guardado; **no lo escribas dentro del archivo** (cambiaría el hash).
+Entrega a la persona: ruta, digest del plan, digest de la spec,
 readiness con sus `CONCERNS` si los hay, número de tareas y cuáles pueden ir en
 paralelo, tareas `high`, y la línea exacta para `control:approvals/<id>.md`.
 Recuerda: desde que se registre esa línea, `plan.md` es inmutable; el progreso
@@ -149,12 +166,12 @@ vive en `tasks.md`.
 | --- | --- |
 | Activación | Spec aprobada del catálogo del IDP → `plan.md` con tareas, cobertura y readiness; `tasks.md` y `participations.md` creados |
 | No activación | «¿Qué tareas quedan?» → responde leyendo `tasks.md`, no genera un plan nuevo |
-| Restricción | Con `build … authorized` vigente y sin defecto de spec, pedir «añade una tarea» → se niega y explica que exige replanificación y nueva autorización |
+| Restricción | Con `build … authorized` vigente y sin ninguna de las cuatro entradas de replanificación, pedir «añade una tarea» → se niega y explica que exige replanificación (cambio de alcance declarado por la persona) y nueva autorización |
 | Comparación | Misma spec, misma base: cobertura igual o mejor, sin tareas por capas ni código en el plan |
 
 ## Referencias
 
-Prácticas y su origen en [README](../README.md) §4.2: tareas con interfaces
+Prácticas y su origen en `skills/README.md` §4.2: tareas con interfaces
 (Superpowers `writing-plans`), incrementos verticales (Pocock `to-tickets`),
 aceptación y archivos por tarea (Osmani), `analyze` (Spec Kit), readiness (BMAD
 `readiness-gate`, S04 l. 82-83 y 275), profundidad proporcional (BMAD),

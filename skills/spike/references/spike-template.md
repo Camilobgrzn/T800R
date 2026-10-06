@@ -6,9 +6,10 @@
 - Fecha: <YYYY-MM-DD>
 - Solicitado por / decisión que bloquea: <spec CA<n> | plan T<n> | S12 pregunta <n>>
 - Autorización: `spike <id> approved` en control:approvals/spikes.md | contemplado en plan <digest> T<n>
-- actor_id: <…>
+- actor_id: <usuario>-a<n>
 - Presupuesto: <n turnos | n minutos>
-- Rama desechable: spike/<id> (último SHA: <…>; descartada el <fecha>)
+- Rama de destino del informe: feat/<id> | rama de la definición (commit `spike: <id>`)
+- Rama desechable: spike/<id> (último SHA: <…>; descartada el <fecha>, después de persistir este archivo)
 
 ## Pregunta
 <una pregunta concreta, con la observación que la respondería>

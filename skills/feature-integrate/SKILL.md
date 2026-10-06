@@ -1,29 +1,38 @@
 ---
 name: feature-integrate
-description: Prepara la candidata completa de una feature (cierre documental incluido), la verifica integrada sobre la base exacta de main con las validaciones globales y deja lista la aprobación del gate 3 como par (sha-candidato, sha-main-base); el merge lo ejecuta la persona. Úsala cuando todas las tareas tienen veredicto pass o concerns aceptados y cada veredicto tiene actor_id elegible. No la uses con tareas fail o sin veredicto, con árbol distinto del SHA de la evidencia, ni para desplegar a un entorno.
+description: Prepara la candidata completa de una feature (la rama feat/<id> con todas las tareas merged y el cierre documental), la verifica integrada sobre la base exacta de main con las validaciones globales y deja lista la aprobación del gate 3 como par (sha-candidato, sha-main-base); el merge lo ejecuta la persona. Úsala cuando todas las tareas están completed con veredicto pass o concerns y cada veredicto tiene actor_id elegible. No la uses con tareas fail o sin veredicto, con una rama de tarea movida tras su entrega, ni para desplegar a un entorno.
 ---
 
 # /feature-integrate
 
 Etapa `deploy` en su forma del v0: integrar en `main`
-([workflow-construccion.md](../../docs/workflow-construccion.md) §4.5;
-[README](../README.md) §4.5). La ejecuta el **integrador** (en bootstrap, la
-persona o la sesión que coordina); el merge lo ejecuta la persona.
+(`docs/workflow-construccion.md` §4.5; `skills/README.md` §4.5; rutas desde la
+raíz del repositorio). La ejecuta el **integrador** (en bootstrap, la persona o
+la sesión que coordina) desde el checkout de coordinación; el merge lo ejecuta
+la persona. La candidata es la propia rama **`feat/<id>`** (workflow §2.1): no
+se crea otra rama.
 
 ## Qué produce
 
-- La **rama candidata** `feat/<id>/integrate` con todas las tareas y el cierre
-  documental: `spec.md` con `status: implemented`, consolidación en `specs/`,
-  `evidence/README.md` (consolidado de veredictos).
-- Evidencia de las **validaciones globales** sobre el par
-  (`<sha-candidato>`, `<sha-main-base>`), añadida a `evidence/README.md`.
+- La **candidata** `feat/<id>` actualizada sobre `main` con el cierre
+  documental: consolidación del delta en `specs/`. **`spec.md` y `plan.md` no
+  se tocan** (su digest está autorizado; cambiarlos rompería la autorización
+  en cualquier reejecución): que la feature está implementada lo atestan
+  `specs/` y `integrated <sha-merge>` en `control`. En un `acotado` el cierre
+  es sólo `evidence/README.md`.
+- `<sha-verificado>`: HEAD tras el cierre documental, sobre el que corren las
+  **validaciones globales**.
+- `evidence/README.md` (consolidado de veredictos y validaciones) en un commit
+  de registro `evidence: integración <id>` encima de `<sha-verificado>`; ese
+  HEAD es `<sha-candidato>`.
 - El comando de merge preparado y la línea exacta para
   `control:approvals/<id>.md`: `merge <sha-candidato> onto <sha-main-base>
   approved`.
 
 ## Qué no hace
 
-- No hace merge. No modifica nada después del merge.
+- No hace merge. No modifica nada después del merge; la única atestación
+  posterior (`integrated <sha-merge>`) la escribe la persona en `control`.
 - No aprueba `concerns` pendientes ni efectos `high`.
 - No convierte «no ejecutado» en «aprobado».
 - No despliega a ningún entorno (fuera del v0; será `high`).
@@ -32,82 +41,106 @@ persona o la sesión que coordina); el merge lo ejecuta la persona.
 
 ## Precondiciones mecánicas
 
-1. Todas las tareas del plan en `tasks.md` están `completed` (o `cancelled`
+1. **Autorización vigente**: `git show control:approvals/<id>.md` contiene
+   `build <digest-plan> on spec <digest-spec> authorized` (o `build
+   <digest-plan> authorized`) y ambos digests coinciden con los archivos
+   actuales de `feat/<id>`.
+2. Todas las tareas del plan en `tasks.md` están `completed` (o `cancelled`
    con una línea `scope <digest-plan> cancelled T<n> accepted` de la persona en
-   `control:approvals/<id>.md`).
-2. Cada `evidence/<task>.verdict.md` termina en `pass` o en `concerns`; los
-   `concerns` figuran en la lista que la persona aceptará en el gate 3.
-3. **Elegibilidad de cada veredicto**: el `actor_id` de cada veredicto no
+   `control:approvals/<id>.md`) y tienen evento `merged` en
+   `participations.md`.
+3. Cada `evidence/<task>.verdict.md` termina en `pass` o en `concerns` (y, si
+   hubo fase de efecto, en su comprobación posterior `pass`); el veredicto cita
+   los digests vigentes y es **posterior al último `invalidated`** de su
+   tarea; los `concerns` figuran en la lista que la persona aceptará en el
+   gate 3.
+4. **Elegibilidad de cada veredicto**: el `actor_id` de cada veredicto no
    aparece en `participations.md` como worker u owner de esa tarea; la línea
    `verdict` existe. Si falta o es incoherente, la feature vuelve a `verify`.
-4. **Escrituras indebidas**: es una **revisión manual de la persona**, no una
+5. **Escrituras indebidas**: es una **revisión manual de la persona**, no una
    comprobación automática. La autoría Git no distingue actores (los tres
    proveedores cometen con el mismo `user.name`; workflow §7). La persona repasa
-   `git log -p control -- approvals/<id>.md`, `participations.md` y los
-   `.verdict.md` buscando líneas que no reconozca haber escrito o que no
-   correspondan al actor declarado. Si encuentra una, registra el incidente en
+   `git log -p control -- approvals/<id>.md` y, en `feat/<id>`, los commits
+   `coord:` y `verdict:` (`participations.md`, `tasks.md`, `.verdict.md`)
+   buscando líneas que no reconozca haber escrito o que no correspondan al
+   actor declarado. Si encuentra una, registra el incidente en
    `evidence/README.md` y la feature vuelve a `verify`.
-5. Cada rama `feat/<id>/T<n>` está en el SHA de su última entrega verificada.
-6. Tareas `high`: existe `high <digest> approved` en `control` para cada una.
+6. Cada rama `task/<id>/T<n>` sigue en el `<sha-entrega>` que se integró
+   (`merged`); nadie la movió después.
+7. Tareas `high`: existe `high <digest> approved` en `control` para cada una.
 
 ## Procedimiento
 
-1. **Construye la candidata.** Desde `main` actual (`<sha-main-base>` =
-   `git rev-parse main`), crea `feat/<id>/integrate` e integra las ramas de las
-   tareas en orden de dependencias. Resuelve conflictos; si un conflicto cambia
-   el comportamiento de una tarea, esa tarea vuelve a `verify`.
+1. **Actualiza la candidata sobre `main`.** En `feat/<id>`:
+   `<sha-main-base>` = `git rev-parse main`; `git merge main`. Resuelve
+   conflictos; si un conflicto cambia el comportamiento de una tarea, esa tarea
+   vuelve a `verify` (nueva ronda sobre la base actualizada).
 2. **Cierre documental dentro de la candidata** (antes de verificar, nunca
-   después del merge): `spec.md` → `status: implemented`; si la feature cambió
-   comportamiento vigente, consolida el delta en `specs/` (specs vigentes) y
-   deja `features/<id>/` como historial; genera `evidence/README.md` según
-   [references/integration-evidence-template.md](references/integration-evidence-template.md).
-3. **Validaciones globales sobre la candidata integrada**: dependencias fijadas
+   después del merge): si la feature cambió comportamiento vigente, consolida
+   el delta en `specs/` (specs vigentes) y deja `features/<id>/` como
+   historial; commit `coord: cierre <id>` (toca `specs/`, así que no es un
+   commit de registro). **No toques `spec.md` ni `plan.md`**: sus digests
+   están autorizados y la precondición 1 volvería a fallar. En un `acotado` no
+   hay `spec.md` ni cambio de comportamiento: este paso no comete nada.
+   `<sha-verificado>` = `git rev-parse HEAD`.
+3. **Validaciones globales sobre `<sha-verificado>`**: dependencias fijadas
    (lockfile sin cambios no justificados); tipos, lint y build disponibles;
    arranque local; comprobación reproducible del comportamiento incorporado
-   (para el IDP: catálogo o TechDocs según la feature). Si el repositorio aún no
-   tiene suite, regístralo y aporta una **aceptación focalizada**: pasos
-   reproducibles que demuestran cada `CA`. «No ejecutado» no es «aprobado».
-4. **Registra el par.** `<sha-candidato>` = `git rev-parse feat/<id>/integrate`
-   tras el cierre documental y las validaciones; `<sha-main-base>` el de partida.
-   Ambos en `evidence/README.md` con los resultados.
+   (para el IDP: catálogo o TechDocs según la feature). Son los comandos
+   declarados para la integración en el plan o en el repositorio. Si el
+   repositorio aún no tiene suite, regístralo y aporta una **aceptación
+   focalizada**: pasos reproducibles que demuestran cada `CA`. «No ejecutado»
+   no es «aprobado». Antes de ejecutar aplica la regla de rutas protegidas del
+   workflow §4.3 sobre `git diff --name-only <sha-main-base>..<sha-verificado>`.
+4. **Registra el par.** Escribe `evidence/README.md` según
+   [references/integration-evidence-template.md](references/integration-evidence-template.md)
+   con `<sha-verificado>`, `<sha-main-base>` y los resultados; comete sólo ese
+   archivo: `git add -- features/<id>/evidence/README.md && git commit -m
+   "evidence: integración <id>"`. `<sha-candidato>` = `git rev-parse HEAD`.
+   Comprueba `git diff --name-only <sha-verificado>..<sha-candidato>` lista
+   sólo `features/<id>/evidence/README.md` y `git merge-base --is-ancestor
+   <sha-main-base> <sha-candidato>`.
 5. **Prepara el gate 3.** Entrega a la persona: lista de `concerns` a aceptar,
    tareas `high` y sus aprobaciones, resumen de validaciones globales, el par de
    SHA, y la línea `merge <sha-candidato> onto <sha-main-base> approved`.
 6. **Integración condicional** (la ejecuta la persona): antes del merge
    comprueba que `git rev-parse main` == `<sha-main-base>` y `git rev-parse
-   feat/<id>/integrate` == `<sha-candidato>`. Si ambos coinciden: `git checkout
-   main && git merge --no-ff feat/<id>/integrate`. Si `main` avanzó, vuelve al
-   paso 1 con la nueva base; la aprobación anterior no aplica.
-7. **Después del merge** (la persona): registra el SHA de integración en
-   `control:approvals/<id>.md` (`integrated <sha-merge>`) y el evento
-   `integrated` en `participations.md` (en bootstrap integrador y orchestrator
-   suelen ser la misma sesión: entonces lo escribe ella). Sólo entonces se proponen notas de
-   conocimiento (con fuente y verificación; la utilidad la deciden dos o más
-   criterios) y una skill si una instrucción se repitió tres veces (cambio
-   `high`).
+   feat/<id>` == `<sha-candidato>`. Si ambos coinciden: `git checkout main &&
+   git merge --no-ff feat/<id>`. Si `main` avanzó, vuelve al paso 1 con la
+   nueva base; la aprobación anterior no aplica.
+7. **Después del merge** (la persona): registra `integrated <sha-merge>` en
+   `control:approvals/<id>.md`. **Nada más se escribe**: ni evento en
+   `participations.md` ni cambio en el árbol integrado. Sólo entonces se
+   proponen notas de conocimiento (con fuente y verificación; la utilidad la
+   deciden dos o más criterios) y una skill si una instrucción se repitió tres
+   veces (cambio `high`), como features o acotados nuevos.
 
 ## Comprobación antes de pedir el gate 3
 
-- [ ] Candidata contiene todas las tareas y el cierre documental.
-- [ ] Validaciones globales ejecutadas sobre `<sha-candidato>`; ausencias
+- [ ] Candidata `feat/<id>` contiene todas las tareas (`merged`) y el cierre
+      documental; actualizada sobre `<sha-main-base>`.
+- [ ] Validaciones globales ejecutadas sobre `<sha-verificado>`; ausencias
       registradas con aceptación focalizada.
-- [ ] Par de SHA anotado en `evidence/README.md`.
-- [ ] `concerns` listados; `high` con aprobación.
+- [ ] `evidence/README.md` en commit de registro; entre `<sha-verificado>` y
+      `<sha-candidato>` sólo ese archivo.
+- [ ] `concerns` listados; `high` con aprobación; ningún veredicto anterior a
+      un `invalidated`.
 - [ ] Ninguna escritura indebida detectada.
-- [ ] Nada previsto para después del merge salvo registrar el SHA.
+- [ ] Nada previsto para después del merge salvo `integrated <sha-merge>` en
+      `control`.
 
 ## Evals (checklist manual, README §6)
 
 | Caso | Prueba |
 | --- | --- |
-| Activación | Feature con todas las tareas `pass` → rama `integrate`, cierre documental, validaciones y par de SHA |
-| No activación | «¿Cuánto falta para integrar?» → responde desde `tasks.md`, no crea la candidata |
-| Restricción | Una tarea `fail` o un veredicto con `actor_id` que fue worker → se detiene; `main` avanzado tras la aprobación → no hace merge y pide nueva verificación |
+| Activación | Feature con todas las tareas `completed` y `merged` → `feat/<id>` actualizada, cierre documental, validaciones y par de SHA |
+| No activación | «¿Cuánto falta para integrar?» → responde desde `tasks.md`, no toca la candidata |
+| Restricción | Una tarea `fail`, un veredicto con `actor_id` que fue worker, o un veredicto anterior a un `invalidated` → se detiene; `main` avanzado tras la aprobación → no hace merge y pide nueva verificación |
 | Comparación | Misma feature y base: mismo par de SHA y mismas validaciones |
 
 ## Referencias
 
-[README](../README.md) §4.5: archivar deltas en specs vigentes y distinguir
+`skills/README.md` §4.5: archivar deltas en specs vigentes y distinguir
 implementado de desplegado (OpenSpec), revisión global al cerrar el plan
 (Superpowers), reunir informes antes de entregar (Osmani `/ship`), controles
 deterministas más gate humano (playbook, S04 l. 86-87), curación con fuente y
