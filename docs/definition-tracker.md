@@ -33,9 +33,8 @@ autorizar.
    corregidos por Fable en cuatro rondas con Astra (`gpt-6-astra`; informes en
    `docs/reviews/skills-codex-2026-10-0*.md`) y una verificación Fable
    independiente; veredicto final de Astra «SÍ con cambios», residuo aplicado.
-   Pendiente que la persona ratifique v4.1 y tres elecciones de diseño
-   (`concerns` cierra la tarea; `actor_id` `<usuario>-a<n>`; referencias desde
-   la raíz en `SKILL.md`).
+   La persona ratificó v4.1 y sus tres elecciones de diseño el 2026-10-06
+   (registrado en S12).
 2. **Aprobación del roadmap v0** por la persona y registro en S12 (paso 5).
 3. **Decisión explícita de autorizar la construcción** (paso 6): comprobar el
    criterio de salida de S12, registrar el cierre y actualizar `AGENTS.md`.
