@@ -1,6 +1,6 @@
 # Roadmap del v0 (T800R + piloto IDP)
 
-- Estado: **borrador v2.1**, pendiente de aprobación de la persona. Paso 5 de
+- Estado: **aprobado** por la persona el 2026-10-06 (v2.1). Paso 5 de
   [S12](definition/session-12-validation-convergence.md).
 - Creado: 2026-10-05. v2 y v2.1 integran la verificación en pareja de la v1 (Fable:
   «SÍ con cambios»; Astra `gpt-6-astra`: «NO» por orden de migraciones y
@@ -66,8 +66,8 @@ skills y bajo T800R, y añade como dato las líneas cambiadas por modo.
 
 ### Prerrequisito de la autorización: corrección de skills
 
-Decidido por la persona el 2026-10-05: las skills y el flujo v4 se corrigen
-**antes** del paso 6, dentro de la fase de definición (son Markdown), para
+Decidido por la persona el 2026-10-05 y **cumplido el 2026-10-06** (flujo
+v4.1, ratificado en S12): las skills y el flujo v4 se corrigen **antes** del paso 6, dentro de la fase de definición (son Markdown), para
 autorizar sobre skills sanas.
 
 - Corregir skills y flujo v4 con los hallazgos altos y medios de la revisión

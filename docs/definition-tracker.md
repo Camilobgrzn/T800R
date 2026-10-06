@@ -35,7 +35,7 @@ autorizar.
    independiente; veredicto final de Astra «SÍ con cambios», residuo aplicado.
    La persona ratificó v4.1 y sus tres elecciones de diseño el 2026-10-06
    (registrado en S12).
-2. **Aprobación del roadmap v0** por la persona y registro en S12 (paso 5).
+2. ~~Aprobación del roadmap v0~~ Aprobado el 2026-10-06 y registrado en S12.
 3. **Decisión explícita de autorizar la construcción** (paso 6): comprobar el
    criterio de salida de S12, registrar el cierre y actualizar `AGENTS.md`.
 4. **Arranque** según F0 del roadmap.
