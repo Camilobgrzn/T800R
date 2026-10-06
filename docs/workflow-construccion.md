@@ -286,8 +286,9 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
     en su `.verdict.md` (commit `verdict:`) y el orchestrator registra
     `ratified`; una sola sesión puede ratificar todas. Sigue `completed` y
     `merged`;
-  - **conservada no terminal** (no cambia y está `pending`, `in_progress`,
-    `waiting` o `blocked`): mantiene estado, owner y trabajo válido (S04:
+  - **conservada no terminal** (no cambia y está `pending`, `ready`,
+    `in_progress`, `waiting` o `blocked`): mantiene estado (una `ready` sigue
+    `ready` si conserva su elegibilidad tras reconciliar), owner y trabajo válido (S04:
     conservar lo independiente); el orchestrator reconcilia en `tasks.md` sus
     dependencias y la referencia al plan nuevo (evento `reconciled`); no se
     ratifica nada porque aún no hay veredicto: se verificará cuando entregue,

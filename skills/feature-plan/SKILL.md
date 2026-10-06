@@ -134,8 +134,9 @@ incertidumbre lo justifican; no es un gate rutinario.
   - **conservada completada**: no cambia y ya está `completed` y `merged`;
     tras el nuevo gate 2 un verifier elegible la ratifica contra los digests
     nuevos (entrada «Ratificación» en su `.verdict.md`; evento `ratified`);
-  - **conservada no terminal**: no cambia y está `pending`, `in_progress`,
-    `waiting` o `blocked`; mantiene estado, owner y trabajo válido; el
+  - **conservada no terminal**: no cambia y está `pending`, `ready`,
+    `in_progress`, `waiting` o `blocked`; mantiene estado (una `ready` sigue
+    `ready` si conserva su elegibilidad tras reconciliar), owner y trabajo válido; el
     orchestrator reconcilia sus dependencias y la referencia al plan nuevo en
     `tasks.md` (evento `reconciled`); se verificará cuando entregue, contra
     los digests nuevos; no la clasifiques como «rehacer»;
