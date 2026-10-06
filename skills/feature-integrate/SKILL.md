@@ -45,15 +45,25 @@ se crea otra rama.
    `build <digest-plan> on spec <digest-spec> authorized` (o `build
    <digest-plan> authorized`) y ambos digests coinciden con los archivos
    actuales de `feat/<id>`.
-2. Todas las tareas del plan en `tasks.md` están `completed` (o `cancelled`
-   con una línea `scope <digest-plan> cancelled T<n> accepted` de la persona en
-   `control:approvals/<id>.md`) y tienen evento `merged` en
+2. Cada tarea del plan en `tasks.md` está `completed` o `cancelled`; nada en
+   otro estado. Las **`completed`** tienen evento `merged` en
    `participations.md`.
-3. Cada `evidence/<task>.verdict.md` termina en `pass` o en `concerns` (y, si
-   hubo fase de efecto, en su comprobación posterior `pass`); el veredicto cita
-   los digests vigentes y es **posterior al último `invalidated`** de su
-   tarea; los `concerns` figuran en la lista que la persona aceptará en el
-   gate 3.
+3. Para cada **`completed`**, `evidence/<task>.verdict.md` termina en `pass` o
+   `concerns` (si hubo fase de efecto, en la comprobación posterior con
+   `pass`/`concerns`; un `ready_for_effect` sin comprobación posterior no
+   cierra), es **posterior al último `invalidated`** de su tarea y cita los
+   digests vigentes **o** termina en una «Ratificación» que los cita (evento
+   `ratified`); los `concerns` figuran en la lista que la persona aceptará en
+   el gate 3.
+3b. Para cada **`cancelled`** (S04 l. 102) no se exige entrega, veredicto ni
+   merge; se exige: evento `cancelled` con razón e impacto; cambio de alcance
+   aceptado (`scope <digest-plan> cancelled T<n> accepted` en
+   `control:approvals/<id>.md`, o `superseded by T<m>` aceptado por la línea
+   `build … authorized` renovada); dependencias reconciliadas (ninguna tarea
+   del plan vigente depende de ella; sus dependientes fueron recableadas);
+   disposición del código parcial anotada (rama `task/<id>/T<n>` sin merge
+   borrada o conservada como referencia; si algo suyo se había integrado en
+   `feat/<id>`, la tarea `completed` que lo retira o corrige).
 4. **Elegibilidad de cada veredicto**: el `actor_id` de cada veredicto no
    aparece en `participations.md` como worker u owner de esa tarea; la línea
    `verdict` existe. Si falta o es incoherente, la feature vuelve a `verify`.
@@ -65,9 +75,12 @@ se crea otra rama.
    buscando líneas que no reconozca haber escrito o que no correspondan al
    actor declarado. Si encuentra una, registra el incidente en
    `evidence/README.md` y la feature vuelve a `verify`.
-6. Cada rama `task/<id>/T<n>` sigue en el `<sha-entrega>` que se integró
-   (`merged`); nadie la movió después.
+6. Cada rama `task/<id>/T<n>` de una tarea `completed` sigue en el
+   `<sha-entrega>` que se integró (`merged`); nadie la movió después.
 7. Tareas `high`: existe `high <digest> approved` en `control` para cada una.
+8. **Checkout de coordinación limpio** (protocolo de commit, workflow §2.1):
+   `git status --porcelain` vacío antes de empezar; cambios o staged ajenos →
+   no los toques y escala.
 
 ## Procedimiento
 
@@ -78,7 +91,8 @@ se crea otra rama.
 2. **Cierre documental dentro de la candidata** (antes de verificar, nunca
    después del merge): si la feature cambió comportamiento vigente, consolida
    el delta en `specs/` (specs vigentes) y deja `features/<id>/` como
-   historial; commit `coord: cierre <id>` (toca `specs/`, así que no es un
+   historial; commit `coord: cierre <id>` con el protocolo de commit (lista
+   explícita; `--cached` igual a la lista; toca `specs/`, así que no es un
    commit de registro). **No toques `spec.md` ni `plan.md`**: sus digests
    están autorizados y la precondición 1 volvería a fallar. En un `acotado` no
    hay `spec.md` ni cambio de comportamiento: este paso no comete nada.
@@ -95,14 +109,19 @@ se crea otra rama.
 4. **Registra el par.** Escribe `evidence/README.md` según
    [references/integration-evidence-template.md](references/integration-evidence-template.md)
    con `<sha-verificado>`, `<sha-main-base>` y los resultados; comete sólo ese
-   archivo: `git add -- features/<id>/evidence/README.md && git commit -m
+   archivo con el protocolo de commit: `git add --
+   features/<id>/evidence/README.md`; `git diff --cached --name-only` lista
+   sólo ese archivo (si no, `git reset -q` y escala); `git commit -m
    "evidence: integración <id>"`. `<sha-candidato>` = `git rev-parse HEAD`.
-   Comprueba `git diff --name-only <sha-verificado>..<sha-candidato>` lista
-   sólo `features/<id>/evidence/README.md` y `git merge-base --is-ancestor
-   <sha-main-base> <sha-candidato>`.
+   Comprueba `git diff --name-only <sha-verificado>..<sha-candidato>` ⊆
+   conjunto «Integrador, candidata» de la tabla de rutas por operación
+   (workflow §2.1: sólo `features/<id>/evidence/README.md`) y `git merge-base
+   --is-ancestor <sha-main-base> <sha-candidato>`.
 5. **Prepara el gate 3.** Entrega a la persona: lista de `concerns` a aceptar,
-   tareas `high` y sus aprobaciones, resumen de validaciones globales, el par de
-   SHA, y la línea `merge <sha-candidato> onto <sha-main-base> approved`.
+   tareas `high` y sus aprobaciones, tareas canceladas con su base de
+   aceptación, resumen de validaciones globales, el par de SHA, y la línea
+   `merge <sha-candidato> onto <sha-main-base> approved` (procedimiento de
+   `control` del workflow §2.1: escribir, cometer, comprobar con `git show`).
 6. **Integración condicional** (la ejecuta la persona): antes del merge
    comprueba que `git rev-parse main` == `<sha-main-base>` y `git rev-parse
    feat/<id>` == `<sha-candidato>`. Si ambos coinciden: `git checkout main &&
@@ -135,7 +154,8 @@ se crea otra rama.
 | --- | --- |
 | Activación | Feature con todas las tareas `completed` y `merged` → `feat/<id>` actualizada, cierre documental, validaciones y par de SHA |
 | No activación | «¿Cuánto falta para integrar?» → responde desde `tasks.md`, no toca la candidata |
-| Restricción | Una tarea `fail`, un veredicto con `actor_id` que fue worker, o un veredicto anterior a un `invalidated` → se detiene; `main` avanzado tras la aprobación → no hace merge y pide nueva verificación |
+| Restricción | Una tarea `fail`, un veredicto con `actor_id` que fue worker, un veredicto anterior a un `invalidated` sin ratificación, o una `cancelled` sin cambio de alcance aceptado → se detiene; `main` avanzado tras la aprobación → no hace merge y pide nueva verificación; `tasks.md` staged ajeno en el checkout → no comete y escala |
+| Continuidad | Tarea `cancelled` con `scope … accepted` y dependientes recableadas → integra sin exigirle veredicto ni merge; tarea conservada con «Ratificación» contra los digests nuevos → aceptada |
 | Comparación | Misma feature y base: mismo par de SHA y mismas validaciones |
 
 ## Referencias

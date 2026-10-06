@@ -19,15 +19,20 @@ Eventos:
 - assigned, transferred, started, delivered (worker/owner; `assigned` y
   `started` se registran juntos al asignar; `delivered` cita `<sha-trabajo>` y
   `<sha-entrega>`, que es el HEAD de la rama de la tarea)
-- verdict, ineligible (verifier; `ineligible` lo registra el orchestrator cuando
-  un candidato a verifier no pudo verificar, sin que se escriba veredicto)
+- verdict (verifier; nota: `pass`, `concerns`, `fail <clase>`,
+  `ready_for_effect` o `posterior pass|fail`), ratified (verifier ratifica un
+  veredicto conservado contra los digests nuevos tras una replanificación),
+  ineligible (lo registra el orchestrator cuando un candidato a verifier no
+  pudo verificar, sin que se escriba veredicto)
 - merged (orchestrator: rama de la tarea integrada en feat/<id> tras pass o
   concerns; cita el SHA de merge)
 - handoff_emitted, handoff_accepted, handoff_rejected (con tipo `work` o
   `integrate` y `<sha-trabajo>`; el receptor no escribe: el orchestrator
   registra su aceptación o rechazo)
 - invalidated (tras una replanificación: la evidencia y los veredictos previos
-  de la tarea dejan de valer)
+  de la tarea dejan de valer; nota: `rehacer` o `superseded by T<m>`)
+- cancelled (orchestrator; nota: razón, impacto y base de aceptación:
+  `scope … accepted` en control | gate 2 renovado)
 
 <!-- sin eventos -->
 ```
@@ -42,7 +47,9 @@ Ejemplos de líneas:
 2026-10-02T12:10 | T1 | camilo | checkout de coordinación | orchestrator | merged | feat/idp-catalog @ 0a1b2c3
 2026-10-03T08:00 | T2 | camilo-a1 | OpenCode, sesión c91 | owner | handoff_emitted | work, trabajo 1122aab
 2026-10-03T09:00 | T2 | camilo-a3 | Claude Code, sesión d04 | owner | handoff_accepted | work, trabajo 1122aab
-2026-10-03T09:01 | T2 | camilo-a3 | Claude Code, sesión d04 | owner | transferred | desde camilo-a1
+2026-10-03T09:01 | T2 | camilo-a3 | Claude Code, sesión d04 | owner | transferred | desde camilo-a1, trabajo 1122aab
+2026-10-04T10:00 | T1 | camilo-a2 | Codex, sesión 8c2 | verifier | ratified | plan 7d9e…, spec 3b1a… (replanificación 1)
+2026-10-04T10:02 | T3 | camilo | checkout de coordinación | orchestrator | cancelled | superseded by T5; código sin merge, rama borrada; gate 2 renovado
 ```
 
 Convención provisional de `actor_id` en bootstrap (workflow §4.4): un

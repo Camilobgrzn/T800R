@@ -113,23 +113,33 @@ Compruébalas y anótalas en la primera entrada de evidencia. Lee `control` y
    - **Hallazgo ajeno** (fuera de tus archivos o de tu tarea): una línea en
      `evidence/<task>.findings.md` con ruta y descripción; no lo toques.
 8. **Efectos `high` y `prohibited`.** Clasifica cada efecto antes de tocarlo.
-   `prohibited` (irreversible fuera del repositorio, S12 l. 64, o declarado en
-   `policy.yaml`): **nunca**; anótalo y detente, aunque exista una aprobación
-   `high`. `high` en ejecución (migración destructiva, push fuera del
+   `prohibited`: **nunca**, aunque exista una aprobación `high`; anótalo y
+   detente. Dos clases: las del canon (irreversible fuera del repositorio, S12
+   l. 64) no se aflojan en el v0 aunque cambie `policy.yaml`; las adicionales
+   de `policy.yaml` sólo las cambia un cambio de política `high` separado, no
+   tu tarea. `high` en ejecución (migración destructiva, push fuera del
    repositorio): en la ronda de build **no lo ejecutes**; entrega el resto y
-   anota «efecto pendiente de aprobación». Lo ejecutas sólo en la **fase de
-   efecto**: `tasks.md` dice `efecto <digest> autorizado`, y `git show
+   anota «efecto pendiente de aprobación» (el verifier emitirá
+   `ready_for_effect`, no `pass`). Lo ejecutas sólo en la **fase de efecto**:
+   `tasks.md` dice `efecto <digest> autorizado`, y `git show
    control:approvals/<id>.md`, releído justo antes, contiene `high <digest>
    approved` para el digest que preparó el verifier (`<id>/T<n> <sha-trabajo>
-   <efecto>`). Después añade la entrada «Efecto» a la evidencia y entrega de
-   nuevo para la comprobación posterior. Si el `high` es por `protected_paths`
-   no hay fase de efecto. Si el efecto es integrar, lo hace la persona con
-   `/feature-integrate`.
+   <efecto>`). Después añade la entrada «Efecto» a la evidencia con el
+   **estado observado** (ejecutado total, parcial o no, y qué quedó) y entrega
+   de nuevo para la comprobación posterior. Si algo falla a medias, no
+   reintentes ni repares por tu cuenta: anota el estado y detente; la persona
+   decide la recuperación y un efecto distinto exige nueva aprobación. Si el
+   `high` es por `protected_paths` no hay fase de efecto. Si el efecto es
+   integrar, lo hace la persona con `/feature-integrate`.
 9. **Entrega**: último commit de trabajo = `<sha-trabajo>`; entrada final en la
    evidencia con ese SHA y el resumen de criterios cubiertos; commit
    `evidence: T<n> ronda <k>` añadiendo **sólo** `features/<id>/evidence/<task>.md`
-   (y `evidence/<task>.findings.md` si lo tocaste) por lista explícita; comprueba
-   `git diff --name-only <sha-trabajo>..HEAD` lista sólo esos archivos.
+   (y `evidence/<task>.findings.md` si lo tocaste) por lista explícita, con
+   `git diff --cached --name-only` igual a la lista; comprueba `git diff
+   --name-only <sha-trabajo>..HEAD` ⊆ conjunto «Worker, entrega» de la tabla
+   de rutas por operación (workflow §2.1): evidencia, findings y, si retomaste
+   la tarea por handoff sin tocar código después, `evidence/<task>.handoff.md`
+   (es válido; no hagas un commit de código artificial).
    `<sha-entrega>` = `git rev-parse HEAD` **después** de ese commit; no se
    escribe dentro de la evidencia (sería el commit que la contiene): lo fijan
    el HEAD de la rama y el evento `delivered`. Pide al orchestrator la línea
@@ -181,6 +191,7 @@ aceptado (workflow §7).
 | Activación | «Construye T2» con T2 `ready` y `build` autorizado → rama desde `feat/<id>`, commits, `evidence/T2.md` en commit `evidence:` |
 | No activación | «¿Qué hace T2?» → responde leyendo el plan, no crea rama ni evidencia |
 | Restricción | Sin línea `build … authorized`, con digest de spec cambiado, con tarea `pending`, pidiendo tocar un archivo fuera de la lista, o con `package.json` modificado y sin revisar → se detiene o no ejecuta, y lo dice |
+| Continuidad | Tarea retomada por handoff aceptado y entregada sin cambios de código posteriores: `<sha-trabajo>..<sha-entrega>` contiene `evidence/T<n>.handoff.md` → entrega válida, sin commit artificial |
 | Comparación | Misma tarea, misma base: evidencia equivalente o mejor, sin comandos no declarados ni rondas repetidas |
 
 ## Referencias

@@ -1,6 +1,6 @@
 ---
 name: feature-spec
-description: Convierte una idea, issue o problema en features/<id>/spec.md con criterios de aceptación verificables, decisiones tomadas y delegadas y riesgo declarado, listo para que la persona lo apruebe en el gate 1. Úsala al abrir una feature, al reclasificar un acotado o cuando build/verify reportan un defecto de spec. No la uses para un acotado, un spike ni cuando ya existe spec aprobada sin defecto conocido.
+description: Convierte una idea, issue o problema en features/<id>/spec.md con criterios de aceptación verificables, decisiones tomadas y delegadas y riesgo declarado, listo para que la persona lo apruebe en el gate 1. Úsala al abrir una feature, al revisar un borrador, al reclasificar un acotado, cuando build/verify/readiness reportan un defecto o una decisión funcional pendiente, o cuando la persona pide un cambio de alcance, comportamiento o interfaz sobre una spec aprobada. No la uses para un acotado, un spike ni cuando ya existe spec aprobada sin defecto conocido.
 ---
 
 # /feature-spec
@@ -30,7 +30,7 @@ y una propuesta de tamaño del cambio (`spike`, `acotado`, `feature`). Nada más
 
 Compruébalas antes de escribir; si alguna falla, detente y dilo.
 
-1. Una de estas cuatro entradas, y dilo cuál:
+1. Una de estas entradas, y dilo cuál:
    - **feature nueva**: `features/<id>/` no existe (`id` único); crea la rama
      `feat/<id>` desde `main` si no existe;
    - **borrador**: existe `spec.md` con `status: draft` y sin línea `spec …
@@ -40,7 +40,15 @@ Compruébalas antes de escribir; si alguna falla, detente y dilo.
      acotado deja de aplicar (el orchestrator registra `invalidated` en sus
      tareas; después replanifica `/feature-plan`);
    - **defecto de spec** reportado en `evidence/<task>.md` o en un
-     `.verdict.md` (`evidence/<task>.findings.md` es sólo para hallazgos ajenos).
+     `.verdict.md` (`evidence/<task>.findings.md` es sólo para hallazgos
+     ajenos), o **`FAIL` del readiness** de `/feature-plan` con una decisión
+     funcional pendiente (la pregunta concreta viene en `plan.md`);
+   - **cambio de alcance, comportamiento o interfaz pedido por la persona**
+     sobre una spec aprobada que no era defectuosa: añade la sección «Impacto
+     del cambio» (qué `CA` cambian o se añaden, qué tareas del plan vigente
+     quedan afectadas); renueva el gate 1 y después `/feature-plan`
+     replanifica y renueva el gate 2.
+   Son cinco entradas; fuera de ellas no reescribas una spec aprobada.
 2. Si `features/<id>/spec.md` ya tiene una línea `spec <digest> approved` en
    `control:approvals/<id>.md` (`git show control:approvals/<id>.md`), advierte
    que cambiarla exige nueva aprobación y, si además hay `build … authorized`,
@@ -65,15 +73,17 @@ Compruébalas antes de escribir; si alguna falla, detente y dilo.
    canon fija, con la fuente. «Decisiones delegadas»: detalles técnicos que el
    worker puede resolver sin cambiar el comportamiento. Una incógnita de
    comportamiento no se delega: va a «Preguntas abiertas» y bloquea el gate 1.
-4. **Declara el riesgo, `prohibited` primero.** Si algún criterio exige un
-   **efecto irreversible fuera del repositorio** (S12 l. 64: borrar o
+4. **Declara el riesgo, `prohibited` primero.** Dos clases. **Prohibiciones del
+   canon** (S12 l. 64): efectos irreversibles fuera del repositorio (borrar o
    transformar datos externos, pagos, envíos, despliegue a producción, push
-   forzado fuera del repositorio) o algo que `policy.yaml` declare
-   `prohibited`, anótalo en «Efectos prohibidos» y **detente**: la spec no es
-   aprobable tal cual; propón reformular el criterio (efecto reversible, o paso
-   manual de la persona fuera de T800R). Una aprobación `high` nunca lo
-   convierte en ejecutable; sólo un cambio de `policy.yaml` (cambio `high`
-   separado) lo reclasifica. Después, `high` si algún criterio implica pérdida
+   forzado fuera del repositorio); siguen prohibidas en el v0 **aunque cambie
+   `policy.yaml`**. **Prohibiciones adicionales**: lo que `policy.yaml` declare
+   `prohibited`; sólo un cambio de política (cambio `high` separado) puede
+   reconsiderarlas. Si algún criterio exige cualquiera de las dos, anótalo en
+   «Efectos prohibidos» con su clase y **detente**: la spec no es aprobable
+   tal cual; propón reformular el criterio (efecto reversible, o paso manual de
+   la persona fuera de T800R). Una aprobación `high` nunca lo convierte en
+   ejecutable. Después, `high` si algún criterio implica pérdida
    o transformación irreversible de datos, credenciales o permisos, contratos
    compartidos, o toca `protected_paths` (`package.json` scripts, hooks, CI,
    lockfiles, `policy.yaml`, `skills/`, configuración de agentes, más los de
@@ -91,7 +101,8 @@ Compruébalas antes de escribir; si alguna falla, detente y dilo.
 7. **Entrega.** Responde a la persona con: ruta del archivo, digest, tamaño
    propuesto, riesgo, lista de preguntas abiertas (si hay, el gate 1 no procede)
    y la línea exacta que debe registrar si aprueba:
-   `spec <digest> approved`.
+   `spec <digest> approved`, con el procedimiento de `control` del workflow
+   §2.1 (escribir, cometer y comprobar con `git show control:approvals/<id>.md`).
 
 ## Hallazgos durante la spec
 
@@ -108,7 +119,11 @@ Compruébalas antes de escribir; si alguna falla, detente y dilo.
 - [ ] No-alcance escrito.
 - [ ] Digest calculado sobre el archivo final y no escrito dentro de él.
 - [ ] No se escribió en ningún otro archivo; la spec está cometida en
-      `feat/<id>` (`coord: spec <id>`).
+      `feat/<id>` (`coord: spec <id>`) con el protocolo de commit del workflow
+      §2.1 (índice limpio al empezar, lista explícita, `--cached` igual a la
+      lista).
+- [ ] Si la entrada fue un cambio pedido por la persona, «Impacto del cambio»
+      lista los `CA` y las tareas afectadas.
 
 ## Evals (checklist manual, README §6)
 

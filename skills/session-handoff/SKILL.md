@@ -85,8 +85,12 @@ verificación a medias se descarta y se rehace con contexto nuevo (workflow
    -- features/<id>/evidence/<task>.handoff.md [features/<id>/evidence/<task>.md]`; comprueba
    `git diff --cached --name-only`; `git commit -m "handoff: T<n>"` (o
    `handoff: integrate <id>`). Comprueba `git diff --name-only
-   <sha-trabajo>..HEAD` lista sólo rutas de registro; el receptor hará la misma
-   comprobación. Árbol limpio después.
+   <sha-trabajo>..HEAD` ⊆ conjunto de tu operación en la tabla de rutas por
+   operación (workflow §2.1): para `work`, evidencia, findings y handoff de
+   la tarea; para `integrate`, `evidence/README.md` ya cometido,
+   `evidence/integrate.handoff.md` y los `tasks.md`, `participations.md` y
+   `*.verdict.md` que otros hayan cometido en `feat/<id>`. El receptor hará la
+   misma comprobación con el mismo conjunto. Árbol limpio después.
 6. **Pide al orchestrator** la línea `handoff_emitted` (tipo, `<sha-trabajo>`)
    en `participations.md`. Tú no la escribes. La transferencia de owner
    (`transferred`) **no** se registra ahora: sólo después de que el receptor
@@ -113,6 +117,7 @@ verificación a medias se descarta y se rehace con contexto nuevo (workflow
 | Activación | «Cierro por hoy» con T2 a medias → commit `wip:`, `evidence/<task>.handoff.md` tipo `work` y petición de `handoff_emitted` |
 | No activación | «Cierro» con T2 ya entregada y sin cambios → responde que no hay nada que entregar; verifier a medias → responde que la verificación se descarta y se rehace |
 | Restricción | Árbol o índice con cambios de origen desconocido → no emite handoff y escala; sin commit `wip:` → no escribe handoff |
+| Continuidad | Integrador con `evidence/README.md` ya cometido y sin código nuevo → handoff `integrate` válido, sin commit artificial |
 | Comparación | Misma situación: mismo contenido esencial, sin copiar spec ni plan |
 
 ## Referencias

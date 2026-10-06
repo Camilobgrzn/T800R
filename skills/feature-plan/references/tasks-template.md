@@ -47,11 +47,25 @@ Reglas del orchestrator:
   posterior **no** incrementan `Ronda`. Al registrar el tercer `fail`, la tarea
   pasa a `blocked` con nota «rondas agotadas: cambiar contexto, tamaño
   (replanificar) o modelo».
-- Efecto `high` en ejecución: con `pass` del verifier y solicitud pendiente, la
-  tarea pasa a `waiting` (nota: `high <digest> pendiente`); cuando la persona
-  registra `high <digest> approved` en `control`, vuelve a `in_progress` con el
-  mismo owner (nota: `efecto <digest> autorizado`) para la fase de efecto; tras
-  la comprobación posterior del verifier, `completed`.
-- `invalidated` (replanificación): la tarea vuelve a `pending` con `Ronda` 0 y
-  nota «invalidada: <motivo>»; su evidencia y veredictos anteriores no cuentan
-  para integrar.
+- Efecto `high` en ejecución: con veredicto previo `ready_for_effect` (no es
+  `pass`: no declara cumplimiento) la tarea pasa a `waiting` (nota: `high
+  <digest> pendiente`); cuando la persona registra `high <digest> approved` en
+  `control`, vuelve a `in_progress` con el mismo owner (nota: `efecto <digest>
+  autorizado`) para la fase de efecto; tras la comprobación posterior con
+  `pass`/`concerns`, `completed`. Un `fail` posterior cuenta como ronda de
+  corrección (`Ronda` + 1) **y** deja la tarea `blocked` con nota «efecto
+  fallido: <estado observado>» hasta que la persona decida la recuperación;
+  si el efecto a reintentar cambia, su digest cambia y exige nueva aprobación.
+- `invalidated` (replanificación): según la disposición del plan, la tarea
+  vuelve a `pending` con `Ronda` 0 y nota «rehacer: <motivo>», o pasa a
+  `cancelled` con nota «superseded by T<m>»; su evidencia y veredictos
+  anteriores no cuentan para integrar. Las conservadas reciben `ratified` y
+  no cambian de estado.
+- `cancelled` (cualquier estado no terminal, S04): nota con razón e impacto;
+  exige cambio de alcance aceptado (`scope … cancelled T<n> accepted` en
+  `control`, o sustitución aceptada en el gate 2 renovado), dependientes
+  recableadas en el plan y disposición del código parcial (rama sin merge
+  borrada o conservada como referencia).
+- Todo cambio en este archivo sigue el protocolo de commit del workflow §2.1
+  (`coord:`; índice limpio al empezar, lista explícita, `--cached` igual a la
+  lista).

@@ -17,11 +17,17 @@ merge (workflow §2.1 y §4.5).
 - Fecha: <YYYY-MM-DDTHH:MM>
 - Integrador (actor_id): <…>
 
-## Tareas
-| Tarea | Worker(s) (actor_id) | Verifier (actor_id) | Rondas | Veredicto | Posterior a invalidated | Merged en feat/<id> | Concerns | High aprobado |
+## Tareas completadas
+| Tarea | Worker(s) (actor_id) | Verifier (actor_id) | Rondas | Veredicto | Digests vigentes | Merged en feat/<id> | Concerns | High aprobado |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| T1 | … | … | 1 | pass | n/a | <sha> | — | n/a |
-| T2 | …, … | … | 2 | concerns | sí | <sha> | <resumen> | `high <digest> approved` (protected_paths) |
+| T1 | … | … | 1 | pass | ratificado el <fecha> | <sha> | — | n/a |
+| T2 | …, … | … | 2 | concerns | sí (posterior a invalidated) | <sha> | <resumen> | `high <digest> approved` (protected_paths) |
+| T4 | … | … | 1 | pass (posterior, tras efecto) | sí | <sha> | — | `high <digest> approved` (fase de efecto) |
+
+## Tareas canceladas (sin entrega, veredicto ni merge)
+| Tarea | Razón e impacto | Base de aceptación | Dependientes recableadas | Código parcial |
+| --- | --- | --- | --- | --- |
+| T3 | <razón>; <impacto> | `scope <digest-plan> cancelled T3 accepted` en control \| superseded by T5 (gate 2 renovado) | <T<n> → T5> \| ninguna | rama sin merge borrada \| conservada como referencia \| retirado por T<m> |
 
 ## Elegibilidad y escrituras
 - Cada verifier ausente de participations.md como worker/owner de su tarea ✔ (comprobación mecánica)

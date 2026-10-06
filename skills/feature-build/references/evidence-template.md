@@ -74,6 +74,7 @@ escribe aquí: una invalidación tras replanificar se registra como evento
 - actor_id: <…>
 - Aprobación releída: `high <digest> approved` en control:approvals/<id>.md ✔ (<hora>)
 - Efecto ejecutado: <qué, comando, resultado>
+- Estado observado: ejecutado total | parcial (<qué quedó hecho y qué no>) | no ejecutado (<motivo>); sin reintentos ni reparaciones por cuenta propia
 - Comprobación propuesta al verifier: <qué observar>
 - SHA del trabajo: <…> (la entrega la fija el evento `delivered`)
 ```

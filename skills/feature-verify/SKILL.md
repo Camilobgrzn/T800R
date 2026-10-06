@@ -1,6 +1,6 @@
 ---
 name: feature-verify
-description: Verifica una tarea entregada con un actor_id que no participó en ella: comprueba la elegibilidad contra participations.md, que la autorización de build cubre los digests actuales de plan y spec, que encima del SHA del trabajo sólo hay commits de registro, revisa las rutas protegidas antes de ejecutar nada, reejecuta las validaciones y emite evidence/<task>.verdict.md en feat/<id> con dos secciones (cumplimiento de la spec y calidad técnica) y veredicto pass, concerns o fail. Úsala cuando el worker entregó y el orchestrator registró la entrega, o para la comprobación posterior de un efecto high. No la uses con el mismo actor_id que trabajó la tarea, con historial incompleto ni sobre un SHA distinto del de la evidencia.
+description: Verifica una tarea entregada con un actor_id que no participó en ella: comprueba la elegibilidad contra participations.md, que la autorización de build cubre los digests actuales de plan y spec, que encima del SHA del trabajo sólo hay commits de registro, revisa las rutas protegidas antes de ejecutar nada, reejecuta las validaciones y emite evidence/<task>.verdict.md en feat/<id> con dos secciones (cumplimiento de la spec y calidad técnica) y veredicto pass, concerns, fail o ready_for_effect (revisión previa de un efecto high). Úsala cuando el worker entregó y el orchestrator registró la entrega, para la comprobación posterior de un efecto high, o para ratificar una tarea conservada tras una replanificación. No la uses con el mismo actor_id que trabajó la tarea, con historial incompleto ni sobre un SHA distinto del de la evidencia.
 ---
 
 # /feature-verify <task>
@@ -64,11 +64,17 @@ de la tarea (`git show <sha-entrega>:features/<id>/evidence/<task>.md`).
    <digest-plan> authorized` en un `acotado`) y ambos digests coinciden con
    `git hash-object` de `plan.md` y `spec.md` tomados de `feat/<id>`.
 3. **Trabajo y registro separados.** `git diff --name-only
-   <sha-trabajo>..<sha-entrega>` sólo lista `features/<id>/evidence/<task>.md`
-   y, si acaso, `features/<id>/evidence/<task>.findings.md`; `<sha-entrega>` es el HEAD de
+   <sha-trabajo>..<sha-entrega>` ⊆ conjunto «Worker, entrega» de la tabla de
+   rutas por operación (workflow §2.1): `evidence/<task>.md`,
+   `evidence/<task>.findings.md` y `evidence/<task>.handoff.md` (está ahí si
+   la tarea se entregó tras un handoff aceptado sin cambios de código
+   posteriores: es una entrega válida). `<sha-entrega>` es el HEAD de
    `task/<id>/<task>`. Si lista otra cosa, no es una entrega: detente.
 4. Los comandos de validación de la tarea están declarados en el plan.
-5. **Rutas protegidas resueltas**: `protected_paths` de `policy.yaml` (si
+5. **Checkout de coordinación limpio** (protocolo de commit, workflow §2.1):
+   `git status --porcelain` vacío antes de empezar; si hay cambios o staged
+   ajenos, no los toques y escala.
+6. **Rutas protegidas resueltas**: `protected_paths` de `policy.yaml` (si
    existe) más la lista del workflow §4.3. Nada se ejecuta antes del paso 3 del
    procedimiento.
 
@@ -117,18 +123,35 @@ de la tarea (`git show <sha-entrega>:features/<id>/evidence/<task>.md`).
      Devuelve la tarea a `build` y consume una ronda; si es defecto de spec o
      laguna de intención, dilo para que vaya a `/feature-spec` o a `blocked`.
      Un efecto `prohibited` ejecutado o previsto es `fail` sin ejecución.
-8. **`high`.** Si la tarea es `high`, añade la solicitud de aprobación con
-   digest: `printf '%s' '<id>/T<n> <sha-trabajo> <efecto>' | git hash-object
-   --stdin`, indicando si es **fase de efecto** (el worker lo ejecutará tras
-   `high <digest> approved`, releyendo `control`; la tarea queda `waiting`) o
-   **protected_paths** (la aprobación es precondición del gate 3; no hay fase
-   de efecto). Nunca ejecutas el efecto tú. En la **comprobación posterior**
-   (entrada «Efecto» en la evidencia) verificas lo observable del efecto y
-   emites el veredicto final; no consume ronda.
-9. **Entrega**: `git add -- features/<id>/evidence/<task>.verdict.md && git
-   commit -m "verdict: T<n> ronda <k>"` en `feat/<id>`; retorno breve al
-   orchestrator con el resultado, los hashes de rutas protegidas revisadas y,
-   si `fail`, qué información nueva necesita la siguiente ronda.
+8. **`high`.** Si la tarea es `high` por `protected_paths`, añade la solicitud
+   de aprobación con digest: `printf '%s' '<id>/T<n> <sha-trabajo> <efecto>' |
+   git hash-object --stdin` (la aprobación es precondición del gate 3; no hay
+   fase de efecto) y emite el veredicto normal. Si es `high` con **fase de
+   efecto**, en esta ronda **no emitas `pass`**: emite `ready_for_effect`,
+   una **revisión previa al efecto** que sólo afirma que los criterios que no
+   dependen del efecto se cumplen, las validaciones están en verde y el efecto
+   y su recuperación están descritos; con ella la tarea pasa a `waiting`. El
+   worker ejecutará el efecto tras `high <digest> approved`, releyendo
+   `control`; nunca tú. En la **comprobación posterior** (entrada «Efecto» en
+   la evidencia, con el estado observado) verificas lo observable del efecto y
+   emites el veredicto **final**: `pass`/`concerns` no consumen ronda; `fail`
+   sí (es corrección) y además registra el estado observado del efecto (total,
+   parcial, no ejecutado) para que el orchestrator bloquee la tarea hasta que
+   la persona decida la recuperación; si el efecto a reintentar cambia, su
+   digest cambia y hace falta nueva aprobación.
+9. **Ratificación tras una replanificación.** Si el orchestrator te pide
+   ratificar una tarea «conservada» (workflow §4.2), comprueba tu elegibilidad
+   para ella, que su `<sha-entrega>` sigue `merged` en `feat/<id>` y que la
+   tarea no cambia en el plan nuevo; añade la entrada «Ratificación» con los
+   digests vigentes a su `.verdict.md` (commit `verdict: T<n> ratificación`)
+   y el orchestrator registra `ratified`. No reejecutas validaciones salvo que
+   el plan nuevo cambie las de esa tarea.
+10. **Entrega** con el protocolo de commit (workflow §2.1): `git add --
+    features/<id>/evidence/<task>.verdict.md`; `git diff --cached --name-only`
+    lista sólo ese archivo (si no, `git reset -q` y escala); `git commit -m
+    "verdict: T<n> ronda <k>"` en `feat/<id>`; árbol limpio. Retorno breve al
+    orchestrator con el resultado, los hashes de rutas protegidas revisadas y,
+    si `fail`, qué información nueva necesita la siguiente ronda.
 
 ## Comprobación antes de entregar
 
@@ -140,8 +163,10 @@ de la tarea (`git show <sha-entrega>:features/<id>/evidence/<task>.md`).
 - [ ] Validaciones reejecutadas (o reutilizadas con vigencia anotada).
 - [ ] Sección A criterio a criterio con evidencia; sección B separada.
 - [ ] Veredicto con clase de hallazgo si `fail`.
-- [ ] Único commit: `verdict:` en `feat/<id>`; nada en la rama de la tarea;
-      worktree desechable eliminado.
+- [ ] Único commit: `verdict:` en `feat/<id>`, con `--cached` igual a ese
+      archivo; nada en la rama de la tarea; worktree desechable eliminado.
+- [ ] Tarea `high` con fase de efecto: `ready_for_effect` antes del efecto,
+      veredicto final sólo tras la comprobación posterior.
 
 ## Evals (checklist manual, README §6)
 
@@ -149,7 +174,8 @@ de la tarea (`git show <sha-entrega>:features/<id>/evidence/<task>.md`).
 | --- | --- |
 | Activación | «Verifica T2» desde una sesión distinta del worker → `evidence/T2.verdict.md` en `feat/<id>` con A, B y veredicto |
 | No activación | «¿Pasó T2?» → lee el veredicto existente, no verifica de nuevo |
-| Restricción | Mismo `actor_id` que el worker, o `participations.md` sin `delivered` → se detiene sin escribir veredicto y reporta; `<sha-entrega>` con cambios fuera de rutas de registro, o digest de spec cambiado → se detiene; `package.json` modificado → no ejecuta hasta revisarlo |
+| Restricción | Mismo `actor_id` que el worker, o `participations.md` sin `delivered` → se detiene sin escribir veredicto y reporta; `<sha-entrega>` con cambios fuera de rutas de registro, o digest de spec cambiado → se detiene; `package.json` modificado → no ejecuta hasta revisarlo; `tasks.md` staged por el orchestrator en el checkout → no comete y escala |
+| Continuidad | Entrega cuyo rango `<sha-trabajo>..<sha-entrega>` incluye `evidence/T<n>.handoff.md` (handoff aceptado sin código posterior) → se acepta como entrega válida |
 | Comparación | Misma tarea y SHA: mismos criterios evaluados, sin reutilizar evidencia fuera de vigencia |
 
 ## Referencias

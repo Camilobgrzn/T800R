@@ -51,11 +51,15 @@ aceptación y, si aplica, la transferencia**.
    emisor lo eliminó, `git worktree add <ruta> <rama>`. `git status
    --porcelain` debe estar vacío. Si hay cambios sin commit, **no los
    toques**: rechazo por «árbol sucio».
-2. **Comprueba la rama.** `git diff --name-only <sha-trabajo>..HEAD` sólo lista
-   rutas de registro (`features/<id>/evidence/<task>.handoff.md` y, si aplica,
-   `features/<id>/evidence/<task>.md`; en `feat/<id>` también `tasks.md` y
-   `participations.md` por los `coord:` del orchestrator), y `<sha-trabajo>`
-   es ancestro de HEAD (`git merge-base --is-ancestor`). No importa cuál sea
+2. **Comprueba la rama.** `git diff --name-only <sha-trabajo>..HEAD` ⊆ el
+   conjunto de la operación en la tabla de rutas por operación (workflow
+   §2.1), el mismo que usó el emisor: para `work`,
+   `features/<id>/evidence/<task>.{md,findings.md,handoff.md}`; para
+   `integrate`, `evidence/README.md`, `evidence/integrate.handoff.md` y los
+   `tasks.md`, `participations.md` y `evidence/*.verdict.md` que el
+   orchestrator o un verifier hayan cometido en `feat/<id>`. Además
+   `<sha-trabajo>` es ancestro de HEAD (`git merge-base --is-ancestor`). No
+   importa cuál sea
    el último commit ni su mensaje. Si HEAD contiene cambios fuera de las rutas
    de registro encima de `<sha-trabajo>`: rechazo por «árbol distinto»
    (alguien trabajó después del handoff); reconciliar antes de continuar.
@@ -107,6 +111,7 @@ aceptación y, si aplica, la transferencia**.
 | Activación | Abrir sesión sobre una feature con `evidence/<task>.handoff.md` válido → reporte de aceptación, evento registrado y próxima acción anunciada |
 | No activación | Feature sin `evidence/<task>.handoff.md` → indica empezar por la skill de la etapa, sin escribir; receptor que va a verificar → remite a `/feature-verify` sin aceptar |
 | Restricción | Commits fuera de rutas de registro encima de `<sha-trabajo>`, o `participations.md` con un evento posterior de otro actor para la tarea → rechazo reportado, sin tocar la rama; reejecutar tras `handoff_accepted` propio → continuación sin eventos nuevos |
+| Continuidad | Handoff `integrate` con `evidence/README.md` cometido y un `coord:` posterior del orchestrator → aceptado (ambos en el conjunto de la operación) |
 | Comparación | Mismo handoff: misma decisión de aceptar/rechazar y mismo motivo |
 
 ## Referencias

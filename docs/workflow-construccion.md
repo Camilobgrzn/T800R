@@ -129,7 +129,40 @@ las skills lo aplican igual.
 6. **Después del merge a `main` nadie escribe en el árbol integrado.** La única
    atestación posterior es `integrated <sha-merge>` en `control`, por la
    persona.
-7. **Comandos por clase.** *Inspección* (lectura de archivos, `git show`,
+7. **Protocolo de commit en el checkout de coordinación.** Orchestrator,
+   verifier e integrador comparten árbol **e índice**; `git add -- <ruta>` no
+   limita lo que `git commit` incorpora si otro dejó algo staged. Por eso una
+   operación a la vez (en bootstrap la persona abre una sola sesión sobre el
+   checkout) y todo escritor, en cualquier rama, sigue el mismo protocolo:
+   (a) empieza con `git status --porcelain` vacío; si hay cambios o staged
+   ajenos, **no los toca, no comete y escala**; (b) escribe sólo sus archivos;
+   (c) `git add -- <lista explícita>`; (d) `git diff --cached --name-only` es
+   exactamente su lista, si no, `git reset -q` y detenerse; (e) commit;
+   (f) termina con árbol limpio. Las skills lo citan como «protocolo de
+   commit».
+8. **Rutas por rol y operación.** Una sola tabla, usada por quien produce y por
+   quien comprueba (`git diff --name-only <desde>..<hasta>` ⊆ conjunto); no se
+   exige un commit de trabajo artificial para pasar la comprobación.
+
+   | Operación (rango) | Conjunto admitido bajo `features/<id>/` |
+   | --- | --- |
+   | Worker, entrega y handoff `work` (`<sha-trabajo>..HEAD` de `task/<id>/T<n>`) | `evidence/<task>.md`, `evidence/<task>.findings.md`, `evidence/<task>.handoff.md` (queda ahí si hubo handoff tras el último cambio de código) |
+   | Verifier (`feat/<id>`) | `evidence/<task>.verdict.md` |
+   | Orchestrator (`feat/<id>`) | `tasks.md`, `participations.md` |
+   | Integrador, handoff `integrate` (`<sha-trabajo>..HEAD` de `feat/<id>`) | `evidence/README.md`, `evidence/integrate.handoff.md`, más `tasks.md`, `participations.md` y `evidence/*.verdict.md` (commits del orchestrator y de verifiers posteriores) |
+   | Integrador, candidata (`<sha-verificado>..<sha-candidato>`) | `evidence/README.md` |
+
+9. **Preparación y uso de `control` (la persona, fuera de una sesión de
+    agente).** Una vez por repositorio: `git worktree add --detach
+    ../<repo>-control main && cd ../<repo>-control && git checkout --orphan
+    control && git rm -rfq . && mkdir approvals && : > approvals/.keep && git
+    add approvals && git commit -m "control: inicio"`. Cada aprobación son tres
+    pasos en ese worktree: escribir la línea (`printf '%s\n' '<línea>' >>
+    approvals/<id>.md`), cometer (`git add -- approvals/<id>.md && git commit
+    -m "approve: <id> <tipo>"`) y comprobar con la misma lectura que hará el
+    consumidor (`git show control:approvals/<id>.md`). Una línea sin commit no
+    abre ningún gate. Es la concreción del gate, no un gate nuevo.
+10. **Comandos por clase.** *Inspección* (lectura de archivos, `git show`,
    `git diff`, `git log`, `git hash-object`, `uname`, `node --version`): siempre.
    *Coordinación* (crear la rama de la tarea, commits en la propia rama,
    escribir las propias rutas de registro): lo fija esta sección por rol.
@@ -182,16 +215,25 @@ del incremento (S04 l. 275) y **aprobar el merge**. `high` añade aprobación
   - **decisiones tomadas** y **decisiones delegadas** al worker;
   - interfaces públicas que se crean o cambian;
   - riesgo `routine` o `high` según los disparadores de S09 (l. 83) más
-    `protected_paths` del `policy.yaml`; **antes** de eso, `prohibited`: si un
-    criterio exige un efecto irreversible fuera del repositorio (S12 l. 64), la
-    spec no es aprobable tal cual y se detiene. `prohibited` no se rebaja con una
-    aprobación; sólo un cambio de `policy.yaml` (`high`, separado) lo cambia. La
-    persona sí puede corregir una clasificación `high` → `routine` con motivo;
+    `protected_paths` del `policy.yaml`; **antes** de eso, `prohibited`, en dos
+    clases: las **prohibiciones del canon** (S12 l. 64: efectos irreversibles
+    fuera del repositorio) no se aflojan en el v0 **aunque cambie
+    `policy.yaml`**; las **prohibiciones adicionales** que declare
+    `policy.yaml` sí pueden reconsiderarse, sólo mediante un cambio de política
+    (`high`, separado). Si un criterio exige cualquiera de las dos, la spec no
+    es aprobable tal cual y se detiene; ninguna aprobación `high` lo habilita.
+    La persona sí puede corregir una clasificación `high` → `routine` con
+    motivo;
   - glosario si introduce términos.
 - Entradas válidas: feature nueva; borrador (`status: draft`) sin digest
   aprobado que se revisa; `acotado` reclasificado (directorio con `plan.md` y
-  sin `spec.md`); defecto de spec reportado en una evidencia o un veredicto.
-  `features/<id>/` y `feat/<id>` se crean aquí si no existen.
+  sin `spec.md`); defecto de spec reportado en una evidencia o un veredicto, o
+  `FAIL` del readiness con una decisión funcional pendiente; **cambio de
+  alcance, comportamiento o interfaz pedido por la persona** sobre una spec
+  aprobada que no era defectuosa: la spec incorpora una sección «Impacto del
+  cambio» (qué `CA` cambian, qué tareas afecta) y renueva el gate 1; después
+  `/feature-plan` replanifica y renueva el gate 2. `features/<id>/` y
+  `feat/<id>` se crean aquí si no existen.
 - Gate 1: la persona registra en `control:approvals/<id>.md` (rama `control`,
   desde fuera de una sesión de agente) `spec <digest-spec> approved`. `status: approved` dentro
   del spec es metadato, no autorización.
@@ -229,10 +271,28 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
   autorización; el progreso se anota en `tasks.md`. Sin esta línea ninguna skill
   de build arranca.
 - Replanificación (reabre el gate 2) por cuatro entradas: defecto de spec;
-  reclasificación de un `acotado`; cambio de alcance pedido por la persona;
-  rondas agotadas en una tarea (cambiar su tamaño). En todas, el planner
-  identifica las tareas afectadas y el orchestrator registra `invalidated` para
-  cada una; su evidencia y veredictos anteriores dejan de contar.
+  reclasificación de un `acotado`; cambio de alcance pedido por la persona (ya
+  pasado por `/feature-spec` y el gate 1 si cambia la spec); rondas agotadas en
+  una tarea (cambiar su tamaño). El planner clasifica **cada** tarea existente
+  en la sección «Replanificación» y, tras la nueva línea `build … authorized`,
+  el orchestrator ejecuta la **reconciliación** que la sección fija:
+  - **conservada** (no cambia): su veredicto cita digests antiguos, así que un
+    verifier elegible para ella la **ratifica** contra los digests nuevos con
+    una entrada «Ratificación» en su `.verdict.md` (commit `verdict:`) y el
+    orchestrator registra `ratified`; una sola sesión puede ratificar todas las
+    conservadas. Sigue `completed` y `merged`;
+  - **rehacer** (afectada, mismo `id`): `invalidated` → `pending` → nueva
+    asignación, entrega y verificación; si ya estaba `merged`, el orchestrator
+    recrea `task/<id>/T<n>` desde `feat/<id>` actual (que contiene el código
+    anterior) y la nueva ronda lo corrige ahí;
+  - **sustituida** (afectada, la corrección va en otra tarea): `invalidated` y
+    `cancelled` con nota `superseded by T<m>`; `T<m>` declara en el plan qué
+    sustituye, cómo dispone del código anterior (lo corrige, lo retira, o la
+    rama sin merge se borra) y hereda sus dependientes. La autorización
+    renovada del gate 2 acepta esa sustitución; no hace falta una línea `scope`.
+  Una tarea obligatoria nunca queda `pending` cuando su corrección va en otra.
+  Integrar exige que cada tarea `completed` tenga veredicto o ratificación
+  con los digests vigentes.
 
 ### 4.3 `build`: `/feature-build <task>`
 
@@ -288,13 +348,22 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
   cambiar contexto, tamaño de tarea (replanificar) o modelo, o escalar; nunca
   repetir sin cambios.
 - Efectos `high` en ejecución (migración destructiva, push fuera del
-  repositorio): el worker entrega **sin** ejecutarlos; tras `pass` del verifier
-  y `high <digest> approved` en `control`, el orchestrator reabre la tarea
-  (`waiting → in_progress`, mismo owner) y el worker ejecuta el efecto releyendo
-  `control` justo antes, añade la entrada «Efecto» a su evidencia y entrega de
-  nuevo; el verifier hace la comprobación posterior. Si el `high` es por tocar
-  `protected_paths`, no hay fase de efecto: la aprobación `high` es precondición
-  del gate 3.
+  repositorio): el worker entrega **sin** ejecutarlos. El verifier emite una
+  **revisión previa al efecto** con veredicto `ready_for_effect`: los criterios
+  que no dependen del efecto se cumplen, las validaciones están en verde, el
+  efecto y su recuperación están descritos; **no declara cumplimiento** de la
+  tarea. Con ella la tarea pasa a `waiting`. Tras `high <digest> approved` en
+  `control`, el orchestrator reabre la tarea (`waiting → in_progress`, mismo
+  owner); el worker ejecuta el efecto releyendo `control` justo antes, añade la
+  entrada «Efecto» a su evidencia (estado observado, total o parcial) y entrega
+  de nuevo; el verifier hace la **comprobación posterior** y emite el veredicto
+  final (`pass`, `concerns` o `fail`). Espera, ejecución y comprobación con
+  `pass` no consumen ronda. Un `fail` posterior sí es una ronda de corrección
+  y además deja la tarea `blocked` con el estado observado del efecto hasta
+  que la persona decida la recuperación (revertir, completar o aceptar el
+  estado); si el efecto a reintentar cambia en algo, su digest cambia y exige
+  nueva aprobación `high`. Si el `high` es por tocar `protected_paths`, no hay
+  fase de efecto: la aprobación `high` es precondición del gate 3.
 - Tocar un archivo fuera de los permitidos bloquea la tarea.
 - Sin subdelegación: un worker no lanza workers.
 - El worker **no escribe** veredictos, aprobaciones ni ejecuta integración.
@@ -352,12 +421,20 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
 
 ### 4.5 `deploy` (integrar): `/feature-integrate`
 
-- Precondiciones mecánicas: todas las tareas `completed` con `pass` o
-  `concerns` (los `concerns` se listan para el gate 3) e integradas en
-  `feat/<id>` (`merged`); cada veredicto con un `actor_id` elegible, posterior
-  al último `invalidated` de su tarea y citando los digests vigentes; la
-  autorización de `build` cubre los digests actuales de `plan.md` y `spec.md`;
-  `high` aprobado donde la tarea lo exige.
+- Precondiciones mecánicas: cada tarea del plan está `completed` o
+  `cancelled`. Las **`completed`**: veredicto `pass` o `concerns` (los
+  `concerns` se listan para el gate 3), `merged` en `feat/<id>`, `actor_id`
+  elegible, posterior al último `invalidated` de su tarea y citando los digests
+  vigentes (o ratificado contra ellos). Las **`cancelled`** (S04 l. 102) no
+  tienen entrega ni veredicto ni merge; exigen evento `cancelled` con razón,
+  impacto, cambio de alcance aceptado (línea `scope <digest-plan> cancelled
+  T<n> accepted` en `control`, o sustitución aceptada en el gate 2 renovado),
+  dependencias reconciliadas (ninguna tarea `completed` o pendiente depende de
+  ella sin recableado en el plan) y disposición explícita del código parcial
+  (rama sin merge borrada o conservada como referencia; si algo se había
+  integrado, la tarea que lo retira). La autorización de `build` cubre los
+  digests actuales de `plan.md` y `spec.md`; `high` aprobado donde la tarea lo
+  exige.
 - La **candidata es `feat/<id>`** actualizada sobre `main` (`git merge main`,
   `<sha-main-base>` = `git rev-parse main` en ese momento). Es **completa**:
   antes de verificarla, el integrador comete en ella el cierre documental
@@ -433,7 +510,7 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
 | `/feature-plan` | `design` | planner | `plan.md` en `feat/<id>`; crea `tasks.md` con todas las tareas en `pending` y `participations.md` sin eventos |
 | `/feature-build <task>` | `build` | worker | rama de la tarea: código, `evidence/<task>.md`, `evidence/<task>.findings.md` |
 | `/feature-verify <task>` | `verify` | verifier | `evidence/<task>.verdict.md` en `feat/<id>` |
-| `/feature-integrate` | `deploy` | integrador + persona | candidata `feat/<id>` (`specs/`, `spec.md`, `evidence/README.md`); el merge a `main` lo ejecuta la persona |
+| `/feature-integrate` | `deploy` | integrador + persona | candidata `feat/<id>` (`specs/`, `evidence/README.md`; nunca `spec.md` ni `plan.md`); el merge a `main` lo ejecuta la persona |
 | `/session-handoff` | transversal | quien cierra | `evidence/<task>.handoff.md` en la rama entregada |
 | `/session-resume` | transversal | quien abre | nada; acepta o rechaza vía eventos del orchestrator |
 | `/spike` | `plan` | worker | `spikes/<id>.md` en `feat/<id>` o en la rama de la definición |
@@ -452,6 +529,15 @@ Reglas de las skills:
   sin enlace relativo, para que sobrevivan a la proyección; sólo `references/`
   de la propia skill se enlaza en relativo, porque el directorio se proyecta
   entero. E4 comprueba que cada proveedor resuelve esas rutas desde la raíz.
+- **Paquete de proyección a otro repositorio (el piloto).** La proyección copia,
+  en las mismas rutas del repositorio destino, `skills/` completo,
+  `docs/workflow-construccion.md`, `skills/README.md` y un `policy.yaml`
+  provisional con la lista de `protected_paths` de §4.3 (es operativa: build y
+  verify la consultan). El `skills/README.md` copiado lleva como primera línea
+  `Proyectado desde T800R @ <sha>`; las referencias al canon (`docs/definition/`,
+  `docs/research-*`, `ideas/`) **no se copian** y se resuelven en el checkout
+  de T800R identificado por ese SHA. E4 comprueba desde el piloto que esos
+  archivos existen y que cada proveedor resuelve las rutas de los `SKILL.md`.
 - Cambiar una skill es `high`: la skill modificada no aprueba su propia
   activación.
 - Evals por skill, desde el v0 como checklist manual con cuatro casos: activación

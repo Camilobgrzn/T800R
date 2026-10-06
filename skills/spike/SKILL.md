@@ -39,7 +39,9 @@ definición. La rama del experimento se descarta sólo después.
 2. Autorización:
    - durante la **definición** (S12 en curso): aprobación explícita y separada
      de la persona, registrada en `control:approvals/spikes.md` como `spike
-     <id> approved` (S12 «Especificación ejecutable», l. 56);
+     <id> approved` (S12 «Especificación ejecutable», l. 56), con el
+     procedimiento de `control` del workflow §2.1 (escribir, cometer,
+     comprobar con `git show control:approvals/spikes.md`);
    - durante la **construcción**: basta con que el incremento autorizado lo
      contemple (el plan lo nombra) o con la aprobación anterior.
 3. Rama de destino identificada (`feat/<id>` o la rama de la definición) y

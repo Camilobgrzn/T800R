@@ -44,7 +44,8 @@ readiness primero.
    spec** (hallazgo en un `evidence/<task>.md` o un `.verdict.md`;
    `evidence/<task>.findings.md` no cuenta, es para hallazgos ajenos); **reclasificación** de
    un `acotado` (ahora existe `spec.md` aprobada); **cambio de alcance** pedido
-   por la persona en esta sesión; **rondas agotadas** en una tarea (`blocked`
+   por la persona (si cambia la spec, ya pasó por `/feature-spec` y hay un
+   nuevo `spec … approved`); **rondas agotadas** en una tarea (`blocked`
    con nota «rondas agotadas» en `tasks.md`: se cambia su tamaño). En
    cualquier otro caso, un `plan.md` con `build … authorized` es inmutable:
    detente y dilo.
@@ -128,22 +129,32 @@ incertidumbre lo justifican; no es un gate rutinario.
   `participations.md` (cabecera y sin eventos).
 - **Replanificación** (cualquiera de las cuatro entradas): no toques
   `participations.md` ni `evidence/`. En `plan.md` añade la sección
-  «Replanificación» con: la entrada y qué cambió, qué tareas quedan
-  **afectadas** (tú las identificas; el orchestrator registra el evento
-  `invalidated` de cada una en `participations.md`, que es lo que invalida su
-  evidencia y sus veredictos, y las devuelve a `pending`), qué tareas
-  **independientes** continúan sin interrupción y qué tareas nuevas aparecen.
-  Una tarea ya `merged` en `feat/<id>` que quede afectada se corrige con una
-  tarea nueva sobre esa base, no borrando historia. Conserva los `id`
-  existentes; los nuevos siguen la numeración. Pide al orchestrator que añada
-  las tareas nuevas a `tasks.md` en `pending`. Esto **reabre el gate 2**: la
+  «Replanificación» con la entrada, qué cambió y la **disposición de cada
+  tarea existente** (workflow §4.2), sin excepción:
+  - **conservada**: no cambia; tras el nuevo gate 2 un verifier elegible la
+    ratifica contra los digests nuevos (entrada «Ratificación» en su
+    `.verdict.md`; evento `ratified`). Sigue `completed` y `merged`;
+  - **rehacer**: afectada y se corrige con el mismo `id`; el orchestrator
+    registra `invalidated` (→ `pending`, `Ronda` 0) y, si estaba `merged`,
+    recrea `task/<id>/T<n>` desde `feat/<id>` actual;
+  - **sustituida por T<m>**: afectada y la corrección va en otra tarea; el
+    orchestrator registra `invalidated` y `cancelled` (`superseded by T<m>`).
+    `T<m>` declara qué sustituye, cómo dispone del código anterior (lo corrige
+    o lo retira; una rama sin merge se borra) y hereda sus dependientes;
+  - **nueva**: aparece ahora; `pending`.
+  Ninguna tarea obligatoria queda `pending` si su corrección va en otra.
+  Conserva los `id` existentes; los nuevos siguen la numeración. Pide al
+  orchestrator que añada las tareas nuevas a `tasks.md` en `pending` y que
+  ejecute la reconciliación tras el gate 2. Esto **reabre el gate 2**: la
   persona debe registrar una nueva línea `build … authorized` con el nuevo
-  digest.
+  digest; esa línea acepta también las sustituciones.
 
 ### Paso 5. Digest y entrega
 
 Comete `plan.md` (y, la primera vez, `tasks.md` y `participations.md`) en
-`feat/<id>` (`coord: plan <id>`). `git hash-object features/<id>/plan.md` sobre
+`feat/<id>` (`coord: plan <id>`) con el protocolo de commit del workflow §2.1
+(índice limpio al empezar, lista explícita, `--cached` igual a la lista).
+`git hash-object features/<id>/plan.md` sobre
 el archivo guardado; **no lo escribas dentro del archivo** (cambiaría el hash).
 Entrega a la persona: ruta, digest del plan, digest de la spec,
 readiness con sus `CONCERNS` si los hay, número de tareas y cuáles pueden ir en

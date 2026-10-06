@@ -47,20 +47,29 @@ orchestrator, que registra `ineligible` en participations.md.)
 - No bloqueante: <lista> | ninguno
 
 ### Veredicto
-**pass | concerns | fail**
+**pass | concerns | fail | ready_for_effect**
 
 - Si concerns: <observaciones no bloqueantes; sin incumplimiento ni riesgo pendiente; cierran la tarea y los acepta la persona en el gate 3>
 - Si fail: clase = <defecto de implementación | criterio no cubierto | archivo fuera de alcance | validación en rojo | protected_path injustificado | efecto prohibido | defecto de spec | laguna de intención>; qué información nueva necesita la siguiente ronda.
+- Si ready_for_effect (sólo high con fase de efecto; **no declara cumplimiento**): criterios que no dependen del efecto cumplidos ✔; validaciones en verde ✔; efecto y recuperación descritos ✔; criterios que dependen del efecto: <lista, pendientes>. La tarea pasa a waiting.
 
 ### Solicitud de aprobación `high` (sólo si la tarea es high)
-- Tipo: fase de efecto (la tarea queda waiting; el worker ejecuta tras la aprobación) | protected_paths (precondición del gate 3; sin fase de efecto)
-- Efecto: <qué efecto protegido>
+- Tipo: fase de efecto (veredicto ready_for_effect; el worker ejecuta tras la aprobación) | protected_paths (precondición del gate 3; sin fase de efecto; veredicto normal)
+- Efecto: <qué efecto protegido>; recuperación prevista: <cómo se revierte o completa>
 - Digest de la solicitud: `printf '%s' '<id>/T<n> <sha-trabajo> <efecto>' | git hash-object --stdin` → <valor>
 - Línea para control:approvals/<id>.md: `high <digest> approved`
 
 ## Comprobación posterior — <fecha> (sólo tras una fase de efecto)
 - actor_id: <…>
-- Entrada «Efecto» de la evidencia: <sha-trabajo> / <sha-entrega>; aprobación releída por el worker ✔
-- Observado: <qué se comprobó y cómo>
-- Veredicto final: **pass | fail** (no consume ronda)
+- Entrada «Efecto» de la evidencia: <sha-trabajo>; aprobación releída por el worker ✔
+- Estado observado del efecto: ejecutado total | parcial (<qué quedó>) | no ejecutado
+- Criterios que dependían del efecto: <cumplido / no, con evidencia>
+- Veredicto final: **pass | concerns** (no consume ronda) | **fail** (consume ronda; la tarea queda blocked con el estado observado hasta que la persona decida la recuperación; un efecto distinto exige nuevo digest y aprobación)
+
+## Ratificación — <fecha> (sólo tras una replanificación, tarea conservada)
+- actor_id: <…> (elegible para T<n>)
+- Digests vigentes: plan <…>, spec <…> (`build … authorized` renovado ✔)
+- T<n> no cambia en el plan nuevo ✔; <sha-entrega> sigue merged en feat/<id> ✔
+- Validaciones: sin cambios en el plan → no reejecutadas | reejecutadas: <resultado>
+- El veredicto de la ronda <k> sigue válido ✔ (el orchestrator registra `ratified`)
 ```

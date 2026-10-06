@@ -26,7 +26,13 @@ la instrucción operativa de cada skill.
   del repositorio** (`docs/workflow-construccion.md`, `skills/README.md`), sin
   enlace relativo; sólo `references/` de la propia skill se enlaza en
   relativo, porque el directorio se proyecta entero. E4 comprueba que cada
-  proveedor resuelve esas rutas desde la raíz (workflow §5).
+  proveedor resuelve esas rutas desde la raíz (workflow §5). **Paquete de
+  proyección al piloto** (workflow §5): `skills/` completo,
+  `docs/workflow-construccion.md`, este README (con la primera línea
+  `Proyectado desde T800R @ <sha>`) y un `policy.yaml` provisional con las
+  `protected_paths` de workflow §4.3, en las mismas rutas del repositorio
+  destino; las referencias al canon (`docs/definition/`, `docs/research-*`,
+  `ideas/`) no se copian y se resuelven en el checkout de T800R de ese SHA.
 - **Las skills no conceden permisos.** Orientan y comprueban lo mecánico; lo que
   un actor puede tocar lo fijan el plan autorizado y el `policy.yaml`
   (workflow §5; [S04](../docs/definition/session-04-operating-cycle.md) l. 112;
@@ -249,7 +255,7 @@ reclasifica a `feature` y vuelve a `plan`.
 | `/feature-plan` | `design` | planner | `spec.md` aprobada (o descripción del `acotado`); replanificación por defecto de spec, reclasificación, cambio de alcance o rondas agotadas | `plan.md` en `feat/<id>`; inicializa `tasks.md` y `participations.md` | Prepara el gate 2 (autorizar `build`, aceptando los `CONCERNS`); `FAIL` cierra y devuelve a `/feature-spec` |
 | `/feature-build <task>` | `build` | worker | Autorización de `build` vigente (digests de plan y spec), tarea `ready` con dependencias `merged`, brief | Rama `task/<id>/<task>` hasta `<sha-trabajo>`; encima commit `evidence:` con `evidence/<task>.md` y `evidence/<task>.findings.md` | Ninguno; se detiene por `intent gap`, defecto de spec, `high` sin aprobar, `prohibited` o ronda 3 |
 | `/feature-verify <task>` | `verify` | verifier | `<sha-trabajo>` y `<sha-entrega>` de `evidence/<task>.md` | `evidence/<task>.verdict.md` en `feat/<id>` (commit `verdict:`) | Cierra la tarea (`pass` o `concerns`) o la devuelve a `build` (`fail`); `high` exige aprobación `local` |
-| `/feature-integrate` | `deploy` | integrador + persona | Todas las tareas `completed` y `merged` en `feat/<id>` | Candidata `feat/<id>` (`specs/`, `spec.md`, `evidence/README.md` en commit `evidence:`) | Prepara el gate 3 (aprobar merge); el merge lo ejecuta la persona; después sólo `integrated` en `control` |
+| `/feature-integrate` | `deploy` | integrador + persona | Cada tarea `completed` (con veredicto o ratificación vigente y `merged`) o `cancelled` (con alcance aceptado y dependencias reconciliadas) | Candidata `feat/<id>` (`specs/`, `evidence/README.md` en commit `evidence:`; nunca `spec.md` ni `plan.md`) | Prepara el gate 3 (aprobar merge); el merge lo ejecuta la persona; después sólo `integrated` en `control` |
 | `/session-handoff` | transversal | worker o integrador que cierra | Estado real de la rama entregada | `evidence/<task>.handoff.md` (tipo `work` o `integrate`), commits `wip:` y `handoff:` | Ninguno |
 | `/session-resume` | transversal | quien abre la sesión | `evidence/<task>.handoff.md`, rama entregada, coordinación actual en `feat/<id>` | Nada; acepta o rechaza vía eventos del orchestrator | Ninguno; puede rechazar el handoff |
 | `/spike` | `plan` | worker | Pregunta bloqueante aprobada | `spikes/<id>.md` en la rama de destino; rama desechable | Ninguno; responde una pregunta, no autoriza construir |
@@ -264,12 +270,15 @@ persona pueda aprobarla en el gate 1 (workflow §4.1).
 
 **Cuándo invocarla.** Al abrir una `feature`; para revisar un borrador aún no
 aprobado; cuando un `acotado` se reclasifica (el directorio ya tiene `plan.md` y
-no `spec.md`); cuando `/feature-build` o `/feature-verify` reportan un
-**defecto de spec**. **Cuándo no.** Para un `acotado` (la spec cabe en
-`plan.md`), para un `spike`, o cuando ya existe spec aprobada sin defecto
-conocido.
+no `spec.md`); cuando `/feature-build`, `/feature-verify` o el readiness de
+`/feature-plan` reportan un **defecto de spec** o una decisión funcional
+pendiente; cuando la persona pide un **cambio de alcance, comportamiento o
+interfaz** sobre una spec aprobada que no era defectuosa (sección «Impacto del
+cambio»; renueva el gate 1 y después el gate 2). **Cuándo no.** Para un
+`acotado` (la spec cabe en `plan.md`), para un `spike`, o cuando ya existe spec
+aprobada sin defecto ni cambio pedido.
 
-**Precondiciones mecánicas.** Una de las cuatro entradas anteriores; si
+**Precondiciones mecánicas.** Una de las cinco entradas anteriores; si
 `spec.md` ya tiene digest aprobado en `control:approvals/<id>.md`, advierte que
 cambiarla exige nueva aprobación y, si había `build` autorizado, nueva
 autorización (workflow §4.1-4.2). Para declarar el riesgo consulta
@@ -322,8 +331,12 @@ la primera ejecución** inicializa `tasks.md` con todo en `pending` y
 el planner los escribe, después son del orchestrator. Todo se comete en
 `feat/<id>`. **Al replanificar** no reinicia registros: conserva
 `participations.md`, identifica las tareas afectadas (el orchestrator registra
-`invalidated` y las devuelve a `pending`), y deja que las independientes
-continúen (workflow §4.2-4.3; conservación histórica de S04 l. 94-99). La skill
+`invalidated`), y deja que las independientes continúen (workflow §4.2-4.3;
+conservación histórica de S04 l. 94-99). Dispone **cada** tarea existente:
+conservada (ratificación del verifier contra los digests nuevos, evento
+`ratified`), rehacer (mismo `id`, `pending`) o sustituida por otra
+(`cancelled superseded by T<m>`); ninguna obligatoria queda `pending` si su
+corrección va en otra. La skill
 comprueba lo mecánico del readiness (aceptación y archivos por tarea, IDs,
 comandos, criterios cubiertos, ningún efecto `prohibited`); el juicio sobre
 incógnitas lo prepara el planner.
@@ -362,9 +375,11 @@ de tarea o modelo, o escalar); en `main`.
 
 **Precondiciones mecánicas.** `control:approvals/<id>.md` contiene `build
 <digest-plan> on spec <digest-spec> authorized` y **ambos** digests coinciden
-con los archivos actuales de `feat/<id>`; la tarea está `ready` en `tasks.md`;
-sus dependencias están `completed` y `merged`; el orchestrator registró la
-asignación en `participations.md` después de cualquier `invalidated`; los
+con los archivos actuales de `feat/<id>`; la tarea está `in_progress` en
+`tasks.md` con el worker como owner (`ready` es la elegibilidad previa a la
+asignación; al asignar, el orchestrator registra `assigned` y `started` juntos
+y la pasa a `in_progress`); sus dependencias están `completed` y `merged`; la
+asignación es posterior a cualquier `invalidated`; los
 archivos permitidos existen en el plan; rama creada desde la base del brief;
 `protected_paths` resueltos (`policy.yaml` más la lista del workflow §4.3).
 
@@ -412,8 +427,9 @@ elegible); sobre un SHA distinto del de la evidencia.
 
 **Precondiciones mecánicas.** El `actor_id` declarado no aparece en
 `participations.md` como worker u owner de la tarea en ningún evento; el
-`delivered` es posterior a cualquier `invalidated` y coincide con la entrada de
-su ronda en `evidence/<task>.md` (`actor_id`, `<sha-trabajo>`,
+`delivered` es posterior a cualquier `invalidated`, su `<sha-entrega>` es el
+HEAD de la rama de la tarea y su `actor_id` y `<sha-trabajo>` coinciden con la
+entrada de su ronda en `evidence/<task>.md` (la entrada no contiene
 `<sha-entrega>`); la autorización de `build` cubre los digests actuales de
 `plan.md` y `spec.md`; entre `<sha-trabajo>` y `<sha-entrega>` sólo hay rutas
 de registro; los comandos de validación del plan están declarados;
@@ -682,7 +698,10 @@ proyectarse a los proveedores.
 | digest | Hash del contenido de `spec.md` o `plan.md` en el momento de aprobar; las líneas de `control:approvals/<id>.md` lo citan para que la aprobación identifique exactamente lo aprobado. Método fijado por las skills: `git hash-object <archivo>`; el digest no se escribe dentro del archivo. |
 | candidata | `feat/<id>` con todas las tareas `merged`, actualizada sobre `main` y con los cambios documentales del cierre (`<sha-verificado>`), más `evidence/README.md` encima: `<sha-candidato>`. |
 | base | SHA de `main` sobre el que se verificó la candidata (`<sha-main-base>`); se aprueba el par y se integra sólo si ambos siguen iguales. |
-| `high` | Nivel de riesgo que exige aprobación `local` de la persona en el punto del efecto (disparadores de S09 l. 83 más `protected_paths`). Dos formas: **fase de efecto** (el worker ejecuta el efecto tras `pass` y aprobación, releyendo `control`; sin consumir ronda) y **`protected_paths`** (la aprobación es precondición del gate 3). |
-| `prohibited` | Nivel de riesgo que nunca se ejecuta: efectos irreversibles fuera del repositorio (S12 l. 64; E5). Se evalúa antes que `high`; una aprobación `high` no lo habilita; sólo cambiar `policy.yaml` (cambio `high` separado) lo reclasifica. |
+| `high` | Nivel de riesgo que exige aprobación `local` de la persona en el punto del efecto (disparadores de S09 l. 83 más `protected_paths`). Dos formas: **fase de efecto** (veredicto previo `ready_for_effect` → `waiting` → aprobación → el worker ejecuta releyendo `control` → comprobación posterior con veredicto final; espera y comprobación `pass` no consumen ronda, un `fail` posterior sí y bloquea hasta decidir la recuperación) y **`protected_paths`** (la aprobación es precondición del gate 3). |
+| `prohibited` | Nivel de riesgo que nunca se ejecuta. Dos clases: las **prohibiciones del canon** (S12 l. 64: efectos irreversibles fuera del repositorio; E5) no se aflojan en el v0 aunque cambie `policy.yaml`; las **adicionales** que declare `policy.yaml` sólo las reconsidera un cambio de política (`high`, separado). Se evalúa antes que `high`; una aprobación `high` no habilita ninguna. |
+| `ready_for_effect` | Veredicto previo de una tarea `high` con fase de efecto: criterios independientes del efecto cumplidos, validaciones en verde, efecto y recuperación descritos; **no declara cumplimiento**; pasa la tarea a `waiting`. El veredicto final llega con la comprobación posterior. |
+| reconciliación | Tras un gate 2 renovado, disposición de cada tarea existente: conservada (ratificación del verifier, evento `ratified`), rehacer (`invalidated` → `pending`, mismo `id`) o sustituida (`invalidated` + `cancelled superseded by T<m>`). Ninguna tarea obligatoria queda `pending` si su corrección va en otra (workflow §4.2). |
+| protocolo de commit | Para todo escritor del checkout de coordinación: índice y árbol limpios al empezar (cambios ajenos → detenerse y escalar), `git add` por lista explícita, `git diff --cached --name-only` igual a la lista antes de cometer, árbol limpio al terminar (workflow §2.1). |
 | readiness | Resultado `PASS` / `CONCERNS` / `FAIL` de «¿puede implementarse sin inventar decisiones no registradas?», con condiciones de S04 l. 83; lo prepara el planner, lo autoriza la persona. |
 | intent gap | Laguna de intención: dos lecturas de la spec producen resultados observables distintos y nada registrado permite elegir. La tarea queda `blocked`, el intento se guarda como parche y se consulta a la persona. |

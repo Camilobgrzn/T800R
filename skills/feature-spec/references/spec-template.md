@@ -53,9 +53,19 @@ observable (p. ej. nombre de un módulo interno, librería auxiliar).
 
 ## Efectos prohibidos
 
-«Ninguno», o la lista de criterios que exigen un efecto irreversible fuera del
-repositorio (S12 l. 64) o algo `prohibited` en `policy.yaml`. Si hay alguno, el
-gate 1 no procede: se reformula el criterio; ninguna aprobación lo habilita.
+«Ninguno», o la lista de criterios que exigen un efecto prohibido, con su
+clase: **canon** (irreversible fuera del repositorio, S12 l. 64; no se afloja
+en el v0 aunque cambie `policy.yaml`) o **política** (`prohibited` en
+`policy.yaml`; sólo un cambio de política `high` lo reconsidera). Si hay
+alguno, el gate 1 no procede: se reformula el criterio; ninguna aprobación lo
+habilita.
+
+## Impacto del cambio
+
+Sólo cuando la entrada es un cambio de alcance, comportamiento o interfaz
+pedido por la persona sobre una spec ya aprobada. `CA` que cambian o se
+añaden; tareas del plan vigente afectadas (el planner las dispondrá al
+replanificar). Renueva el gate 1 y después el gate 2.
 
 ## Preguntas abiertas
 
