@@ -354,8 +354,11 @@ superada por los cierres posteriores; la próxima sesión es la 12.
 
 Las investigaciones son evidencia o recomendaciones; sólo los acuerdos
 explícitos del documento rector tienen autoridad. La revisión transversal de
-OpenAI y Anthropic sigue pendiente de completar según
-[su alcance y matriz](product-definition.md#revisión-transversal-de-prácticas-de-harnesses).
+OpenAI y Anthropic quedó completada y aprobada el 2026-10-09 según
+[su alcance y matriz](product-definition.md#revisión-transversal-de-prácticas-de-harnesses);
+el registro está en
+[revision-transversal-cierre.md](revision-transversal-cierre.md) y la decisión
+en [S12](definition/session-12-validation-convergence.md#decisiones).
 
 ## Sesiones
 

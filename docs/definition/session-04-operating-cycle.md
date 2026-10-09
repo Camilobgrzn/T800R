@@ -250,7 +250,10 @@ rígida entre plan y design ni una ruta de almacenamiento.
 - Schema, rutas, timeout y canal de consultas, esperas y handoffs en la sesión 5.
 - Esquemas, rutas y elección de herramientas; no adoptar OKF, Agent Skills,
   OpenSpec o Spec Kit sólo por haberlos investigado.
-- Continuar revisión transversal de OpenAI y Anthropic en las sesiones aplicables.
+- ~~Continuar revisión transversal de OpenAI y Anthropic en las sesiones
+  aplicables.~~ Completada en S12 el 2026-10-09:
+  [revision-transversal-cierre.md](../revision-transversal-cierre.md), §2, áreas
+  2 y 3. Ningún acuerdo de esta unidad cambia.
 
 Próxima acción: iniciar la sesión 5 y definir el contrato `handoff/v1`.
 
@@ -286,10 +289,13 @@ final precede a `deploy`; el cierre sigue los requisitos ya aceptados. Las tarea
 siguen al entregable en la etapa donde contribuyen, con historia y dependencias
 revalidadas cuando un hallazgo obliga a volver atrás.
 
-Revisar las prácticas aplicables de OpenAI y Anthropic: inicialización,
+Las prácticas aplicables de OpenAI y Anthropic sobre inicialización,
 planificación, progreso incremental, trabajo prolongado, comprobación del estado
-real, validación y recuperación. Compararlas con las necesidades de agentes de
-una misma sesión y de sesiones independientes.
+real, validación y recuperación, y su comparación con agentes de una misma
+sesión y de sesiones independientes, quedaron revisadas en S12 (2026-10-09):
+[revision-transversal-cierre.md](../revision-transversal-cierre.md), §1
+(P01-P04, P07, P24, P25) y §2, áreas 2 y 3. Las conclusiones de esta unidad no
+cambian.
 
 ### Persistencia mínima de consultas y esperas
 

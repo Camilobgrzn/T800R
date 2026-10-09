@@ -1,6 +1,7 @@
 # Especificación v0 (T800R + piloto IDP)
 
-- Estado: **borrador, pendiente de verificación y aprobación de la persona**.
+- Estado: **aprobada** por la persona el 2026-10-09, tras verificación en pareja
+  (Fable y Astra `gpt-6-astra`, ambos «SÍ con cambios», cambios aplicados).
   Criterio de salida de [S12](definition/session-12-validation-convergence.md)
   («Criterio de salida» y «Evidencia y resultados») y criterio de cierre de
   [product-definition.md](product-definition.md) («haya pruebas de aceptación
@@ -171,7 +172,7 @@ repositorio temporal) y forma `EXEC` (repositorio real); se anota `CF+EXEC`.
 | AT-92 | Efecto `high` aprobado | Ejecutar con fallo inyectado entre el registro previo y el efecto; reanudar | Orden observable: validación → decisión → `effect_pending` → efecto → registro posterior → reconciliación; tras el fallo, `effect_pending` queda visible y el efecto **no** se reintenta hasta comprobar su estado real | S11 l. 59, 157; ADR-010 punto 6; S09 l. 77 (`fail closed`) | 1.5, 2.2 | `CF` | T800R |
 | AT-93 | Adopción con dos worktrees | Abrir el ledger desde cada uno; ejecutar `doctor` | Un único SQLite en el directorio de estado de la plataforma bajo `project_id`, compartido; no existe bajo el repositorio; `doctor` muestra la ruta efectiva | S11 l. 112; ADR-010 punto 6 | 1.5 | `CF` | T800R |
 | AT-94 | Feature del IDP integrada (I3-I5) | Reconstruir, **sólo** desde ledger, Git y tracker: tareas, owners, participaciones, veredictos, aprobaciones, efectos `high`, handoffs | La persona responde «qué pasó y por qué» sin consultar transcripciones ni a los agentes; cada afirmación enlaza un evento o commit | S12 l. 70 (métrica global); S01 objetivo 2 | 5.4 | `EXEC` | IDP |
-| AT-95 | Feature cerrada | Calcular las métricas de workflow §8 (tiempo spec aprobada → primera evidencia; rondas por tarea; reaperturas de spec; rechazos de handoff; `intent gap`; tokens si se exponen) más tiempo de registros y gates (1.1) | En bootstrap, `features/<id>/metrics.md` por feature; desde F1, las mismas métricas derivadas localmente de eventos y resultados, sin telemetría remota | Workflow §8; S11 l. 160; roadmap 0.8, 1.1 | 0.8, 1.1, 5.4 | `D`+`CF` | ambos |
+| AT-95 | Feature cerrada | Calcular las métricas de workflow §8 (tiempo spec aprobada → primera evidencia; rondas por tarea; reaperturas de spec; rechazos de handoff; `intent gap`; tokens si se exponen) más tiempo de registros y gates (1.1) | En bootstrap, `features/<id>/metrics.md` por feature, escrito en el cierre documental (`coord: cierre <id>`) con la línea «capacidad ausente → destino» (P27) y las reejecuciones de validaciones no deterministas (P10); el tiempo del gate 3 se deriva de los commits de `control` (workflow v4.2 §4.5, §8); desde F1, las mismas métricas derivadas localmente de eventos y resultados, sin telemetría remota | Workflow §8; S11 l. 160; roadmap 0.8, 1.1 | 0.8, 1.1, 5.4 | `D`+`CF` | ambos |
 | AT-96 | Actor lógico `camilo-a1` con dos ejecuciones en proveedores distintos | Registrar participaciones | Ambas comparten `actor_id`; proveedor y sesión son atributos; el predicado del verifier las trata como un mismo actor | S12 l. 68; roadmap 1.6 | 1.6 | `CF` | T800R |
 | AT-97 | **Métrica global**: I1-I5 integradas en `main` del IDP | Derivar la tabla de la métrica desde ledger y Git | Tabla con: denominador = tareas de cada `plan.md` que llegaron a `main`; numerador = las asignadas por el orchestrator, ejecutadas por un agente vía adapter y con evidencia en el ledger; exclusiones listadas aparte (línea base de `create-app`, ediciones humanas fuera de tarea); modo por tarea (manual, con skills, bajo T800R) y líneas cambiadas por modo; resultado numerador/denominador ≥ 75 %. Los gates humanos no restan | S12 l. 69-70 (métrica global, umbral 75 %); roadmap «Dos carriles» | 5.4 | `EXEC` | IDP |
 
@@ -199,10 +200,10 @@ mínima provisional: **macOS arm64, Node 24 con patch fijado en 0.7** (S12
 «Preguntas abiertas»). La conformidad live de adapters fuera de esa tupla queda
 `deferred` al backlog («Perfiles de conformidad por tupla»), junto con los
 prebuilds de SQLite para Linux glibc arm64/x64 y Windows x64 (S11 l. 119,
-backlog «Bindings SQLite precompilados»). **Tensión no resuelta aquí**: S11 l.
-127 exige que core, schemas, ledger y CLI ejecuten su matriz de CI en macOS,
-Linux y Windows, y el backlog no difiere esa matriz; sólo la conformidad de
-adapters es por tupla. Decide la persona (§7).
+backlog «Bindings SQLite precompilados»). La matriz de CI del core en
+Linux y Windows que exige S11 l. 127 queda `deferred` al backlog por decisión de
+la persona del 2026-10-09 (§7); el core conserva el diseño multiplataforma de
+S11 (puertos, sin supuestos POSIX) y su CI corre en macOS arm64 durante el v0.
 
 | Adapter / proveedor | Superficie y perfil (S11) | Tupla | Versión a fijar | Estructural | Conductual | Integración | Resiliencia | Estado inicial |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -244,10 +245,9 @@ E4 es un experimento, no la certificación: se declara **superado** cuando los
 tres proveedores completan AT-64 (una tarea de extremo a extremo con el mismo
 handoff, sin cambios en el repositorio; S12 l. 70); **parcial documentado**
 cuando lo hacen dos y el tercero queda `ineligible` o `unverified` con motivo,
-versión probada y punto de resolución en el backlog. Ese mínimo de dos es una
-**propuesta pendiente de ratificación (§7.1)**: S12 l. 70 lo da como ejemplo
-(«p. ej. dos de tres proveedores»), no como umbral. Con uno o ninguno, E4 es
-`fail` según la propuesta: la regla de decisión de S12 no lo hace obligatorio,
+versión probada y punto de resolución en el backlog. Ese mínimo de dos lo
+**ratificó la persona el 2026-10-09** (§7.1); S12 l. 70 lo daba sólo como ejemplo
+(«p. ej. dos de tres proveedores»). Con uno o ninguno, E4 es `fail`: la regla de decisión de S12 no lo hace obligatorio,
 pero incumple el acuerdo inicial 3 de
 [product-definition.md](product-definition.md) («compatibilidad con Codex, Claude
 Code y OpenCode») y el v0 no cierra hasta una decisión explícita de la persona
@@ -315,8 +315,8 @@ CS-03 como fixtures y pruebas puras, sin repositorio real.
 | --- | --- | --- | --- | --- |
 | E1 | Sí | AT-17 `pass` en ambos repos (≤ 30 min, sin editar generados, `doctor` verde). AT-10-12 son prerrequisitos de la fase 5.1, no parte del veredicto | No admite | Cualquier repo > 30 min o con edición manual de generados |
 | E2 | Sí | AT-48 `pass` bajo el orchestrator (4.6): estado, próxima acción y bloqueos desde lo persistido, sin explicación humana, 0 tareas rehechas. Las ejecuciones de 1.7 (manual) y 3.2 (con Beads) son evidencia intermedia; AT-47 cuenta para la celda de Beads (§2) | No admite | Tareas rehechas > 0 o explicación humana necesaria |
-| E3 | No | AT-22 (detección antes de integrar, sin pérdida) y AT-33 (100 % verifier distinto) `pass` | S12 l. 70 sólo dice «éxito parcial documentado» sin fijar límites. **Propuesta pendiente de ratificación (§7.1)**: detección antes de integrar y preservación del trabajo cumplidas (objetivo 3 de S01), pero la serialización o el bloqueo requirió intervención humana, o se observó en menos tareas de las planeadas en I4; AT-33 sin parcial (obligación de S09 l. 86 y S12) | Colisión no detectada antes de integrar, o pérdida de trabajo, o AT-33 `fail` |
-| E4 | No | AT-64 `pass` en los tres proveedores (el estado `compatible` es condición de release, §2.1, no de E4) | S12 l. 70 da «p. ej. dos de tres proveedores» como ejemplo, no como mínimo. **Propuesta pendiente de ratificación (§7.1)**: dos de tres como umbral del parcial (§2.2) | Uno o ninguno según la propuesta (§2.2: el v0 no cierra sin decisión de la persona) |
+| E3 | No | AT-22 (detección antes de integrar, sin pérdida) y AT-33 (100 % verifier distinto) `pass` | S12 l. 70 sólo dice «éxito parcial documentado» sin fijar límites. **Ratificado por la persona el 2026-10-09 (§7.1)**: detección antes de integrar y preservación del trabajo cumplidas (objetivo 3 de S01), pero la serialización o el bloqueo requirió intervención humana, o se observó en menos tareas de las planeadas en I4; AT-33 sin parcial (obligación de S09 l. 86 y S12) | Colisión no detectada antes de integrar, o pérdida de trabajo, o AT-33 `fail` |
+| E4 | No | AT-64 `pass` en los tres proveedores (el estado `compatible` es condición de release, §2.1, no de E4) | S12 l. 70 da «p. ej. dos de tres proveedores» como ejemplo. **Ratificado por la persona el 2026-10-09 (§7.1)**: dos de tres como umbral del parcial (§2.2) | Uno o ninguno (§2.2: el v0 no cierra sin decisión de la persona) |
 | E5 | Sí | AT-82 `pass` (completo) tras AT-80-81 `pass` (parcial, 2.3) | No admite | Un push a `main` sin aprobación `local`, o una acción `prohibited` ejecutada, o un evento sin registrar |
 
 Regla de S12 l. 70: E1, E2 y E5 obligatorios; E3 y E4 admiten parcial sin
@@ -378,36 +378,34 @@ resolución anterior a ella.
 | Patch exacto de Node 24 y versiones del toolchain | `deferred` a 0.7 (lockfile del monorepo) | Tarea 0.7 | S11 l. 65, 118 ya fijan major y herramientas. |
 | Schemas `adapter-descriptor` y `capability-snapshot` (y `agent-turn`, `mediated-operation`, `operation-result`, `diagnostic`) no listados en el roadmap | **tensión detectada**: S08 l. 66 y ADR-010 «Consecuencias» los exigen para conformidad (AT-62), pero 1.2/4.2/4.3 no los nombran. Disposición propuesta: 4.2 añade `adapter-descriptor`, `capability-snapshot` y `agent-turn`; 4.3 añade `mediated-operation`; `operation-result` y `diagnostic` entran con la CLI en 1.4 | Al abrir la feature de 4.2 (nota en el roadmap) | El roadmap ya declara «schemas que añade» por fase; ampliar la lista no cambia dependencias ni orden. |
 | Umbrales de las métricas de workflow §8 | `deferred`: observación sin umbral en el v0 | Informe de cierre (5.4), con los datos de 1.1 | El canon no fija umbrales; fijarlos sin medir contradice «medir antes de automatizar». |
-| Límites del parcial de E3 y mínimo de dos proveedores en E4 | **propuestas** en §4.2 y §2.2, a ratificar (§7.1) | Paso 6 de S12 | S12 l. 70 no fija límites para E3 y da «dos de tres» sólo como ejemplo para E4; las propuestas no aflojan AT-33 ni el objetivo 3 de S01. |
+| Límites del parcial de E3 y mínimo de dos proveedores en E4 | **ratificados** por la persona el 2026-10-09 (§7.1) | Resuelto | S12 l. 70 no fija límites para E3 y da «dos de tres» sólo como ejemplo para E4; las propuestas no aflojan AT-33 ni el objetivo 3 de S01. |
 | Certificación de fuga señuelo de credenciales por tupla | `deferred` al backlog («Auth de proveedor fuera de la frontera de herramientas»); la prueba con secretos señuelo de S11 l. 124 sí entra en el v0 (AT-53, 65, 103) | Al certificar adapters para terceros | El v0 conserva allowlist de entorno, señuelos en CI y no persistencia del stream bruto; lo diferido es certificar la frontera de auth por tupla, no probarla. |
 | Perfil `signed` y transición `local` ↔ `signed` | `deferred` al backlog | Más de un aprobador | `approval/v1` no cambia (S12 l. 60); el v0 sólo ejerce `local`. |
 | Conciliar «no seleccionar tecnología en la definición» con S11 (`REV-2026-104`) | `deferred` con punto de resolución «al cerrar S12» (backlog «Proceso») | Paso 6 de S12 | Afecta al registro del proceso, no a ninguna `AT`. |
 | Modelo de dos momentos (definición y verificación contra producto) | Fuera del v0; exige enmendar S04 | Después del v0 | El v0 conserva los tres gates de v4.1 (roadmap «Fuera del v0»). |
-| Revisión transversal: calidad, costes, ciclos de mejora y cobertura final | Cerrada en borrador en [revision-transversal-cierre.md](revision-transversal-cierre.md), pendiente de las decisiones de la persona sobre las prácticas que añaden obligaciones (P08 evaluación regresiva del harness, P14 invariantes en los lints de 0.7, P20 comprobación de enlaces en 0.7, P27 línea en `metrics.md` al gate 3) | Paso 6 de S12 | **Condicional**: si la persona aprueba P08, P14, P20 o P27, enmiendan el roadmap (0.7, 0.8) y el flujo v4.1 (§4.3, §4.4, §7, §8) y esta especificación añade las `AT` correspondientes (lints de fronteras ampliados en AT-04, enlaces en AT-04, campo nuevo en AT-95, eval regresiva de skills junto a AT-16). Si no, las métricas (AT-95) y la medición (1.1) son su realización en el v0. |
+| Revisión transversal: calidad, costes, ciclos de mejora y cobertura final | Cerrada y aprobada por la persona el 2026-10-09 en [revision-transversal-cierre.md](revision-transversal-cierre.md); las enmiendas P08, P10, P14, P20 y P27 entran en el roadmap v2.2 (0.7, 0.8) y en el flujo v4.2; P12 (salida íntegra de validaciones) queda como decisión de la persona en 0.8 | 0.8 para P12 | Las enmiendas se verifican con AT-04, AT-16 y AT-95 en sus tareas; no añaden gates. |
 
 ## 7. Decisiones de la persona
 
-Decisiones reales que este documento no puede tomar:
+Resueltas el 2026-10-09, registradas en
+[S12](definition/session-12-validation-convergence.md#decisiones):
 
-1. **Límites del parcial de E3 y E4.** S12 l. 70 admite «éxito parcial
-   documentado» sin fijar límites para E3 y con «p. ej. dos de tres» para E4.
-   Ratificar o corregir las dos propuestas: los límites del parcial de E3 (§4.2)
-   y el mínimo de dos proveedores para E4 (§2.2), y confirmar que, bajo ellas,
-   E4 con uno o ningún proveedor impide cerrar el v0 hasta su decisión (§4.3).
-2. **CI del core en tres SO durante el v0.** S11 l. 127 la exige y el backlog no
-   la difiere; la conformidad por tupla sí (§2, §6). Mantenerla o diferirla con
-   nota en el backlog.
+1. **Límites del parcial de E3 y E4: ratificados.** E3 es parcial cuando la
+   colisión se detecta antes de integrar y sin pérdida de trabajo, pero la
+   serialización o el bloqueo requirió intervención humana, o se observó en
+   menos tareas de las planeadas (AT-33 no admite parcial). E4 es parcial con
+   dos de tres proveedores; con uno o ninguno, el v0 no cierra hasta decisión
+   explícita de la persona (§2.2, §4.3).
+2. **CI del core en tres SO: `deferred` al backlog.** La CI del core corre en
+   macOS arm64 durante el v0; Linux y Windows se retoman al publicar para
+   terceros. Se conserva el diseño multiplataforma de S11 l. 127 (puertos, sin
+   supuestos POSIX en core), de modo que no se reintroduce lo que S11 rechazó
+   al descartar «Limitar el core a macOS y Linux».
+3. **Endurecimiento de E1: descartado.** AT-10-12 siguen como prerrequisitos de
+   fase; E1 es la literalidad de S12 l. 70.
+4. **Endurecimiento de E2: descartado.** La ejecución manual de 1.7 es evidencia
+   intermedia, no condición de E2.
 
-Endurecimientos propuestos, no exigidos por S12 l. 70 (se aceptan o se descartan;
-sin ellos las reglas de §4.2 son la literalidad de S12):
-
-3. E1: exigir además AT-10-12 `pass` en el mismo recorrido de E1, no sólo como
-   prerrequisito de fase.
-4. E2: exigir además AT-48 `pass` en su forma manual (1.7) antes de la forma bajo
-   el orchestrator, para medir el coste de la continuidad sin producto.
-
-Nota editorial (no es una decisión de alcance): añadir al roadmap, al abrir las
-features correspondientes, los schemas que S08 l. 66 y S11 l. 115 ya exigen y
-que 1.2/4.2/4.3 no nombran: `operation-result` y `diagnostic` en 1.4;
-`adapter-descriptor`, `capability-snapshot` y `agent-turn` en 4.2;
-`mediated-operation` en 4.3 (§6).
+Nota editorial aplicada en el roadmap (v2.2): `operation-result` y `diagnostic`
+en 1.4; `adapter-descriptor`, `capability-snapshot` y `agent-turn` en 4.2;
+`mediated-operation` en 4.3, tal como ya exigen S08 l. 66 y S11 l. 115 (§6).

@@ -1,7 +1,16 @@
 # Cierre de la revisión transversal de prácticas de harnesses
 
-- Estado: **borrador, pendiente de verificación y aprobación** por la persona.
-- Fecha: 2026-10-06. Preparado por Claude (Fable 5.1) para el paso 6 de
+- Estado: **aprobado por la persona el 2026-10-09**, tras verificación en
+  pareja (Fable y Astra `gpt-6-astra`, ambos «SÍ con cambios», aplicados).
+  Aprobado tal como se recomienda: las 31 decisiones de §1; las enmiendas P08,
+  P10, P14, P20 y P27 (registradas en [roadmap v2.2](roadmap-v0.md) y
+  [flujo v4.2](workflow-construccion.md) y en las skills afectadas); P05
+  diferida a la planificación de I3; `REV-2026-005`, `REV-2026-022` y
+  `REV-2026-032` atendidas por este cierre; restos de S04 limpiados. **P12
+  (salida íntegra en `evidence/<task>.out/`) no se decide ahora: queda como
+  decisión de la persona en [roadmap 0.8](roadmap-v0.md).**
+- Fecha: 2026-10-06 (borrador); 2026-10-09 (aprobación). Preparado por Claude
+  (Fable 5.1) para el paso 6 de
   [S12](definition/session-12-validation-convergence.md) (pregunta 7 de la sesión).
 - Qué cierra: el compromiso de
   [product-definition.md › Revisión transversal de prácticas de harnesses](product-definition.md#revisión-transversal-de-prácticas-de-harnesses)

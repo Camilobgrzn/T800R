@@ -100,6 +100,13 @@ de la tarea (`git show <sha-entrega>:features/<id>/evidence/<task>.md`).
    coinciden `<sha-trabajo>`, comando y entorno (SO, Node, hash del lockfile)
    y la salida quedó capturada en la evidencia; anota «reutilizado» cuando lo
    hagas. En cualquier otro caso, ejecuta. Al terminar, `git worktree remove`.
+   **Validación no determinista:** si una validación falla y pasa al
+   reejecutarla sin cambios (o el worker ya la anotó así), registra ambas
+   salidas en el veredicto bajo «validación no determinista», di con cuál
+   decides y por qué, y **no** la conviertas en `concerns`. Si esa misma
+   validación ya consta como no determinista en otra feature, anótalo:
+   `/feature-integrate` la llevará al gate 3 como candidata a `acotado`
+   (workflow §4.4).
 5. **Sección A: cumplimiento de la spec.** Un renglón por criterio de
    aceptación de la tarea y por `CA` cubierto: cumplido / parcial / no, con la
    evidencia concreta (salida, prueba, observación). Comprueba también que el
@@ -107,7 +114,10 @@ de la tarea (`git show <sha-entrega>:features/<id>/evidence/<task>.md`).
    cambia comportamiento fuera del alcance.
 6. **Sección B: calidad técnica.** Estándares del repo, simplicidad, riesgos
    introducidos, pruebas adecuadas, deuda que deja. Separa lo bloqueante de lo
-   opinable.
+   opinable. Si una observación sobre un mismo patrón ya figura en un veredicto
+   anterior (otra tarea de esta feature o de otra), márcala «repetida
+   (<feature>/T<m>)»: es candidata a regla mecánica con mensaje de remediación
+   y `/feature-integrate` la listará en el gate 3 (workflow §4.4).
 7. **Veredicto.**
    - `pass`: todos los criterios cumplidos, validaciones en verde, nada
      bloqueante en B.

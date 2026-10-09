@@ -95,8 +95,15 @@ se crea otra rama.
    historial; commit `coord: cierre <id>` con el protocolo de commit (lista
    explícita; `--cached` igual a la lista; toca `specs/`, así que no es un
    commit de registro). **No toques `spec.md` ni `plan.md`**: sus digests
-   están autorizados y la precondición 1 volvería a fallar. En un `acotado` no
-   hay `spec.md` ni cambio de comportamiento: este paso no comete nada.
+   están autorizados y la precondición 1 volvería a fallar. En el mismo commit
+   escribe `features/<id>/metrics.md` con las métricas del workflow §8 hasta
+   la candidata (tiempo hasta primera evidencia, rondas por tarea, reaperturas
+   de spec, rechazos de handoff, `intent gap`, tokens si el proveedor los
+   expone, reejecuciones por validación no determinista) y la línea
+   «capacidad ausente detectada → destino (`lesson`, tarea o regla)» o
+   «ninguna»; el tiempo del gate 3 no se escribe aquí, se deriva de los
+   commits de `control`. En un `acotado` no hay `spec.md` ni cambio de
+   comportamiento: este paso comete sólo `metrics.md`.
    `<sha-verificado>` = `git rev-parse HEAD`.
 3. **Validaciones globales sobre `<sha-verificado>`**: dependencias fijadas
    (lockfile sin cambios no justificados); tipos, lint y build disponibles;
@@ -120,7 +127,9 @@ se crea otra rama.
    --is-ancestor <sha-main-base> <sha-candidato>`.
 5. **Prepara el gate 3.** Entrega a la persona: lista de `concerns` a aceptar,
    tareas `high` y sus aprobaciones, tareas canceladas con su base de
-   aceptación, resumen de validaciones globales, el par de SHA, y la línea
+   aceptación, observaciones de calidad marcadas «repetida» y validaciones no
+   deterministas repetidas (ambas como candidatas a `acotado`; la persona
+   decide si lo abre), resumen de validaciones globales, el par de SHA, y la línea
    `merge <sha-candidato> onto <sha-main-base> approved` (procedimiento de
    `control` del workflow §2.1: escribir, cometer, comprobar con `git show`).
 6. **Integración condicional** (la ejecuta la persona): antes del merge
@@ -147,6 +156,8 @@ se crea otra rama.
       `<sha-candidato>` sólo ese archivo.
 - [ ] `concerns` listados; `high` con aprobación; ningún veredicto anterior a
       un `invalidated`.
+- [ ] `features/<id>/metrics.md` en el cierre documental, con la línea de
+      capacidad ausente; «repetidas» y no deterministas repetidas listadas.
 - [ ] Ninguna escritura indebida detectada.
 - [ ] Nada previsto para después del merge salvo `integrated <sha-merge>` en
       `control`.

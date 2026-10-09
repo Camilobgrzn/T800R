@@ -43,6 +43,7 @@ construya software en repositorios propios:
 | --- | --- | --- | --- |
 | Orquestación | Leases acotados con fencing tokens y CAS | S11 «Leases acotados con fencing y CAS»; ADR-010 | Cuando haya más de una sesión escribiendo sobre el mismo repositorio de forma habitual |
 | Orquestación | Perfiles de conformidad por tupla adapter/OS/arquitectura | S11 «Core y CLI multiplataforma…»; S12 preguntas 2 y 5 | Al publicar para terceros |
+| Orquestación | Matriz de CI del core en Linux y Windows (el diseño multiplataforma se conserva; la CI del v0 corre en macOS arm64) | S11 «Core y CLI multiplataforma…» l. 127; decisión de la persona del 2026-10-09 en S12 «Especificación v0» | Al publicar para terceros o al aparecer un usuario en Linux o Windows |
 | Memoria y contexto | Hindsight, RTK, Context Mode | S11 «Componentes diferidos» | Tras medir el baseline propio |
 | CLI y adopción | Sincronización por reconciliación de tres vías | S10 «Sincronización por reconciliación de tres vías» | Cuando `sync` simple produzca conflictos reales |
 | CLI y adopción | Snapshot exacto y compatible de adopción | S10 «Snapshot exacto y compatible de adopción» | Con la primera actualización que rompa compatibilidad |

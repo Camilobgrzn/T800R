@@ -21,7 +21,7 @@
   concreto de resolución» (índice l. 128).
 - Tipo: `incompleto`
 - Gravedad: `media`
-- Estado: `deferred`
+- Estado: `accepted`
 - Confianza: `alta` sobre los hechos; `media` sobre el impacto (S11 y S12 no
   leídas; S05-S07 sólo por búsqueda de términos; el cierre de S04 l. 319-327
   corresponde a `B018`)
@@ -177,9 +177,9 @@
 
 ## Resolución humana
 
-- Decisión y justificación: `deferred`. Cerrada en bloque el 2026-09-30 por la decisión «Perfil MVP mínimo» de S12: el área afectada pasa al backlog de arquitectura objetivo ([backlog-ideas.md](../backlog-ideas.md)) y la anotación se retomará cuando el uso del MVP muestre el problema o el área salga del backlog. La evidencia y la propuesta se conservan sin cambios.
-- Responsable y fecha: la persona (Camilo Barreto), 2026-09-30.
-- Enlace al cambio canónico o ADR: [S12 «Decisiones»](../definition/session-12-validation-convergence.md#decisiones), fila «Perfil MVP mínimo»; [backlog-ideas.md](../backlog-ideas.md).
+- Decisión y justificación: `accepted` (atendida). Primero `deferred` en bloque el 2026-09-30 por la decisión «Perfil MVP mínimo» de S12. El 2026-10-09 la persona aprobó el [cierre de la revisión transversal](../revision-transversal-cierre.md), que es el punto de resolución que faltaba: su §2, áreas 2 y 3, enlaza las decisiones de S04 y S05 y los «Por qué» de ADR-003 y ADR-004, y su §1 (P01-P04, P07, P24, P25) registra las prácticas con decisión y justificación. En la misma resolución se limpiaron los dos restos de S04: l. 253 queda tachada con enlace al cierre y el párrafo en imperativo de l. 289-292 se reescribió como constancia de lo revisado, sin cambiar ninguna conclusión de la unidad. La evidencia y la propuesta originales se conservan.
+- Responsable y fecha: la persona (Camilo Barreto), 2026-10-09 (resolución); 2026-09-30 (aplazamiento previo).
+- Enlace al cambio canónico o ADR: [S12 «Decisiones»](../definition/session-12-validation-convergence.md#decisiones), fila «Cierre de la revisión transversal de prácticas de harnesses»; [revision-transversal-cierre.md](../revision-transversal-cierre.md) §1 y §2; [S04 «Detalles diferidos después del cierre»](../definition/session-04-operating-cycle.md#detalles-diferidos-después-del-cierre) y [«Transiciones de etapa y continuidad de tareas»](../definition/session-04-operating-cycle.md#transiciones-de-etapa-y-continuidad-de-tareas).
 - Enlaces relacionados: [B017](blocks/B017.md), [B013](blocks/B013.md)
   (pregunta 6), [B016](blocks/B016.md) (pregunta 5), `REV-2026-005`,
   `REV-2026-022`, `REV-2026-028`, `REV-2026-031`, cruce `CT07`

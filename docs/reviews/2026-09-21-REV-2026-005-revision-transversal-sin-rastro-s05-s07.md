@@ -8,7 +8,7 @@
 - Revisión examinada: fecha 2026-09-21; repositorio sin commits, huella no disponible
 - Tipo: `incompleto`
 - Gravedad: `alta`
-- Estado: `deferred`
+- Estado: `accepted`
 - Confianza: `media`
 - Impacto: el criterio de cierre exige que «se haya completado la revisión
   transversal de prácticas de OpenAI y Anthropic, con decisiones y pendientes
@@ -171,9 +171,9 @@
 
 ## Resolución humana
 
-- Decisión y justificación: `deferred`. Cerrada en bloque el 2026-09-30 por la decisión «Perfil MVP mínimo» de S12: el área afectada pasa al backlog de arquitectura objetivo ([backlog-ideas.md](../backlog-ideas.md)) y la anotación se retomará cuando el uso del MVP muestre el problema o el área salga del backlog. La evidencia y la propuesta se conservan sin cambios.
-- Responsable y fecha: la persona (Camilo Barreto), 2026-09-30.
-- Enlace al cambio canónico o ADR: [S12 «Decisiones»](../definition/session-12-validation-convergence.md#decisiones), fila «Perfil MVP mínimo»; [backlog-ideas.md](../backlog-ideas.md).
+- Decisión y justificación: `accepted` (atendida). Primero `deferred` en bloque el 2026-09-30 por la decisión «Perfil MVP mínimo» de S12. El 2026-10-09 la persona aprobó el [cierre de la revisión transversal](../revision-transversal-cierre.md), que atiende la propuesta en su variante (b): la §2 del cierre da estado por área con enlace a las decisiones de cada unidad o ADR, y la §4.1 (aplicada en el índice rector) explicita que S05-S09 no registraron prácticas por unidad y que el contraste quedó en los «Por qué la decisión» de ADR-004, 005, 007 y 010 y en esa tabla. No se hizo pasada retroactiva en S05-S07; ningún acuerdo de esas unidades cambia. La evidencia y la propuesta originales se conservan.
+- Responsable y fecha: la persona (Camilo Barreto), 2026-10-09 (resolución); 2026-09-30 (aplazamiento previo).
+- Enlace al cambio canónico o ADR: [S12 «Decisiones»](../definition/session-12-validation-convergence.md#decisiones), fila «Cierre de la revisión transversal de prácticas de harnesses»; [revision-transversal-cierre.md](../revision-transversal-cierre.md) §2 y §4; [índice rector, «Estado de la revisión transversal»](../product-definition.md#revisión-transversal-de-prácticas-de-harnesses).
 - Enlaces relacionados: [REV-2026-004](2026-09-21-REV-2026-004-preguntas-abiertas-sin-disposicion.md),
   [checkpoint B002](blocks/B002.md)
 

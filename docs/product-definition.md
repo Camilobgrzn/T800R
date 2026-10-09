@@ -129,10 +129,22 @@ justificación. Una decisión aplazada incluirá un punto concreto de resolució
 Antes de cerrar la definición se comprobará la cobertura de estas áreas y se
 explicitarán los casos en que los artículos no aporten evidencia suficiente.
 
-Estado de la revisión transversal: pendiente de completar. S11 incorporó las
-decisiones aplicables de arquitectura, restricciones ejecutables, seguridad de
-credenciales, aislamiento y estrategia de pruebas. S12 debe completar validación,
-calidad, costes, ciclos de mejora y la comprobación final de cobertura.
+Estado de la revisión transversal: **completada el 2026-10-06 y aprobada el
+2026-10-09**; cierre en
+[revision-transversal-cierre.md](revision-transversal-cierre.md), registrado
+en [S12](definition/session-12-validation-convergence.md#decisiones). S03, S04
+y S10 registraron las prácticas de sus áreas en sus unidades; S05-S09 no
+registraron prácticas por unidad y el contraste quedó en los «Por qué la
+decisión» de ADR-004, ADR-005, ADR-007 y ADR-010 y en la tabla de cobertura de
+la §2 del cierre. S12 completó validación de extremo a extremo, observabilidad
+del piloto, calidad, costes y ciclos de mejora (31 prácticas: 18 `accepted`, 8
+`deferred` con punto de resolución en el roadmap v0 o el backlog, 5 `rejected`)
+y la comprobación de cobertura: las diez áreas tienen decisiones y pendientes
+trazables. Los artículos no aportan evidencia suficiente en costes económicos,
+umbrales, permisos y aprobación humana, portabilidad entre proveedores,
+adopción sobre repositorios existentes ni arquitectura multiagente; esas
+decisiones se sustentan en acuerdos propios e investigación complementaria y
+se validan con E1-E5.
 
 ### Preguntas de producto aún abiertas
 

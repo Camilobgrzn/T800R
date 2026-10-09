@@ -99,7 +99,11 @@ Compruébalas y anótalas en la primera entrada de evidencia. Lee `control` y
 6. **Valida**: ejecuta exactamente los comandos declarados (sujeto al paso 3);
    copia salida resumida y código de salida a la evidencia. Lo que no puedas
    ejecutar va como «no ejecutado: motivo» (falta herramienta, requiere
-   secreto, requiere red, protected_paths). Nunca lo marques como pasado.
+   secreto, requiere red, protected_paths). Nunca lo marques como pasado. Si
+   un comando falla y al reejecutarlo sin cambios pasa, registra **ambas**
+   ejecuciones (salida, código de salida, motivo presunto) bajo «validación no
+   determinista»; no anotes sólo la que pasó ni decidas tú que fue un flake:
+   el verifier reejecuta y decide (workflow §4.3).
 7. **Clasifica cada hallazgo** que aparezca:
    - **Laguna de intención** (dos lecturas de la spec dan resultados distintos y
      nada registrado permite elegir): guarda el intento como commit `wip:`,

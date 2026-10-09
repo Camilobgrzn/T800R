@@ -6,7 +6,12 @@ de verdad es [workflow-construccion.md](../docs/workflow-construccion.md) (v4,
 aceptado el 2026-09-30 en [S12](../docs/definition/session-12-validation-convergence.md),
 fila «Flujo de construcción por feature y skills (v4)»; v4.1 del 2026-10-05
 incorpora las correcciones de la revisión Codex
-[skills-codex-2026-10-05.md](../docs/reviews/skills-codex-2026-10-05.md)). Este
+[skills-codex-2026-10-05.md](../docs/reviews/skills-codex-2026-10-05.md);
+v4.2 del 2026-10-09 incorpora las enmiendas aprobadas del
+[cierre de la revisión transversal](../docs/revision-transversal-cierre.md):
+validaciones no deterministas en `feature-build` y `feature-verify`,
+observaciones «repetidas» en `feature-verify`, y `metrics.md` con la línea de
+capacidad ausente en `feature-integrate`). Este
 README explica qué skills existen, cómo encajan en el flujo y de qué referencias
 se tomó cada práctica; no sustituye al flujo ni a los ocho `SKILL.md`, que son
 la instrucción operativa de cada skill.
@@ -414,6 +419,7 @@ modificadas sin revisar. Nunca ejecuta `prohibited`. No recibe secretos.
 | `protected_paths` para todo lo ejecutable por configuración; contenido no confiable como dato | [MULTI_AGENT_HARNESS_ARCHITECTURE.md](../ideas/MULTI_AGENT_HARNESS_ARCHITECTURE.md) §17 l. 804-810; [S09](../docs/definition/session-09-security-governance.md) l. 62 (rutas protegidas) | Un comando permitido ejecuta tests y dependencias modificados; se revisa antes | Presentar worktrees como aislamiento (l. 808; playbook l. 79-80): en el v0 es ejecución en host supervisada |
 | Sin secretos en el entorno del worker | Workflow §4.3; [S09](../docs/definition/session-09-security-governance.md) l. 59 (secretos por referencia opaca) | Un worker no necesita el valor de un secreto para construir | Variables inyectadas al agente (arquitectura l. 805): el broker de secretos está en el backlog |
 | Commit al finalizar cada porción de trabajo | Pocock `implement` — [research-sdlc-references.md](../docs/research-sdlc-references.md) l. 89-90 | Git como red de seguridad (S12 l. 64) | Revisión al finalizar por el propio implementador como verificación: no cuenta como verifier (S04 l. 107) |
+| Validación no determinista: registrar ambas ejecuciones, nunca sólo la que pasó; el verifier decide (v4.2) | OpenAI *Harness engineering*, «Throughput changes the merge philosophy» — [revision-transversal-cierre.md](../docs/revision-transversal-cierre.md) P10 | Un flake silenciado es evidencia falsa; dos apariciones de la misma validación llevan a un `acotado` que la estabilice | Tolerar flakes con reejecuciones posteriores sin registro y gates de merge mínimos: `rejected` en v0 por la prioridad seguridad > agilidad y E5 |
 
 ### 4.4 `/feature-verify <task>`
 
@@ -468,6 +474,8 @@ esa línea.
 | Separar generador y revisor con condición de terminación explícita (límite de rondas) | Microsoft AutoGen reflection — [research-orchestrator-responsibilities.md](../docs/research-orchestrator-responsibilities.md) l. 33 | Ilustra separación de ejecución y verificación | Tratar esa separación como autoridad de seguridad automática (l. 33) |
 | `high`: aprobación `local` con el digest de la solicitud, revalidada justo antes del efecto | [S12](../docs/definition/session-12-validation-convergence.md) «Perfil de aprobación humana», l. 60 | El verifier prepara, la persona autoriza | Perfil `signed` obligatorio (l. 61): queda en el backlog |
 | `done` que vuelve a revisión al reinvocar; `blocked` detiene | BMAD `build-auto` estados — [research-superpowers-bmad.md](../docs/research-superpowers-bmad.md) l. 95-97 | Inspira que `fail` consume ronda y devuelve a `build` | Sus estados propios: T800R usa los de S04 l. 91 |
+| Validación no determinista registrada con ambas salidas, sin convertirla en `concerns` (v4.2) | [revision-transversal-cierre.md](../docs/revision-transversal-cierre.md) P10; workflow §4.4 | `concerns` queda reservado a observaciones sin riesgo pendiente; la repetición en otra feature va al gate 3 como candidata a `acotado` | — |
+| Observación de calidad repetida sobre un mismo patrón → candidata a regla mecánica con remediación (v4.2) | OpenAI *Harness engineering*, «Enforcing architecture and taste» y «Entropy and garbage collection» — [revision-transversal-cierre.md](../docs/revision-transversal-cierre.md) P14, P15 | «Once encoded, they apply everywhere at once»; dos apariciones bastan y la persona decide el `acotado` en el gate 3 | Tareas en segundo plano con PRs automergeados: `deferred`; el automerge `rejected` (gate 3 humano, S04) |
 
 ### 4.5 `/feature-integrate`
 
@@ -522,6 +530,8 @@ avanzó, vuelve a actualizar, verificar y pedir nueva aprobación.
 | Curar conocimiento sólo con fuente y verificación; utilidad decidida por dos o más criterios | Knowledge Curator — [MULTI_AGENT_HARNESS_ARCHITECTURE.md](../ideas/MULTI_AGENT_HARNESS_ARCHITECTURE.md) §12 l. 520-548 | Evita notas sin respaldo o derivables del código | OKF automático desde el resumen de cierre (arquitectura l. 511); memoria semántica como verdad ([propuesta-harness-multiagente.md](../ideas/propuesta-harness-multiagente.md) l. 334) |
 | Instrucción repetida tres veces → proponer skill (cambio `high`) | [propuesta-harness-multiagente.md](../ideas/propuesta-harness-multiagente.md) l. 323 | Antes de eso es sobreingeniería | Publicación autónoma de la skill: la activación exige aprobación `high` (workflow §5) |
 | Sin push a `main` ni merge sin aprobación de la persona | Redes de seguridad — [S12](../docs/definition/session-12-validation-convergence.md) «Perfil MVP mínimo», l. 64; E5 l. 68 | Git como colchón | — |
+| `features/<id>/metrics.md` en el cierre documental, con la línea «capacidad ausente detectada → destino» (v4.2) | OpenAI *Harness engineering*, «Redefining the role of the engineer» («what capability is missing») — [revision-transversal-cierre.md](../docs/revision-transversal-cierre.md) P27; workflow §8 | Cada atasco de un agente deja rastro de qué faltó y adónde fue (`lesson`, tarea o regla); las métricas de §8 se miden por feature desde el día 1 | Que el propio agente escriba la corrección y la integre sin gate: la persona decide en el gate 3 |
+| Repetidas y no deterministas repetidas listadas para el gate 3 como candidatas a `acotado` (v4.2) | [revision-transversal-cierre.md](../docs/revision-transversal-cierre.md) P10, P14; workflow §4.5 | La persona ve en un solo lugar qué conviene codificar o estabilizar | — |
 
 Sin referencia externa: la **candidata completa** (documentación del cierre antes
 de verificar) y la **integración condicional del par** (`sha-candidato`,

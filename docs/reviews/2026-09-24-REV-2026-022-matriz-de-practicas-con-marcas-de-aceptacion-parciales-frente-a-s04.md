@@ -15,7 +15,7 @@
   (l. 221)
 - Tipo: `incompleto`
 - Gravedad: `media`
-- Estado: `deferred`
+- Estado: `accepted`
 - Confianza: `alta` sobre los hechos; `media` sobre el impacto (no se leyeron
   S06, S07 ni S12 para las filas asignadas a las sesiones 6, 7 y 12)
 - Impacto: qué prácticas de la matriz siguen siendo propuestas y cuáles ya son
@@ -113,9 +113,9 @@
 
 ## Resolución humana
 
-- Decisión y justificación: `deferred`. Cerrada en bloque el 2026-09-30 por la decisión «Perfil MVP mínimo» de S12: el área afectada pasa al backlog de arquitectura objetivo ([backlog-ideas.md](../backlog-ideas.md)) y la anotación se retomará cuando el uso del MVP muestre el problema o el área salga del backlog. La evidencia y la propuesta se conservan sin cambios.
-- Responsable y fecha: la persona (Camilo Barreto), 2026-09-30.
-- Enlace al cambio canónico o ADR: [S12 «Decisiones»](../definition/session-12-validation-convergence.md#decisiones), fila «Perfil MVP mínimo»; [backlog-ideas.md](../backlog-ideas.md).
+- Decisión y justificación: `accepted` (atendida). Primero `deferred` en bloque el 2026-09-30 por la decisión «Perfil MVP mínimo» de S12. El 2026-10-09 la persona aprobó el [cierre de la revisión transversal](../revision-transversal-cierre.md): su §1 registra cada práctica con fuente, problema, beneficios, costes, riesgos, decisión y justificación (el formato que el índice exigía y la matriz de S03 no tenía), y su §2, área 1, deja constancia de que la matriz de S03 es insumo y de que las decisiones vigentes son las de las tablas de S03 y S04 (reanudar comprobando estado real, S04 l. 109; comprobaciones automatizadas de restricciones, S04 l. 112 y S11). La matriz de S03 no se reescribe; ningún acuerdo cambia. La evidencia y la propuesta originales se conservan.
+- Responsable y fecha: la persona (Camilo Barreto), 2026-10-09 (resolución); 2026-09-30 (aplazamiento previo).
+- Enlace al cambio canónico o ADR: [S12 «Decisiones»](../definition/session-12-validation-convergence.md#decisiones), fila «Cierre de la revisión transversal de prácticas de harnesses»; [revision-transversal-cierre.md](../revision-transversal-cierre.md) §1 y §2.
 - Enlaces relacionados: [B011](blocks/B011.md),
   [`REV-2026-005`](2026-09-21-REV-2026-005-revision-transversal-sin-rastro-s05-s07.md),
   [`REV-2026-021`](2026-09-24-REV-2026-021-atribuciones-de-evidencia-sin-enlace-y-evals-atribuidos-a-fuente-no-listada.md)

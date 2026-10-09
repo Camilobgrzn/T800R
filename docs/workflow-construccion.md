@@ -10,7 +10,15 @@
   (`docs/reviews/skills-codex-2026-10-05.md`): modelo de coordinación explícito
   (§2), rutas protegidas y `prohibited` antes de ejecutar (§4.1, §4.3),
   candidata y atestación posterior al merge (§4.5), handoff con tipo y orden
-  fijo (§4.6). Los tres gates humanos y el canon no cambian.
+  fijo (§4.6). Los tres gates humanos y el canon no cambian. **v4.2
+  (2026-10-09)**: enmiendas aprobadas por la persona del
+  [cierre de la revisión transversal](revision-transversal-cierre.md):
+  declaración de cobertura en los cambios `high` a skills, política o
+  configuración de agentes (§7, P08); regla para validaciones no deterministas
+  (§4.3, §4.4, P10); observaciones de calidad repetidas como candidatas a regla
+  mecánica (§4.4, §4.5, P14); `features/<id>/metrics.md` en el cierre
+  documental con la línea de capacidad ausente (§4.5, §5, §8, P27). Los tres
+  gates humanos y el canon siguen sin cambiar.
 - Ámbito: cómo la persona y los agentes construyen T800R y el repositorio piloto
   (IDP con Backstage) feature a feature. Es la versión 0 del flujo que T800R
   instalará después en otros repositorios; las skills de este documento son las
@@ -350,6 +358,14 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
   entorno (SO, versión de Node, hash del lockfile), fecha, y «no ejecutado:
   motivo» cuando algo no se pudo correr. El SHA de entrega (`<sha-entrega>`)
   es ese commit `evidence:`; lo que se verifica es `<sha-trabajo>` (§2.1).
+- **Validación no determinista (v4.2).** Si un comando declarado falla y una
+  reejecución sin cambios en el árbol pasa, la evidencia registra **ambas**
+  ejecuciones (salida, código de salida y motivo presunto); nunca se anota
+  sólo la que pasó. La reejecución no cambia por sí sola el resultado de la
+  tarea ni se expresa como `concerns` (que §4.4 reserva a observaciones sin
+  riesgo pendiente): el verifier la reejecuta y decide. Si la misma validación
+  vuelve a comportarse de forma no determinista en otra feature, se propone un
+  `acotado` para estabilizarla antes de seguir confiando en ella.
 - Hallazgos durante el build, clasificados:
   - **laguna de intención** → tarea `blocked` (`intent gap`), consulta a la
     persona; el intento se guarda como parche;
@@ -422,6 +438,20 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
   para que el worker pueda reutilizar esa revisión.
 - Un informe con dos secciones separadas: **cumplimiento de la spec** (cada
   criterio con evidencia) y **calidad técnica**.
+- **Validación no determinista (v4.2).** Si al reejecutar una validación falla
+  y pasa sin cambios, el verifier registra ambas salidas en el veredicto como
+  «validación no determinista» y no la convierte en `concerns`; el veredicto
+  se decide con la ejecución que el verifier considere representativa y lo
+  dice. Si esa validación ya consta como no determinista en otra feature, lo
+  anota para que `/feature-integrate` la lleve al gate 3 como candidata a
+  `acotado`.
+- **Observación repetida → regla (v4.2).** Si una observación de calidad
+  técnica sobre un mismo patrón ya figura en un veredicto anterior (otra tarea
+  de la misma feature o de otra), el verifier la marca «repetida (<feature>/T<m>)».
+  `/feature-integrate` lista las repetidas en el gate 3 como candidatas a un
+  `acotado` que las codifique como regla mecánica (lint, test estructural),
+  con el mensaje de remediación incluido; la persona decide si lo abre. Dos
+  apariciones bastan; no se espera a la tercera.
 - Veredicto en `evidence/<task>.verdict.md`, cometido en `feat/<id>`
   (`verdict: T<n> ronda k`), nunca en la rama de la tarea: `pass`; `concerns`
   sólo para observaciones no bloqueantes sin incumplimiento de aceptación ni
@@ -460,8 +490,12 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
   (consolidación del delta en `specs/`); **`spec.md` y `plan.md` no se tocan**,
   porque su digest está autorizado y una reejecución lo rompería; que la
   feature está implementada lo atestan `specs/` y la línea `integrated
-  <sha-merge>` en `control`. En un `acotado` el cierre es sólo
-  `evidence/README.md`. Nada se modifica después del merge.
+  <sha-merge>` en `control`. **El cierre documental incluye
+  `features/<id>/metrics.md` (v4.2)** con las métricas de §8 hasta la
+  candidata, incluida la línea «capacidad ausente detectada → destino»; el
+  tiempo del gate 3 se deriva después de las fechas de los commits de
+  `control` y no se escribe en la feature. En un `acotado` el cierre es sólo
+  `evidence/README.md` y `metrics.md`. Nada se modifica después del merge.
 - Se verifica la **candidata integrada exacta**: sobre `<sha-verificado>` (HEAD
   tras el cierre documental) se ejecutan las validaciones globales del
   repositorio; su evidencia va en `evidence/README.md`, cometido encima como
@@ -474,6 +508,9 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
   comportamiento incorporado (catálogo o TechDocs). Si no hay suite, se registra
   la ausencia y se aporta una aceptación focalizada; «no ejecutado» no es
   «aprobado».
+- Lo que el integrador entrega para el gate 3 incluye, además de `concerns`,
+  `high` y canceladas, las observaciones «repetidas» y las validaciones no
+  deterministas repetidas como candidatas a `acotado` (v4.2).
 - Gate 3: la persona escribe en `control:approvals/<id>.md` `merge
   <sha-candidato> onto <sha-main-base> approved`. Como `control` es una rama
   aparte, registrar la aprobación no mueve ni `main` ni la candidata. La
@@ -529,7 +566,7 @@ Orden corregido (Astra): primero diseño y tareas, después readiness.
 | `/feature-plan` | `design` | planner | `plan.md` en `feat/<id>`; crea `tasks.md` con todas las tareas en `pending` y `participations.md` sin eventos |
 | `/feature-build <task>` | `build` | worker | rama de la tarea: código, `evidence/<task>.md`, `evidence/<task>.findings.md` |
 | `/feature-verify <task>` | `verify` | verifier | `evidence/<task>.verdict.md` en `feat/<id>` |
-| `/feature-integrate` | `deploy` | integrador + persona | candidata `feat/<id>` (`specs/`, `evidence/README.md`; nunca `spec.md` ni `plan.md`); el merge a `main` lo ejecuta la persona |
+| `/feature-integrate` | `deploy` | integrador + persona | candidata `feat/<id>` (`specs/`, `metrics.md` en el cierre documental, `evidence/README.md`; nunca `spec.md` ni `plan.md`); el merge a `main` lo ejecuta la persona |
 | `/session-handoff` | transversal | quien cierra | `evidence/<task>.handoff.md` en la rama entregada |
 | `/session-resume` | transversal | quien abre | nada; acepta o rechaza vía eventos del orchestrator |
 | `/spike` | `plan` | worker | `spikes/<id>.md` en `feat/<id>` o en la rama de la definición |
@@ -605,16 +642,23 @@ trabajo es el último commit que toca otra cosa.
 | Se acepta un handoff con otra base | Todo trabajo va en commit antes del handoff; aceptación condicional contra SHA base, `<sha-trabajo>` (sólo rutas de registro encima) y la coordinación actual de `feat/<id>` (owner y último evento) | — |
 | La evidencia mueve lo que atesta | Commits de registro encima del SHA del trabajo, comprobables por ruta (§2.1); veredictos en `feat/<id>`; atestación posterior al merge sólo en `control` | — |
 | Código del host peligroso (tests, scripts, hooks, dependencias) | Sólo comandos declarados; `protected_paths` (`policy.yaml` más la lista de §4.3) comprobados **antes de cada ejecución**, incluidos hooks versionados; revisión del verifier con hash por archivo antes de ejecutar sobre ellos modificados; `prohibited` nunca se ejecuta; sin secretos en el entorno | **Ejecución en host supervisada, riesgo residual aceptado**: un comando permitido ejecuta tests y dependencias modificados; los worktrees no aíslan; el runner OCI está en el backlog |
-| Inyección y autoalteración | El contenido no confiable es dato, no instrucción; cambiar skills, política o configuración de agentes es `high` | — |
+| Inyección y autoalteración | El contenido no confiable es dato, no instrucción; cambiar skills, política o configuración de agentes es `high`. **v4.2 (cierre P08):** la solicitud `high` de ese cambio declara qué experimento E1-E5 o qué métrica de §8 cubre el comportamiento afectado y en qué tarea del roadmap se verificará; reejecutar ese experimento antes de integrar sólo es obligatorio cuando ya se superó una vez (roadmap 4.5-4.6); antes, basta la declaración y la eval manual de la skill (§5) | Evaluación regresiva proporcional (S04 l. 111) sin corpus automatizado hasta que exista baseline (cierre P09) |
 | Base distinta a la aprobada | Se aprueba el par (candidata, base de `main`) y la persona integra sólo si ambos siguen iguales | — |
 | La aprobación altera lo aprobado | Las aprobaciones viven en la rama huérfana `control`, fuera de la candidata y de `main`; registrar una no cambia el SHA de ninguna de las dos | — |
 
 ## 8. Métricas del flujo (v0)
 
-Se registran por feature, para que E1-E5 y la agilidad sean evaluables:
-tiempo desde spec aprobada hasta primera evidencia; rondas por tarea;
-reaperturas de spec; rechazos de handoff; tareas bloqueadas por `intent gap`;
-tokens cuando el proveedor los exponga.
+Se registran por feature en `features/<id>/metrics.md`, escrito en el cierre
+documental (§4.5), para que E1-E5 y la agilidad sean evaluables: tiempo desde
+spec aprobada hasta primera evidencia; rondas por tarea; reaperturas de spec;
+rechazos de handoff; tareas bloqueadas por `intent gap`; tokens cuando el
+proveedor los exponga. **v4.2 (cierre P27):** una línea «capacidad ausente
+detectada → destino» por feature: qué herramienta, guardrail o documentación
+faltó cuando un agente se atascó y adónde fue (`lesson` de conocimiento, tarea
+nueva o regla mecánica), o «ninguna». **v4.2 (cierre P10):** número de
+reejecuciones por validación no determinista. El tiempo humano de registros y
+gates se mide por separado (roadmap 0.8, 1.1); el del gate 3 se deriva de las
+fechas de los commits de `control`.
 
 ## 9. Tensiones resueltas
 
