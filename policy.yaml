@@ -1,0 +1,71 @@
+# policy.yaml provisional de T800R (roadmap v0, tarea 0.1).
+#
+# Procedimiento humano, sin enforcement: la consultan las skills feature-spec,
+# feature-plan, feature-build y feature-verify (workflow §4.1-4.4) y la aplica
+# la persona hasta que exista la política real de T800R (roadmap F2, AT-70).
+# YAML 1.2 restringido (S11 l. 78): sin alias, merge keys, tags ni claves
+# duplicadas. Sin código ni expresiones (AT-70). Tocar este archivo es `high`.
+#
+# Orden de evaluación (workflow §4.1, AT-72): primero `prohibited`, que
+# prevalece sobre todo lo demás y ninguna aprobación habilita; después `high`
+# (S09 l. 83 más protected_paths); lo que no cae en ninguno es `routine`.
+#   routine    — autorización efectiva, validación normal, auditoría aplicable.
+#   high       — verifier independiente y aprobación humana antes del efecto o
+#                de su integración (línea `high <digest> approved` en
+#                `control:approvals/<id>.md`).
+#   prohibited — nunca se ejecuta. Las prohibiciones del canon (S12 l. 65,
+#                «Perfil MVP mínimo») no se aflojan en el v0 aunque cambie este
+#                archivo; las adicionales sólo cambian con un cambio de
+#                política `high` separado.
+
+version: 0
+repository: T800R
+approval_profile: local
+
+# Lista de §4.3 del workflow más las rutas propias de este repositorio.
+# Modificar cualquiera de ellas en una tarea es `high`; el worker comprueba
+# antes de cada ejecución que no hay ninguna modificada respecto de la base
+# o que su `git hash-object` coincide con el revisado por el verifier.
+# Los patrones `**/` cubren los manifiestos y lockfiles de paquetes anidados
+# del monorepo (tarea 0.7).
+protected_paths:
+  - policy.yaml
+  - "**/package.json"       # scripts (se protege el archivo entero)
+  - pnpm-workspace.yaml
+  - "**/pnpm-lock.yaml"
+  - "**/package-lock.json"
+  - "**/yarn.lock"
+  - Makefile
+  - .githooks/**            # hooks de Git versionados
+  - .husky/**
+  - .github/**              # configuración de CI
+  - skills/**
+  - AGENTS.md               # configuración de los agentes
+  - CLAUDE.md
+  - opencode.jsonc
+  - .claude/**
+  - .opencode/**
+  - .codex/**
+
+levels:
+  routine:
+    - todo efecto que no esté clasificado como prohibited ni como high
+  high:
+    # Baseline no retirable (S09 l. 83) más protected_paths.
+    - desplegar a producción
+    - pérdida, corrupción o transformación irreversible de datos
+    - crear, rotar, revocar o ampliar identidades, credenciales o permisos
+    - relajar política o enforcement
+    - integrar cambios clasificados high tras verificación independiente
+    - push a main (bootstrap: sólo la persona integra, con `merge … approved`)
+    - modificar una ruta de protected_paths
+  prohibited:
+    canon:
+      # S12 l. 65: efectos irreversibles fuera del repositorio. No se aflojan.
+      - efectos externos irreversibles o compromisos financieros
+      - borrar o reescribir historia publicada (push --force, borrado de ramas remotas)
+      - exponer secretos al entorno de un worker
+    additional:
+      # Propias de este repositorio; sólo las cambia una política `high` separada.
+      - escritura en la rama control por un agente (workflow §2)
+      - push a main o a control desde una sesión de agente

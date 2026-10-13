@@ -23,9 +23,15 @@ nueva.
 
 **Siguiente sesión: F0 del roadmap, en orden.**
 
-1. 0.1: rama huérfana `control` en T800R (procedimiento de workflow §2.1 punto 9:
-   worktree dedicado, commit inicial, `approvals/`) y `policy.yaml` provisional
-   con la lista de §4.3.
+1. 0.1: **en curso (2026-10-13).** `policy.yaml` provisional en la raíz,
+   verificado por Astra (`gpt-6-astra`, «SÍ con cambios», aplicados). Node
+   fijado en 24.21.0 con nvm (`.nvmrc`); la persona reafirmó Node 24 frente a
+   26 (Backstage recomienda 22/24; 26 entra en LTS el 2026-10-28). Falta la
+   rama huérfana `control`, que crea la persona fuera de una sesión de agente
+   (workflow §2.1 punto 9) con `approvals/.keep` y un `README.md` con la
+   plantilla de líneas de §6. Dev containers para el IDP: sin decidir; si se
+   adoptan, como `acotado` de entorno reproducible en I1, nunca como runner, y
+   `.devcontainer/**` entra en `protected_paths`.
 2. 0.2 y 0.3: repo del IDP con `@backstage/create-app` en versión fijada (fijar
    nombre y versión; comprobar la versión de Node que soporta), línea base
    referenciada desde S12, y su rama `control` y `policy.yaml`.
