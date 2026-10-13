@@ -32,9 +32,12 @@ nueva.
    containers para el IDP: sin decidir; si se adoptan, como `acotado` de
    entorno reproducible en I1, nunca como runner, y `.devcontainer/**` entra en
    `protected_paths`.
-2. 0.2 y 0.3: repo del IDP con `@backstage/create-app` en versión fijada (fijar
-   nombre y versión; comprobar la versión de Node que soporta), línea base
-   referenciada desde S12, y su rama `control` y `policy.yaml`.
+2. 0.2: **completada el 2026-10-13.** Repo `idp-backstage` creado con
+   `@backstage/create-app` 0.9.2 (Backstage 1.55.0, Yarn 4.13.0, `engines.node`
+   `22 || 24`, sin divergencia); línea base `b3c5ee8` registrada en S12
+   «Evidencia y resultados»; `.nvmrc` 24.21.0 en `1c3e869`; remoto privado en
+   GitHub. 0.3: `policy.yaml` provisional cometido (`ba780de`, sin push);
+   **falta la rama `control` del IDP**, que crea la persona.
 3. 0.4: proyectar el paquete de skills (workflow §5) a Claude Code, OpenCode y
    Codex en ambos repos y comprobar que cada proveedor activa `/feature-spec` y
    `/spike` y resuelve sus referencias.

@@ -81,6 +81,15 @@ ausencia de ambigüedades que impidan implementar las pruebas. No otorgará esta
 conformidad se producirá durante la construcción con versiones, entorno y revisión
 registrados, y será necesaria antes del release correspondiente.
 
+**Línea base del piloto (registrada el 2026-10-13, roadmap 0.2).** Repositorio
+`idp-backstage` (`~/src/idp-backstage`, remoto privado
+`github.com/Camilobgrzn/idp-backstage`). Commit de línea base `b3c5ee8`
+(«Initial commit») generado con `@backstage/create-app` 0.9.2, release de
+Backstage 1.55.0, Yarn 4.13.0 vendorizado por corepack, `engines.node`
+`22 || 24`: coincide con Node 24, de modo que no hay divergencia que registrar
+(AT-05). Encima: `1c3e869` fija Node 24.21.0 en `.nvmrc` y `ba780de` añade el
+`policy.yaml` provisional (0.3). La rama `control` del piloto la crea la persona.
+
 ### Preguntas abiertas
 
 - ~~¿Qué repositorio será el piloto del MVP?~~ Resuelta el 2026-09-30: IDP con
