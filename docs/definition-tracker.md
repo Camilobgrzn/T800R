@@ -2,52 +2,54 @@
 
 ## Estado actual
 
-- Fase: definición; construcción aún no autorizada.
-- Avance: 11 de 12 sesiones completadas.
-- Sesión actual: 12 — validación y convergencia (`in_progress`).
-- Última actualización: 2026-10-05.
+- Fase: **construcción del v0 autorizada** (2026-10-13); definición cerrada.
+- Avance: 12 de 12 sesiones completadas.
+- Sesión actual: ninguna de definición; construcción por el
+  [roadmap v0](roadmap-v0.md), empezando por F0.
+- Última actualización: 2026-10-13.
 - Coordinador declarado: `openai/gpt-5.6-sol`.
 - Documento rector: [product-definition.md](product-definition.md); unidades
   canónicas por sesión: [definition/README.md](definition/README.md).
 
 ## Próxima acción
 
-**Estado al 2026-10-05.** S12 tiene resueltos cuatro de sus seis pasos: piloto
-(IDP con Backstage, catálogo + TechDocs, repositorio nuevo), flujo de
-construcción por feature ([workflow-construccion.md](workflow-construccion.md),
-v4), experimentos E1-E5 y las ocho skills redactadas en
-[skills/](../skills/README.md) (verificadas por Fable; la pasada de Codex quedó
-pendiente por cuota). La persona aceptó las skills el 2026-10-05 para continuar.
+**Estado al 2026-10-13.** S12 cerrada con la construcción del v0 autorizada
+explícitamente por la persona ([cierre](definition/session-12-validation-convergence.md#s12-cierre)).
+Artefactos que gobiernan la construcción: [roadmap-v0.md](roadmap-v0.md) v2.2,
+[especificacion-v0.md](especificacion-v0.md),
+[workflow-construccion.md](workflow-construccion.md) v4.2, `skills/` y
+[backlog-ideas.md](backlog-ideas.md). La persona pidió arrancar en una sesión
+nueva.
 
-**Avance 2026-10-05.** Roadmap v0 en borrador v2.1
-([roadmap-v0.md](roadmap-v0.md)), verificado en pareja (Fable «SÍ con
-cambios»; Astra dos rondas, bloqueantes resueltos en v2.1); umbral de la
-métrica global fijado en 75 % de tareas del IDP bajo el orchestrator; se
-mantienen los tres gates de v4. La revisión Codex (`gpt-6-astra`) de `skills/`
-dio 18 hallazgos (8 altos); la persona decidió corregirlos **antes** de
-autorizar.
+**Siguiente sesión: F0 del roadmap, en orden.**
 
-**Siguiente, en orden:**
+1. 0.1: rama huérfana `control` en T800R (procedimiento de workflow §2.1 punto 9:
+   worktree dedicado, commit inicial, `approvals/`) y `policy.yaml` provisional
+   con la lista de §4.3.
+2. 0.2 y 0.3: repo del IDP con `@backstage/create-app` en versión fijada (fijar
+   nombre y versión; comprobar la versión de Node que soporta), línea base
+   referenciada desde S12, y su rama `control` y `policy.yaml`.
+3. 0.4: proyectar el paquete de skills (workflow §5) a Claude Code, OpenCode y
+   Codex en ambos repos y comprobar que cada proveedor activa `/feature-spec` y
+   `/spike` y resuelve sus referencias.
+4. 0.5 y 0.6: sondas de superficies headless y de Beads, cada una con su línea
+   `spike <id> approved` en `control:approvals/spikes.md`, que escribe la
+   persona.
+5. 0.7 (esqueleto del monorepo de T800R) y 0.8 (I1 del IDP), las dos con
+   `/feature-spec`. Al cerrar 0.8, la persona decide P12.
 
-1. ~~Corrección de skills y flujo v4~~ Hecha el 2026-10-06: flujo v4.1 y skills
-   corregidos por Fable en cuatro rondas con Astra (`gpt-6-astra`; informes en
-   `docs/reviews/skills-codex-2026-10-0*.md`) y una verificación Fable
-   independiente; veredicto final de Astra «SÍ con cambios», residuo aplicado.
-   La persona ratificó v4.1 y sus tres elecciones de diseño el 2026-10-06
-   (registrado en S12).
-2. ~~Aprobación del roadmap v0~~ Aprobado el 2026-10-06 y registrado en S12.
-3. **Decisión explícita de autorizar la construcción** (paso 6): comprobar el
-   criterio de salida de S12, registrar el cierre y actualizar `AGENTS.md`.
-4. **Arranque** según F0 del roadmap.
-
-La construcción continúa sin autorización hasta el cierre de S12.
+Método acordado: un resumen sencillo antes de cada pregunta de decisión; pareja
+Fable + Astra para diseñar y verificar; Codex vía codex-companion con
+`gpt-6-astra` `medium` y respaldo `gpt-5.6-sol` `xhigh`.
 
 Historial: el 2026-09-29 se resolvió `REV-2026-110` (perfil de aprobación `local`;
 SSHSIG/FIDO pasa a perfil `signed`; enmiendas en S11 l. 133-137 y ADR-010 punto
 14). El 2026-09-30 se resolvió `REV-2026-105` (predicado de elegibilidad del
 verifier), se decidió el perfil MVP mínimo (109 REV `deferred` a
 [backlog-ideas.md](backlog-ideas.md)), el piloto, el flujo v4 y E1-E5. El
-2026-10-05 se aceptaron las ocho skills.
+2026-10-05 se aceptaron las ocho skills. El 2026-10-06 se ratificó el flujo v4.1
+y se aprobó el roadmap v0; el 2026-10-09, la especificación v0 y el cierre de
+la revisión transversal; el 2026-10-13 se cerró S12 y se autorizó construir.
 
 ## Registro de cierre de la sesión 11
 
@@ -376,7 +378,7 @@ en [S12](definition/session-12-validation-convergence.md#decisiones).
 | 9 | Seguridad y gobernanza | `completed` | [Cierre](definition/session-09-security-governance.md#s09-cierre) y [ADR-008](adr/ADR-008-baseline-de-seguridad-y-gobernanza.md) |
 | 10 | Experiencia del producto | `completed` | [Cierre](definition/session-10-product-experience.md#s10-cierre) y [ADR-009](adr/ADR-009-experiencia-portable-de-adopcion-y-mantenimiento.md) |
 | 11 | Arquitectura del MVP | `completed` | [Cierre](definition/session-11-mvp-architecture.md#s11-cierre) y [ADR-010](adr/ADR-010-arquitectura-tecnica-del-mvp.md) |
-| 12 | Validación y convergencia | `in_progress` | [Unidad activa](definition/session-12-validation-convergence.md); resolver primero la frontera entre validación y construcción |
+| 12 | Validación y convergencia | `completed` | [Cierre](definition/session-12-validation-convergence.md#s12-cierre): construcción del v0 autorizada; continuar con F0 del [roadmap](roadmap-v0.md) |
 
 ## Criterio de salida de la sesión 5
 

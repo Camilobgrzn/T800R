@@ -2,18 +2,26 @@
 
 ## Fase actual
 
-T800R está en fase de definición. El objetivo actual es acordar el producto y
-sus contratos antes de construirlo.
+T800R está en **fase de construcción del v0**, autorizada por la persona el
+2026-10-13 al cerrar S12. La definición está cerrada: sus acuerdos son canon y
+cambiarlos exige registrar la enmienda en la unidad o ADR correspondiente.
 
-No implementes código de producto, instales dependencias ni selecciones
-tecnología durante esta fase. Sólo realiza un spike técnico si el usuario lo
-aprueba explícitamente para resolver una decisión bloqueada.
+Construye siguiendo el [roadmap v0](docs/roadmap-v0.md) (fase por fase, en su
+orden de dependencias), el flujo por feature de
+[workflow-construccion.md](docs/workflow-construccion.md) v4.2 con las skills de
+`skills/`, y las pruebas de aceptación de
+[especificacion-v0.md](docs/especificacion-v0.md). Respeta los tres gates
+humanos (spec, autorizar `build`, merge), las aprobaciones en la rama `control`
+que sólo escribe la persona y las redes de seguridad: sin push a `main` ni
+efectos `high` sin aprobación, y nunca efectos `prohibited`. Lo que está en
+[backlog-ideas.md](docs/backlog-ideas.md) no se construye en el v0. Los spikes
+requieren aprobación explícita en `control:approvals/spikes.md`.
 
 ## Fuentes de contexto
 
 Lee en este orden:
 
-1. `docs/definition-tracker.md` para conocer la sesión y la próxima acción.
+1. `docs/definition-tracker.md` para conocer el estado y la próxima acción.
 2. `docs/product-definition.md` y la unidad aplicable de `docs/definition/` para
    conocer acuerdos, preguntas y criterios de salida.
 3. Los documentos de `ideas/` sólo cuando aporten a la discusión actual.
@@ -22,13 +30,15 @@ Lee en este orden:
 `docs/definition/` es la fuente canónica de los acuerdos de su sesión. Los
 documentos de `ideas/` son insumos y no representan decisiones aceptadas.
 
-Para la construcción (aún no autorizada) ya están definidos el flujo por feature
-en `docs/workflow-construccion.md` (v4, aceptado en S12) y las ocho skills en
-`skills/` (catálogo en `skills/README.md`). Léelos antes de proponer cómo
-trabajar; no los proyectes a `.claude/` ni `.opencode/` hasta que S12 autorice
-construir. Lo diferido del MVP está en `docs/backlog-ideas.md`.
+Para construir, lee además `docs/roadmap-v0.md`, `docs/workflow-construccion.md`
+(v4.2), `skills/README.md` y `docs/especificacion-v0.md`. Las skills se proyectan
+a `.claude/`, `.opencode/` y Codex según la tarea 0.4 del roadmap y el paquete
+de proyección de workflow §5. Lo diferido del MVP está en `docs/backlog-ideas.md`.
 
-## Forma de trabajo
+## Forma de trabajo en la definición
+
+Aplica sólo si la persona reabre una sesión de definición o pide una enmienda
+al canon; la construcción sigue el flujo por feature.
 
 1. Trabaja únicamente en la sesión marcada como `ready`, `in_progress` o
    `blocked` en el tracker.

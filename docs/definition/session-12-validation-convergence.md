@@ -1,6 +1,7 @@
 # S12 — Sesión 12: validación y convergencia
 
-Estado: `in_progress`. Sesión iniciada el 2026-09-24.
+Estado: `completed`. Sesión iniciada el 2026-09-24 y cerrada el 2026-10-13 con
+la construcción del v0 **autorizada** ([cierre](#s12-cierre)).
 
 ### Objetivo
 
@@ -93,3 +94,28 @@ registrados, y será necesaria antes del release correspondiente.
   cierre en bloque el 2026-09-30 (ver «Perfil MVP mínimo»).
 - ~~¿Qué experimentos y métricas del v0 determinan éxito en el piloto y en el
   dogfooding?~~ Resuelta el 2026-09-30: E1-E5 (ver «Decisiones»).
+
+<a id="s12-cierre"></a>
+
+### Comprobación de cierre
+
+El criterio de salida está cumplido. Existe una especificación v0 con pruebas de
+aceptación, matriz de conformidad, corpus, métricas, umbrales y reglas de
+decisión explícitos ([especificacion-v0.md](../especificacion-v0.md)); el piloto
+es el IDP con Backstage; la revisión transversal está completa
+([revision-transversal-cierre.md](../revision-transversal-cierre.md)); las
+incógnitas restantes tienen disposición y no bloquean la implementación
+(especificación §6; P12 se decide en la tarea 0.8); y backlog y roadmap están
+ordenados ([backlog-ideas.md](../backlog-ideas.md),
+[roadmap-v0.md](../roadmap-v0.md) v2.2). El flujo de construcción es
+[workflow-construccion.md](../workflow-construccion.md) v4.2 con las ocho skills
+de `skills/`. También se cumplen los criterios de cierre de la definición de
+[product-definition.md](../product-definition.md); el retiro está definido en
+S10 y su implementación quedó en el backlog por el perfil MVP mínimo.
+
+**Decisión explícita de la persona, 2026-10-13: la construcción del v0 queda
+autorizada.** El arranque empieza en una sesión nueva por la fase F0 del roadmap.
+Los adapters y tuplas siguen `target/unverified` hasta superar su conformidad
+ejecutada; la autorización no certifica ninguna conducta observable sólo en
+ejecución. Los spikes de F0 (0.5, 0.6) requieren su aprobación en
+`control:approvals/spikes.md`.

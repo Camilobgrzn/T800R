@@ -89,7 +89,7 @@ una segunda pasada; las anotaciones no modifican los acuerdos por sí mismas.
 | 9 | [S09: seguridad y gobernanza](definition/session-09-security-governance.md) | [S09-CIERRE](definition/session-09-security-governance.md#s09-cierre) |
 | 10 | [S10: experiencia del producto](definition/session-10-product-experience.md) | [S10-CIERRE](definition/session-10-product-experience.md#s10-cierre) |
 | 11 | [S11: arquitectura del MVP](definition/session-11-mvp-architecture.md) | [S11-CIERRE](definition/session-11-mvp-architecture.md#s11-cierre) |
-| 12 | [S12: validación y convergencia](definition/session-12-validation-convergence.md) | En curso |
+| 12 | [S12: validación y convergencia](definition/session-12-validation-convergence.md) | Cerrada; construcción autorizada (2026-10-13) |
 
 ## Preguntas pendientes globales
 
