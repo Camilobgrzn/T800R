@@ -36,8 +36,9 @@ nueva.
    `@backstage/create-app` 0.9.2 (Backstage 1.55.0, Yarn 4.13.0, `engines.node`
    `22 || 24`, sin divergencia); línea base `b3c5ee8` registrada en S12
    «Evidencia y resultados»; `.nvmrc` 24.21.0 en `1c3e869`; remoto privado en
-   GitHub. 0.3: `policy.yaml` provisional cometido (`ba780de`, sin push);
-   **falta la rama `control` del IDP**, que crea la persona.
+   GitHub. 0.3: **completada el 2026-10-14**: `policy.yaml` provisional
+   (`ba780de`) y rama `control` creada por la persona (`8b96d12`, worktree
+   `../idp-backstage-control`).
 3. 0.4: proyectar el paquete de skills (workflow §5) a Claude Code, OpenCode y
    Codex en ambos repos y comprobar que cada proveedor activa `/feature-spec` y
    `/spike` y resuelve sus referencias.
