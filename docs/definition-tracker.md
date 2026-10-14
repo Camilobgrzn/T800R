@@ -21,7 +21,19 @@ Artefactos que gobiernan la construcción: [roadmap-v0.md](roadmap-v0.md) v2.2,
 [backlog-ideas.md](backlog-ideas.md). La persona pidió arrancar en una sesión
 nueva.
 
-**Siguiente sesión: F0 del roadmap, en orden.**
+**Siguiente sesión (handoff del 2026-10-14): F0 va por 0.7.** 0.1-0.6 están
+completadas (detalle abajo). La persona aceptó la elegibilidad de Claude Code
+(F4) y de Beads (F3) con las enmiendas a S11 l. 87, 106 y 189. Arrancar con
+`/feature-spec` para 0.7 (esqueleto del monorepo de T800R: Node 24.21.0 ya
+fijado en `.nvmrc`, TypeScript estricto, pnpm vía corepack, JSON Schema 2020-12,
+ESLint + dependency-cruiser con remediación en los mensajes, comprobación de
+enlaces internos de `docs/` y `skills/`); la spec va al gate 1 con un resumen
+sencillo antes de pedir la aprobación. Pendientes de la persona: push de `main`
+de T800R (remoto vacío) y de `idp-backstage`; decidir si se retira la copia
+redundante `.opencode/skills/`; dev containers del IDP (sin decidir). Regla
+operativa vigente: la sesión no hace push a `main`.
+
+**Plan de F0, en orden.**
 
 1. 0.1: **completada el 2026-10-13.** `policy.yaml` provisional en la raíz,
    verificado por Astra (`gpt-6-astra`, «SÍ con cambios», aplicados); Node
@@ -64,7 +76,8 @@ nueva.
    checkout principal desde un worktree y toca rutas protegidas. **Decisiones
    pendientes de la persona:** elegibilidad de Claude Code (antes de F4) y de
    Beads (antes de F3), con las enmiendas menores a S11 que proponen los
-   informes.
+   informes. **Decididas el 2026-10-14:** ambos elegibles (S12 «Elegibilidad del
+   adapter de Claude Code», «Elegibilidad de Beads»; enmiendas S11 l. 87, 106, 189).
 5. 0.7 (esqueleto del monorepo de T800R) y 0.8 (I1 del IDP), las dos con
    `/feature-spec`. Al cerrar 0.8, la persona decide P12.
 
