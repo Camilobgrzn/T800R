@@ -1,0 +1,7 @@
+packages:
+  - packages/*
+  - packages/adapters/*
+
+# pnpm >= 10 lee la configuración del proyecto de este archivo (no de .npmrc).
+# Rechaza la instalación si Node no cumple engines.node del package.json raíz.
+engineStrict: true
