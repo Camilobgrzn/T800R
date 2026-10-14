@@ -39,9 +39,15 @@ nueva.
    GitHub. 0.3: **completada el 2026-10-14**: `policy.yaml` provisional
    (`ba780de`) y rama `control` creada por la persona (`8b96d12`, worktree
    `../idp-backstage-control`).
-3. 0.4: proyectar el paquete de skills (workflow §5) a Claude Code, OpenCode y
-   Codex en ambos repos y comprobar que cada proveedor activa `/feature-spec` y
-   `/spike` y resuelve sus referencias.
+3. 0.4: **completada el 2026-10-14.** `skills/` proyectado a `.claude/skills/`,
+   `.agents/skills/` (Codex y OpenCode) y `.opencode/skills/` en ambos repos,
+   con origen `b4a746b` y manifiesto `skills/projection.md`; el piloto recibió
+   además `docs/workflow-construccion.md` y `skills/README.md` con la primera
+   línea `Proyectado desde T800R @ b4a746b`. Verificación headless: Claude Code
+   2.1.299, Codex CLI 0.159.2 y OpenCode 1.18.31 activan `spike` y
+   `feature-spec` y resuelven las rutas desde la raíz en los dos repos (AT-15).
+   Pendiente de la persona: mantener o retirar la copia `.opencode/skills/`,
+   redundante para OpenCode mientras exista `.claude/skills/`.
 4. 0.5 y 0.6: sondas de superficies headless y de Beads, cada una con su línea
    `spike <id> approved` en `control:approvals/spikes.md`, que escribe la
    persona.
