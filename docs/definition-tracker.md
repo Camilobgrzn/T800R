@@ -52,8 +52,19 @@ nueva.
    `spike <id> approved` en `control:approvals/spikes.md`, que escribe la
    persona. **2026-10-14:** la persona decidió Claude Code primero (roadmap
    v2.3, S12 «Orden de proveedores»); 0.5 se hace sólo sobre Claude Code y
-   Codex/OpenCode se retoman después, sin fecha. Pendiente: aprobación de los
-   dos spikes en `control`.
+   Codex/OpenCode se retoman después, sin fecha. **Spikes ejecutados el
+   2026-10-14** (aprobación `2844ca2` en `control`; informes `spikes/0.5.md` y
+   `spikes/0.6.md` en `main`, commit `40a231a`; ramas descartadas). 0.5: Claude
+   Code 2.1.300 arranca cerrado con `--restricted -p --tools "" --strict-mcp-config
+   --setting-sources user` (`--bare` y `--setting-sources ""` dejan sin sesión
+   OAuth); denegación registrada en `permission_denials`; `SIGINT` termina en
+   <1 s; límites: contexto de Git y correo inyectado, autoupdate. 0.6: Beads
+   (`@beads/bd` 1.3.1) ofrece CAS nativo por owner y estado
+   (`--if-assignee`/`--if-status`, exit 13), no por base; `bd init` escribe en el
+   checkout principal desde un worktree y toca rutas protegidas. **Decisiones
+   pendientes de la persona:** elegibilidad de Claude Code (antes de F4) y de
+   Beads (antes de F3), con las enmiendas menores a S11 que proponen los
+   informes.
 5. 0.7 (esqueleto del monorepo de T800R) y 0.8 (I1 del IDP), las dos con
    `/feature-spec`. Al cerrar 0.8, la persona decide P12.
 
