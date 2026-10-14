@@ -50,7 +50,10 @@ nueva.
    redundante para OpenCode mientras exista `.claude/skills/`.
 4. 0.5 y 0.6: sondas de superficies headless y de Beads, cada una con su línea
    `spike <id> approved` en `control:approvals/spikes.md`, que escribe la
-   persona.
+   persona. **2026-10-14:** la persona decidió Claude Code primero (roadmap
+   v2.3, S12 «Orden de proveedores»); 0.5 se hace sólo sobre Claude Code y
+   Codex/OpenCode se retoman después, sin fecha. Pendiente: aprobación de los
+   dos spikes en `control`.
 5. 0.7 (esqueleto del monorepo de T800R) y 0.8 (I1 del IDP), las dos con
    `/feature-spec`. Al cerrar 0.8, la persona decide P12.
 

@@ -11,6 +11,14 @@
   regla de validaciones no deterministas y decisión pendiente P12). El resto
   de las enmiendas vive en [workflow-construccion.md](workflow-construccion.md)
   v4.2. Fases, dependencias y camino crítico no cambian.
+- **Enmienda v2.3 (2026-10-14, orden de proveedores):** la persona decidió
+  concentrar el v0 en **Claude Code**, su entorno actual, y abordar Codex y
+  OpenCode cuando el flujo funcione con Claude Code, sin fecha. No retira la
+  portabilidad (S08, ADR-007) ni el perfil MVP mínimo: la sonda 0.5 se ejecuta
+  primero sólo sobre la superficie de Claude Code, 4.2 construye primero ese
+  adapter, y 4.6/E4 (rotación de proveedores) se cumple cuando exista un
+  segundo proveedor elegible. La proyección 0.4 a los tres proveedores ya está
+  hecha y se mantiene. Registrado en S12 «Decisiones».
 - Creado: 2026-10-05. v2 y v2.1 integran la verificación en pareja de la v1 (Fable:
   «SÍ con cambios»; Astra `gpt-6-astra`: «NO» por orden de migraciones y
   bootstrap; ronda 2: «NO» por persistencia prebootstrap y métrica global, resueltos en v2.1) y la revisión Codex de `skills/` del mismo día.
@@ -96,7 +104,7 @@ Depende de: autorización (paso 6).
 | 0.2 | Crear el repo IDP con `@backstage/create-app` en versión fijada; comprobar la versión de Node que soporta y registrarla si difiere de Node 24 | IDP | Commit de línea base referenciado desde S12 |
 | 0.3 | En el IDP: rama `control` y `policy.yaml` provisional | IDP | Igual que 0.1 |
 | 0.4 | Proyectar `skills/` a `.claude/skills/`, `.opencode/` y Codex en ambos repos (copia manual con SHA de origen registrado hasta que exista `sync`) | ambos | Cada proveedor activa `/feature-spec` y `/spike` y resuelve sus referencias |
-| 0.5 | **Sonda de superficies headless (spike aprobado en `control:approvals/spikes.md`)**: un turno por proveedor sobre su superficie S11 (Claude Code `--restricted -p --tools ""`, Codex app-server por stdio, OpenCode server en loopback) con configuración cerrada; demostrar catálogo de tools vacío, sin MCP/hooks/skills heredados, cancelación terminal; una operación permitida y otra denegada; versión exacta, entorno y tokens si se exponen | T800R | `spikes/0.5.md`; decisión de la persona sobre proveedores no elegibles antes de F4 |
+| 0.5 | **Sonda de superficies headless (spike aprobado en `control:approvals/spikes.md`)**. **v2.3:** primero sólo Claude Code; Codex y OpenCode se sondean con el mismo guion cuando la persona los retome. Un turno por proveedor sobre su superficie S11 (Claude Code `--restricted -p --tools ""`, Codex app-server por stdio, OpenCode server en loopback) con configuración cerrada; demostrar catálogo de tools vacío, sin MCP/hooks/skills heredados, cancelación terminal; una operación permitida y otra denegada; versión exacta, entorno y tokens si se exponen | T800R | `spikes/0.5.md`; decisión de la persona sobre proveedores no elegibles antes de F4 |
 | 0.6 | **Sonda de Beads (spike aprobado)**: ¿admite una transición condicional atómica contra base, owner y estado (S11)? | T800R | `spikes/0.6.md`; decisión de la persona antes de F3 |
 | 0.7 | Primera feature de T800R con las skills: esqueleto del monorepo (Node 24 con patch fijado, TypeScript estricto, pnpm, JSON Schema 2020-12 con validador, comprobación de fronteras con ESLint + dependency-cruiser). **v2.2:** toda regla propia de lint o de fronteras lleva en su mensaje de error la remediación (cierre P14); se añade una comprobación de enlaces internos de `docs/` y `skills/` como validación declarada del repositorio (cierre P20) | T800R | `pnpm test`, comprobación de fronteras y comprobación de enlaces en verde; una regla propia violada a propósito muestra su remediación |
 | 0.8 | Incremento IDP I1 con `/feature-spec` → `/feature-integrate`; validaciones del día 1: tipos, lint, build, arranque y aceptación reproducible del catálogo. **v2.2:** es la primera eval de las skills: cualquier cambio `high` a `skills/` o `policy.yaml` durante I1 declara qué experimento o métrica lo cubre (workflow §7, cierre P08); si aparece una validación no determinista se aplica la regla del workflow §4.3-4.4 (cierre P10); al cerrar I1 la persona **decide P12** (salida íntegra de las validaciones en `evidence/<task>.out/` referenciada por hash, o dejarla al CAS del backlog) | IDP | Feature integrada; `features/<id>/metrics.md` con las métricas del workflow §8 (incluida la línea «capacidad ausente detectada → destino», cierre P27) más tiempo de registros y gates por separado; decisión P12 registrada en S12 |
@@ -171,7 +179,8 @@ Depende de: F2-F4. Schemas que añade: `lock`, `adoption-snapshot`,
 - **Skills**: la revisión Codex encontró ocho defectos altos; se corrigen antes
   de autorizar porque usarlas así invalidaría la medición y E2.
 - **Superficies headless (0.5)**: si un proveedor no es elegible, E4 admite éxito
-  parcial; se decide en 0.5, no en F4.
+  parcial; se decide en 0.5, no en F4. **v2.3:** mientras sólo exista Claude
+  Code, E4 queda pendiente, no fallido.
 - **Beads (0.6)**: sin operación condicional no es elegible para transferencias
   de escritura (S11); la persona decide antes de F3.
 - **Coste manual (1.1)**: si es alto, adelanta F2 completa o el bloque 3.1+3.3,
