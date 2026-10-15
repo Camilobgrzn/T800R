@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://t800r.dev/schemas/_smoke/smoke/0",
+  "title": "Schema de prueba del validador (0.7/T3)",
+  "description": "Núcleo cerrado con extensiones namespaced (S11 l. 72). No es un contrato del catálogo; los schemas v1 llegan en 1.2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "revision", "name"],
+  "properties": {
+    "schema": { "type": "string", "const": "_smoke/smoke" },
+    "revision": { "type": "integer", "minimum": 0 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+      "uniqueItems": true
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$": { "type": "object" }
+      }
+    }
+  }
+}

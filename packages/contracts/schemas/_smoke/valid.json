@@ -1,0 +1,7 @@
+{
+  "schema": "_smoke/smoke",
+  "revision": 0,
+  "name": "ejemplo",
+  "tags": ["uno", "dos-2"],
+  "extensions": { "acme.notas": { "texto": "libre" } }
+}

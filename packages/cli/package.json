@@ -1,0 +1,28 @@
+{
+  "name": "@t800r/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "t800r": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@t800r/adapter-api": "workspace:*",
+    "@t800r/adapter-claude-code": "workspace:*",
+    "@t800r/contracts": "workspace:*",
+    "@t800r/runtime": "workspace:*",
+    "commander": "15.0.0"
+  }
+}
