@@ -29,3 +29,5 @@ handoff_rejected, invalidated, cancelled (semántica en
 2026-10-15T10:16 | T4 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | assigned | brief v1, base feat/0.7-monorepo @ 82376ba (T1 y T2 merged; T3 entregada, archivos disjuntos)
 2026-10-15T10:16 | T4 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | started | rama task/0.7-monorepo/T4 (registrado junto con assigned)
 2026-10-15T10:18 | T4 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | delivered | trabajo 498553927540f1b564ef3c6d15143ada2aebd26b, entrega c63960d9bade4ea0bf719aa10ca9cf10bd23666e; build, test, lint, check:boundaries y bin (Node 24 y 25) en verde
+2026-10-15T10:18 | T5 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | assigned | brief v1, base feat/0.7-monorepo @ 380ac1e (T1 y T2 merged; T3 y T4 entregadas, archivos disjuntos)
+2026-10-15T10:18 | T5 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | started | rama task/0.7-monorepo/T5 (registrado junto con assigned)

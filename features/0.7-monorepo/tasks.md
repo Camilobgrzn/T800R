@@ -8,4 +8,4 @@ plan_digest_autorizado: cbc188d9c81e76bb0ec32c7fef21f1ba42d63860 (spec f0ea9d14c
 | T2 | completed | camilo-a1 | T1 | 1 | 2026-10-15 | concerns: ver veredicto 886b3f9 (B.2-B.5, no bloqueantes) |
 | T3 | in_progress | camilo-a1 | T1, T2 | 0 | 2026-10-15 | base 69c5db2 |
 | T4 | in_progress | camilo-a1 | T1, T2 | 0 | 2026-10-15 | base 82376ba; en paralelo con T3 (en verificación) |
-| T5 | ready | | T1, T2 | 0 | 2026-10-15 | paralelizable con T3, T4; T1 y T2 merged |
+| T5 | in_progress | camilo-a1 | T1, T2 | 0 | 2026-10-15 | base 380ac1e; en paralelo con T3 y T4 (en verificación) |
