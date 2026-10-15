@@ -6,6 +6,6 @@ plan_digest_autorizado: cbc188d9c81e76bb0ec32c7fef21f1ba42d63860 (spec f0ea9d14c
 | --- | --- | --- | --- | --- | --- | --- |
 | T1 | completed | camilo-a1 | | 1 | 2026-10-15 | pass ronda 2 (veredicto 2e19d70); high: protected_paths, solicitud 38fcbd67… pendiente de `high … approved` antes del gate 3 |
 | T2 | completed | camilo-a1 | T1 | 1 | 2026-10-15 | concerns: ver veredicto 886b3f9 (B.2-B.5, no bloqueantes) |
-| T3 | in_progress | camilo-a1 | T1, T2 | 1 | 2026-10-15 | fail ronda 1 (defecto de implementación: orden por localeCompare; veredicto 25cf99b) |
+| T3 | completed | camilo-a1 | T1, T2 | 1 | 2026-10-15 | concerns: ver veredicto fad92f2 (informativas) |
 | T4 | completed | camilo-a1 | T1, T2 | 0 | 2026-10-15 | pass ronda 1 (veredicto 7b86559) |
-| T5 | in_progress | camilo-a1 | T1, T2 | 0 | 2026-10-15 | base 380ac1e; en paralelo con T3 y T4 (en verificación) |
+| T5 | completed | camilo-a1 | T1, T2 | 0 | 2026-10-15 | concerns: ver veredicto fdfe31e (B.1, B.2) |
