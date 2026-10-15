@@ -21,3 +21,4 @@ handoff_rejected, invalidated, cancelled (semántica en
 2026-10-15T10:01 | T2 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | delivered | trabajo 504b086e42c7c8e0ef4c216a7ec62fff5458e81a, entrega a95eff8c13399524e8a5ea2d4a5f39ceaf5a4973; lint, check:boundaries, build y test en verde
 2026-10-15T10:08 | T2 | camilo-a2 | Claude Code, subagente verify-T2 | verifier | verdict | fail defecto de implementación, ronda 1 (bloques de capa de ESLint anulan la regla frontera-runtime en core/policy/evidence); veredicto 0c00a06
 2026-10-15T10:09 | T2 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | delivered | ronda 2: trabajo c7da9dd608e5470c1c1ad8addfdbadd33bc3455f, entrega 82abd3a9e86d17fb74c17d13f1f77c4d730151dd; lint, check:boundaries, build y test en verde
+2026-10-15T10:14 | T2 | camilo-a2 | Claude Code, subagente verify-T2-r2 | verifier | verdict | concerns, ronda 2 (trabajo c7da9dd); veredicto 886b3f9; concerns B.2-B.5 no bloqueantes para el gate 3
