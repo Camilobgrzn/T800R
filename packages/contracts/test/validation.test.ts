@@ -65,6 +65,20 @@ describe('compileSchema (CA7)', async () => {
     expect(JSON.stringify(a)).toBe(JSON.stringify(c));
   });
 
+  it('el orden de los diagnósticos es por unidades de código, no por locale (zzz antes que ärbol; /z antes que /ä)', () => {
+    const result = validateAgainst(schema, { schema: '_smoke/smoke', revision: 1, name: 'x', zzz: 1, ärbol: 2 });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.diagnostics.map((d) => d.params['additionalProperty'])).toEqual(['zzz', 'ärbol']);
+    const nested = compileSchema({
+      type: 'object',
+      properties: { ä: { type: 'integer' }, z: { type: 'integer' } },
+    })({ ä: 'no', z: 'no' });
+    expect(nested.ok).toBe(false);
+    if (nested.ok) return;
+    expect(nested.diagnostics.map((d) => d.path)).toEqual(['/z', '/ä']);
+  });
+
   it('modo estricto: un schema con una palabra clave desconocida no compila', () => {
     expect(() => compileSchema({ type: 'object', propiedades: {} })).toThrow(/strict mode|unknown keyword/i);
   });

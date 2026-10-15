@@ -41,12 +41,17 @@ function toDiagnostic(error: ErrorObject): Diagnostic {
   };
 }
 
+/** Orden total por unidades de código UTF-16, independiente del locale del host (reproducible). */
+function compareStrings(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
 function compare(a: Diagnostic, b: Diagnostic): number {
   return (
-    a.path.localeCompare(b.path) ||
-    a.keyword.localeCompare(b.keyword) ||
-    a.message.localeCompare(b.message) ||
-    JSON.stringify(a.params).localeCompare(JSON.stringify(b.params))
+    compareStrings(a.path, b.path) ||
+    compareStrings(a.keyword, b.keyword) ||
+    compareStrings(a.message, b.message) ||
+    compareStrings(JSON.stringify(a.params), JSON.stringify(b.params))
   );
 }
 
