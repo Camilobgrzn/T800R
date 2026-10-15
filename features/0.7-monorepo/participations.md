@@ -23,3 +23,5 @@ handoff_rejected, invalidated, cancelled (semántica en
 2026-10-15T10:09 | T2 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | delivered | ronda 2: trabajo c7da9dd608e5470c1c1ad8addfdbadd33bc3455f, entrega 82abd3a9e86d17fb74c17d13f1f77c4d730151dd; lint, check:boundaries, build y test en verde
 2026-10-15T10:14 | T2 | camilo-a2 | Claude Code, subagente verify-T2-r2 | verifier | verdict | concerns, ronda 2 (trabajo c7da9dd); veredicto 886b3f9; concerns B.2-B.5 no bloqueantes para el gate 3
 2026-10-15T10:14 | T2 | camilo | checkout de coordinación | orchestrator | merged | feat/0.7-monorepo @ b17c22c (merge --no-ff de 82abd3a)
+2026-10-15T10:14 | T3 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | assigned | brief v1, base feat/0.7-monorepo @ 69c5db2 (T1 y T2 merged)
+2026-10-15T10:14 | T3 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | started | rama task/0.7-monorepo/T3 (registrado junto con assigned)
