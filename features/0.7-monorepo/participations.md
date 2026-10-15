@@ -38,3 +38,5 @@ handoff_rejected, invalidated, cancelled (semántica en
 2026-10-15T10:23 | T3 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | delivered | ronda 2: trabajo 62050b9975e41e9888c971cd1ea9cee5e8466c18, entrega b8b130aadfa76781ecc027dab63dac7eafcdd509; build, test, lint y check:boundaries en verde (también con LANG=sv_SE)
 2026-10-15T14:32 | T3 | camilo-a2 | Claude Code, subagente verify-T3-r2 | verifier | verdict | concerns, ronda 2 (trabajo 62050b9); veredicto fad92f2; observaciones informativas para el gate 3
 2026-10-15T14:32 | T5 | camilo-a2 | Claude Code, subagente verify-T5 | verifier | verdict | concerns, ronda 1 (trabajo f34230f); veredicto fdfe31e; B.1 decodeURIComponent sin try/catch, B.2 APFS insensible a mayúsculas; para el gate 3
+2026-10-15T14:32 | T3 | camilo | checkout de coordinación | orchestrator | merged | feat/0.7-monorepo @ 36d8e8f (merge --no-ff de b8b130a)
+2026-10-15T14:32 | T5 | camilo | checkout de coordinación | orchestrator | merged | feat/0.7-monorepo @ b5f0cc9 (merge --no-ff de 91eb846)
