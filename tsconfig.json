@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/contracts" },
+    { "path": "packages/adapter-api" },
+    { "path": "packages/runtime" },
+    { "path": "packages/adapters/claude-code" },
+    { "path": "packages/cli" }
+  ]
+}

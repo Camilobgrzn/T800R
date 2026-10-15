@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "types": ["node"]
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../contracts" },
+    { "path": "../adapter-api" },
+    { "path": "../runtime" },
+    { "path": "../adapters/claude-code" }
+  ]
+}
