@@ -5,3 +5,10 @@ packages:
 # pnpm >= 10 lee la configuración del proyecto de este archivo (no de .npmrc).
 # Rechaza la instalación si Node no cumple engines.node del package.json raíz.
 engineStrict: true
+
+# Política de scripts de instalación de dependencias (pnpm >= 11, strictDepBuilds
+# por defecto): ninguna dependencia ejecuta scripts salvo decisión explícita aquí.
+# esbuild (transitiva de tsx y vite) carga su binario desde el package opcional
+# de la plataforma; su postinstall no hace falta.
+allowBuilds:
+  esbuild: false
