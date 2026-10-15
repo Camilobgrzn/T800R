@@ -5,7 +5,7 @@ plan_digest_autorizado: cbc188d9c81e76bb0ec32c7fef21f1ba42d63860 (spec f0ea9d14c
 | Tarea | Estado | Owner (actor_id) | Depende de | Ronda | Última actualización | Nota |
 | --- | --- | --- | --- | --- | --- | --- |
 | T1 | completed | camilo-a1 | | 1 | 2026-10-15 | pass ronda 2 (veredicto 2e19d70); high: protected_paths, solicitud 38fcbd67… pendiente de `high … approved` antes del gate 3 |
-| T2 | pending | | T1 | 0 | 2026-10-14 | |
+| T2 | ready | | T1 | 0 | 2026-10-15 | T1 merged |
 | T3 | pending | | T1, T2 | 0 | 2026-10-14 | paralelizable con T4, T5 |
 | T4 | pending | | T1, T2 | 0 | 2026-10-14 | paralelizable con T3, T5 |
 | T5 | pending | | T1, T2 | 0 | 2026-10-14 | paralelizable con T3, T4 |
