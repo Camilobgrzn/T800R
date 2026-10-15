@@ -16,3 +16,5 @@ handoff_rejected, invalidated, cancelled (semántica en
 2026-10-15T09:45 | T1 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | delivered | ronda 2: trabajo 5b9628fc654c31b3107ed8bf553aadcf6953c8e2, entrega b2595e132612f4ab2f05bc3b33af76104e01bd46; validaciones no ejecutadas (pnpm-workspace.yaml cambió de hash)
 2026-10-15T09:49 | T1 | camilo-a2 | Claude Code, subagente verify-T1-r2 | verifier | verdict | pass, ronda 2 (trabajo 5b9628f); veredicto 2e19d70; solicitud high 38fcbd67b2db1f1c7186c116c98b61af8b5901f4 (protected_paths, precondición del gate 3)
 2026-10-15T09:49 | T1 | camilo | checkout de coordinación | orchestrator | merged | feat/0.7-monorepo @ 2d05120 (merge --no-ff de b2595e1)
+2026-10-15T09:52 | T2 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | assigned | brief v1, base feat/0.7-monorepo @ fac4af2 (T1 merged en 2d05120)
+2026-10-15T09:52 | T2 | camilo-a1 | Claude Code, sesión 22baeb5f | worker | started | rama task/0.7-monorepo/T2 (registrado junto con assigned)
