@@ -71,6 +71,13 @@ describe('fronteras dentro de runtime (CA5, CA6)', () => {
     expectViolation(await lintImport('packages/runtime/src/policy/x.ts', '../adoption/index.js'), 'capa-policy');
     expectViolation(await lintImport('packages/runtime/src/evidence/x.ts', '../application/index.js'), 'capa-evidence');
   });
+  it('las capas conservan la frontera del package: core/policy/evidence → cli o adapter fallan', async () => {
+    expectViolation(await lintImport('packages/runtime/src/core/x.ts', '@t800r/cli'), 'frontera-runtime');
+    expectViolation(await lintImport('packages/runtime/src/core/x.ts', '@t800r/adapter-claude-code'), 'frontera-runtime');
+    expectViolation(await lintImport('packages/runtime/src/policy/x.ts', '@t800r/cli'), 'frontera-runtime');
+    expectViolation(await lintImport('packages/runtime/src/evidence/x.ts', '@t800r/adapter-claude-code'), 'frontera-runtime');
+    expectViolation(await lintImport('packages/runtime/src/adoption/x.ts', '@t800r/cli'), 'frontera-runtime');
+  });
   it('application → core y policy → core están permitidos', async () => {
     expect(await lintImport('packages/runtime/src/application/x.ts', '../core/index.js')).toEqual([]);
     expect(await lintImport('packages/runtime/src/policy/x.ts', '../core/index.js')).toEqual([]);
@@ -118,6 +125,7 @@ describe('toda regla propia lleva remediación (CA6)', () => {
     expect(blocks.length).toBeGreaterThanOrEqual(7);
     for (const block of blocks) {
       const rule = block.rules['@typescript-eslint/no-restricted-imports'] as [string, { patterns: { message: string }[] }];
+      expect(rule[1].patterns.length, block.name).toBeGreaterThan(0);
       for (const pattern of rule[1].patterns) {
         expect(pattern.message, block.name).toContain(graph.PREFIX);
       }

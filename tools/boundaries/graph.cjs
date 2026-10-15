@@ -97,37 +97,47 @@ function forbiddenSpecifiers(allowed) {
   return ['@t800r/*'].concat(allowed.map((a) => `!${a}`));
 }
 
-function restricted(patterns, rule, message) {
-  return {
-    '@typescript-eslint/no-restricted-imports': [
-      'error',
-      { patterns: [{ group: patterns, message: `[${rule}] ${message}` }] },
-    ],
-  };
+/** Una entrada de `patterns` de no-restricted-imports con su mensaje. */
+function pattern(patterns, rule, message) {
+  return { group: patterns, message: `[${rule}] ${message}` };
+}
+
+/**
+ * Regla no-restricted-imports con una o varias entradas. ESLint **reemplaza**
+ * (no fusiona) las opciones de una regla cuando dos bloques aplican al mismo
+ * archivo, así que un bloque más específico (capa de runtime) debe repetir
+ * las entradas del bloque de package que también le aplica.
+ */
+function restricted(entries) {
+  return { '@typescript-eslint/no-restricted-imports': ['error', { patterns: entries }] };
 }
 
 /** Bloques de configuración plana de ESLint con las reglas de frontera. */
 function eslintConfigs() {
   const blocks = [];
-  for (const [name, pkg] of Object.entries(PACKAGES)) {
+  for (const pkg of Object.values(PACKAGES)) {
     if (!pkg.rule) continue;
     blocks.push({
       name: `t800r/${pkg.rule}`,
       files: [`${pkg.dir}/**/*.ts`],
-      rules: restricted(forbiddenSpecifiers(pkg.allowed), pkg.rule, pkg.message),
+      rules: restricted([pattern(forbiddenSpecifiers(pkg.allowed), pkg.rule, pkg.message)]),
     });
-    void name;
   }
   blocks.push({
     name: `t800r/${ADAPTERS.rule}`,
     files: [`${ADAPTERS.dirGlob}/**/*.ts`],
-    rules: restricted(forbiddenSpecifiers(ADAPTERS.allowed), ADAPTERS.rule, ADAPTERS.message),
+    rules: restricted([pattern(forbiddenSpecifiers(ADAPTERS.allowed), ADAPTERS.rule, ADAPTERS.message)]),
   });
+  const runtime = PACKAGES['@t800r/runtime'];
   for (const [layer, cfg] of Object.entries(RUNTIME_LAYERS)) {
     blocks.push({
       name: `t800r/${cfg.rule}`,
-      files: [`${PACKAGES['@t800r/runtime'].dir}/src/${layer}/**/*.ts`],
-      rules: restricted(cfg.forbidden.map((f) => `**/${f}/**`), cfg.rule, cfg.message),
+      files: [`${runtime.dir}/src/${layer}/**/*.ts`],
+      rules: restricted([
+        // Conserva la frontera del package: este bloque sustituye al de runtime en estos archivos.
+        pattern(forbiddenSpecifiers(runtime.allowed), runtime.rule, runtime.message),
+        pattern(cfg.forbidden.map((f) => `**/${f}/**`), cfg.rule, cfg.message),
+      ]),
     });
   }
   return blocks;
